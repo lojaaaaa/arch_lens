@@ -1,0 +1,196 @@
+================================================================================
+  ARCHLENS — ОТЧЁТ О РАЗРАБОТКЕ
+  Последнее обновление: 2026-02-19
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. ТЕКУЩИЙ СТАТУС ПРОЕКТА
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Фаза:          Phase 1 завершена частично → Phase 2 (Deep Analysis + UX) начата
+  Задач всего:   35
+  Выполнено:     0 / 35
+  В работе:      0
+  Готовность:    ~40% (Phase 1 — базовый функционал реализован до PRD/tasks)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. ЧТО СДЕЛАНО (до начала tasks.json)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [✓] Canvas редактор на React Flow (@xyflow/react)
+  [✓] 8 типов нод по 3 слоям (frontend/backend/data)
+  [✓] 6 типов связей (calls, reads, writes, subscribes, depends_on, emits)
+  [✓] Zustand store для управления состоянием редактора
+  [✓] Properties panel для нод (все 8 типов) и рёбер
+  [✓] Header с меню File (Save, Restore, Import, Export) + горячие клавиши
+  [✓] JSON импорт/экспорт с Zod-валидацией
+  [✓] localStorage — сохранение/восстановление схемы
+  [✓] NestJS backend с анализом (4 правила: orphans, cycles, bottleneck, UI→State)
+  [✓] Страница анализа с отображением score, метрик и issues
+  [✓] Роутинг: /editor, /analysis, /not-found
+  [✓] PRD документ (PRD-ArchLens-2026-02-19.md)
+  [✓] Декомпозиция задач (tasks.json — 35 задач)
+  [✓] Файл прогресса для агентов (progress.md)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. ЧТО НУЖНО СДЕЛАТЬ (приоритет → от высокого к низкому)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ── CRITICAL (блокирующие) ──
+
+  [ ] TASK-001  Рефакторинг analysis service → модульный rule engine
+                Блокирует: TASK-002..008, TASK-034
+  [ ] TASK-002  Structural правила: S04 fan-in, S05 missing data, S06 frontend→DB
+  [ ] TASK-003  Structural правила: S07 no gateway, S08 disconnected, S09 SPOF, S10 redundant
+  [ ] TASK-004  Pattern правила: P01 god service, P02 coupling, P03 missing cache, P04 UI→State
+  [ ] TASK-005  Pattern правила: P05 stateful chain, P06 nesting, P07 errors, P08 monolith
+  [ ] TASK-006  Load правила: L01 render, L02 API overload, L03 DB write bottleneck
+  [ ] TASK-007  Load правила: L04 cache miss, L05 external risk, L06 sync chain
+  [ ] TASK-008  Scoring: grade A–F + bonus-система
+  [ ] TASK-009  Human-readable: complexity ползунок + criticality сегменты
+  [ ] TASK-010  Human-readable: requestRate, readWriteRatio, hitRate, reliability
+  [ ] TASK-012  Визуальное различие слоёв: цвета + иконки нод
+  [ ] TASK-014  Страница анализа: grade с цветом
+  [ ] TASK-016  Store для highlight + навигация Issue → Редактор
+  [ ] TASK-017  Подсветка проблемных нод + центрирование canvas
+
+  ── HIGH ──
+
+  [ ] TASK-011  Русификация лейблов + tooltips
+  [ ] TASK-013  Визуальные стили для типов связей
+  [ ] TASK-015  Фильтрация/сортировка issues
+  [ ] TASK-018  Кликабельные issue-карточки
+  [ ] TASK-019  Sidebar: группировка по слоям с иконками
+  [ ] TASK-020  Onboarding подсказка на пустом canvas
+  [ ] TASK-021  CORS + DTO-валидация на бэке
+  [ ] TASK-022  Метрики с визуальными индикаторами
+  [ ] TASK-023  Edge properties: frequency + synchronous UI
+  [ ] TASK-029  E2E integration test: полный цикл
+  [ ] TASK-030  Синхронизация типов frontend ↔ backend
+
+  ── MEDIUM ──
+
+  [ ] TASK-024  Русификация header меню
+  [ ] TASK-025  Улучшение валидации JSON-импорта
+  [ ] TASK-026  Breadcrumbs и навигация «Назад»
+  [ ] TASK-027  Loading-состояние при анализе
+  [ ] TASK-028  Контекстное меню для нод
+  [ ] TASK-031  Responsive layout анализа
+  [ ] TASK-032  Сохранение анализа в localStorage
+
+  ── LOW ──
+
+  [ ] TASK-033  Toast-уведомления
+  [ ] TASK-034  AI-заглушка (DeepSeek интерфейс)
+  [ ] TASK-035  README.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. УЗКИЕ МЕСТА И НА ЧТО ОБРАТИТЬ ВНИМАНИЕ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ⚠  UX ПАРАМЕТРОВ НОД
+     Сейчас все параметры — голые number input'ы. Пользователь видит
+     "Complexity: [1]" и не понимает, что это значит. Это ГЛАВНАЯ UX-проблема.
+     Задачи TASK-009 и TASK-010 — ключевые для юзабилити.
+     Файл: client/src/pages/editor/ui/properties/node-properties-sheet.tsx
+
+  ⚠  МОНОЛИТНЫЙ ANALYSIS SERVICE
+     Все 4 правила анализа зашиты inline в один метод analyze().
+     Добавлять новые правила в таком формате — хрупко и нетестируемо.
+     TASK-001 (рефакторинг в rule engine) — критический путь.
+     Файл: server/src/analysis/analysis.service.ts
+
+  ⚠  ОТСУТСТВИЕ ВАЛИДАЦИИ НА БЭКЕ
+     DTO (architecture-graph.dto.ts) не имеют декораторов class-validator.
+     Любой мусор проходит в analyze(). Потенциально может крашить сервер.
+     Файл: server/src/analysis/dto/architecture-graph.dto.ts
+
+  ⚠  ТИПЫ НЕ СИНХРОНИЗИРОВАНЫ
+     Frontend (shared/model/types.ts) и backend (dto + analysis.service.ts)
+     определяют одни и те же интерфейсы независимо. При расхождении — баги.
+     TASK-030 — синхронизация.
+
+  ⚠  НЕТ ВИЗУАЛЬНОГО РАЗЛИЧИЯ НОД
+     Все ноды на canvas выглядят одинаково (default тип React Flow).
+     Пользователь не видит разницы между Database и UI Component.
+     TASK-012 — кастомные ноды с цветами и иконками.
+
+  ⚠  EDGE PARAMETERS НЕ ИСПОЛЬЗУЮТСЯ
+     Поля frequency и synchronous определены в типе GraphEdge,
+     но не учитываются ни в UI edge-properties, ни в анализе.
+     Связи TASK-023 → TASK-007 (L06 sync chain latency).
+
+  ⚠  НЕТ ОБРАБОТКИ ОШИБОК ЗАПРОСА АНАЛИЗА
+     При недоступном бэкенде или ошибке — ничего не происходит.
+     Нет loading state, нет error state. TASK-027.
+
+  ⚠  ПРЯМОЙ ДОСТУП К /analysis
+     Если пользователь перейдёт на /analysis без предварительного анализа,
+     страница будет пустой. Нужен guard/redirect. TASK-026.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. GIT-ПРОЦЕСС
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Репозиторий:    монорепо (client + server в одном git)
+  Ветка:          main
+  Начальный коммит: 84e0d56 init: project setup with editor, analysis and docs
+
+  Формат коммитов (Conventional Commits):
+    feat:     новая функциональность
+    fix:      исправление бага
+    refactor: рефакторинг без изменения поведения
+    style:    стили, форматирование
+    docs:     документация
+    chore:    вспомогательное (зависимости, конфиги)
+    test:     тесты
+
+  Стратегия веток:
+    Сейчас:   работа на main (до MVP)
+    После MVP: main (стабильный) ← develop ← feat/TASK-XXX-описание
+
+  Правила:
+    - Коммиты крупных фич — только после апрува пользователя
+    - Перед коммитом — проверка tsc --noEmit и eslint
+    - Не коммитить .env файлы (только .env.example)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. АРХИТЕКТУРНЫЕ ЗАМЕТКИ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Frontend:  React 19 + TypeScript + Vite
+             React Flow (@xyflow/react) для canvas
+             Zustand для state management
+             Shadcn UI + Tailwind CSS для компонентов
+             React Router v7 (lazy loading)
+             Zod для валидации, TanStack React Query для fetching
+
+  Backend:   NestJS + TypeScript
+             Пока один модуль: AnalysisModule (controller + service)
+             Нет БД (stateless), нет auth
+
+  Структура client/src:
+    app/         — router, providers, main
+    pages/       — editor (canvas, header, properties, store), analysis
+    features/    — architecture-graph-io (import/export)
+    shared/      — ui (shadcn), model (types), api, lib, hooks, config
+
+  Структура server/src:
+    analysis/    — controller, service, dto
+    app.*        — root module
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. ИСТОРИЯ ИЗМЕНЕНИЙ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  2026-02-19  Создан PRD (PRD-ArchLens-2026-02-19.md)
+              Создан tasks.json (35 задач)
+              Создан progress.md
+              Создан report.txt
+              Инициализирован git-репозиторий (монорепо)
+              Удалены вложенные .git из client/ и server/
+              Коммит: 84e0d56 init: project setup with editor, analysis and docs
+              Добавлен git-workflow в tasks.json и report.txt
+              Статус: планирование завершено, готовность к Phase 2
+
+================================================================================
