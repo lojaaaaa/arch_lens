@@ -24,7 +24,7 @@ export class AnalysisService {
     const context = buildGraphContext(graph);
     const issues = this.engine.run(context);
     const metrics = calculateMetrics(context);
-    const score = calculateScore(issues);
+    const { score, grade } = calculateScore(issues, context);
 
     const criticalCount = issues.filter(
       (i) => i.severity === 'critical',
@@ -33,6 +33,7 @@ export class AnalysisService {
     return {
       summary: {
         score,
+        grade,
         issuesCount: issues.length,
         criticalIssuesCount: criticalCount,
       },

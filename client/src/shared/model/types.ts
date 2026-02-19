@@ -201,9 +201,12 @@ export interface ArchitectureMetrics {
     estimatedDataLoad: number;
 }
 
+export type Grade = 'A' | 'B' | 'C' | 'D' | 'F';
+
 export interface AnalysisResult {
     summary: {
         score: number; // 0..100
+        grade: Grade;
         issuesCount: number;
         criticalIssuesCount: number;
     };

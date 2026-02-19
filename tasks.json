@@ -75,7 +75,7 @@
         "Шаг 4: Отправить граф без этих проблем → issues S04-S06 отсутствуют"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-003",
@@ -97,7 +97,7 @@
         "Шаг 5: Нормальный граф → S07-S10 отсутствуют"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-004",
@@ -119,7 +119,7 @@
         "Шаг 5: ui_page → state_store → P04 warning"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-005",
@@ -140,7 +140,7 @@
         "Шаг 4: api_gateway с endpointsCount=20 → P08 warning"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-006",
@@ -160,7 +160,7 @@
         "Шаг 3: Database с readWriteRatio=0.2 и 6 writes-связей → L03 critical"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-007",
@@ -180,7 +180,7 @@
         "Шаг 4: Цепочка из 2 вызовов → L06 отсутствует"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-008",
@@ -200,7 +200,7 @@
         "Шаг 4: Проверить что grade корректно маппится из score"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-009",

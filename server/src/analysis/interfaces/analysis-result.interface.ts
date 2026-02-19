@@ -1,5 +1,7 @@
 import type { AnalysisIssue } from './analysis-issue.interface.js';
 
+export type Grade = 'A' | 'B' | 'C' | 'D' | 'F';
+
 export interface AnalysisMetrics {
   totalNodes: number;
   totalEdges: number;
@@ -14,6 +16,7 @@ export interface AnalysisMetrics {
 export interface AnalysisResultDto {
   summary: {
     score: number;
+    grade: Grade;
     issuesCount: number;
     criticalIssuesCount: number;
   };

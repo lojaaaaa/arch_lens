@@ -9,9 +9,9 @@
 
   Фаза:          Phase 2 (Deep Analysis + UX)
   Задач всего:   35
-  Выполнено:     1 / 35  (TASK-001)
+  Выполнено:     8 / 35  (TASK-001..008)
   В работе:      0
-  Готовность:    ~43%
+  Готовность:    ~57%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   2. ЧТО СДЕЛАНО (до начала tasks.json)
@@ -39,13 +39,13 @@
   ── CRITICAL (блокирующие) ──
 
   [✓] TASK-001  Рефакторинг analysis service → модульный rule engine
-  [ ] TASK-002  Structural правила: S04 fan-in, S05 missing data, S06 frontend→DB
-  [ ] TASK-003  Structural правила: S07 no gateway, S08 disconnected, S09 SPOF, S10 redundant
-  [ ] TASK-004  Pattern правила: P01 god service, P02 coupling, P03 missing cache, P04 UI→State
-  [ ] TASK-005  Pattern правила: P05 stateful chain, P06 nesting, P07 errors, P08 monolith
-  [ ] TASK-006  Load правила: L01 render, L02 API overload, L03 DB write bottleneck
-  [ ] TASK-007  Load правила: L04 cache miss, L05 external risk, L06 sync chain
-  [ ] TASK-008  Scoring: grade A–F + bonus-система
+  [✓] TASK-002  Structural правила: S04 fan-in, S05 missing data, S06 frontend→DB
+  [✓] TASK-003  Structural правила: S07 no gateway, S08 disconnected, S09 SPOF, S10 redundant
+  [✓] TASK-004  Pattern правила: P01 god service, P02 coupling, P03 missing cache, P04 UI→State
+  [✓] TASK-005  Pattern правила: P05 stateful chain, P06 nesting, P07 errors, P08 monolith
+  [✓] TASK-006  Load правила: L01 render, L02 API overload, L03 DB write bottleneck
+  [✓] TASK-007  Load правила: L04 cache miss, L05 external risk, L06 sync chain
+  [✓] TASK-008  Scoring: grade A–F + bonus-система
   [ ] TASK-009  Human-readable: complexity ползунок + criticality сегменты
   [ ] TASK-010  Human-readable: requestRate, readWriteRatio, hitRate, reliability
   [ ] TASK-012  Визуальное различие слоёв: цвета + иконки нод
@@ -178,10 +178,10 @@
       interfaces/    — AnalysisRule, GraphContext, AnalysisIssue, AnalysisResult
       engine/        — RuleEngine, GraphContext builder, Metrics/Score calculators
       rules/
-        structural/  — OrphanNodes, CyclicDeps, HighFanOut, DirectUiState
-        (pattern/)   — будет в TASK-004, TASK-005
-        (load/)      — будет в TASK-006, TASK-007
-      analysis.config.ts — пороговые значения
+        structural/  — S01-S10 (10 правил)
+        pattern/     — P01-P08 (8 правил)
+        load/        — L01-L06 (6 правил)
+      analysis.config.ts — все пороговые значения (structural, pattern, load, scoring)
       analysis.service.ts — тонкий оркестратор
       analysis.controller.ts, dto/
     app.*            — root module
@@ -204,5 +204,27 @@
                 - tsc --noEmit ✓, nest build ✓, API тест ✓
 
               code_style.md приведён в порядок и структурирован
+
+              TASK-002..007: Все правила анализа (24 правила)
+                - Structural (S01-S10): orphans, cycles, fan-out, fan-in,
+                  missing data layer, frontend→DB, no gateway, disconnected layers,
+                  SPOF, redundant edges
+                - Pattern (P01-P08): god service, tight coupling, missing cache,
+                  direct UI→state, stateful chain, excessive nesting,
+                  no error boundary, monolith API
+                - Load (L01-L06): render pressure, API overload, DB write bottleneck,
+                  cache miss impact, external dependency risk, sync chain latency
+                - Все пороги централизованы в analysis.config.ts
+                - Тест: 22 issues на комплексном графе, 6 critical ✓
+                - tsc --noEmit ✓, nest build ✓, API тест ✓
+
+              code_style.md: добавлены принципы SOLID, DRY, KISS, YAGNI
+
+              TASK-008: Scoring grade A-F + bonus
+                - Score = 100 - penalty + bonus (clamped 0..100)
+                - Bonus: cache_present (+3), gateway_present (+3), no_cycles (+5), all_connected (+3)
+                - Grade: A (90+), B (75-89), C (60-74), D (40-59), F (0-39)
+                - Backend DTO + frontend type обновлены: summary.grade
+                - Тест: clean=100/A, medium=99/A, bad=0/F ✓
 
 ================================================================================
