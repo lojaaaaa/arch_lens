@@ -7,11 +7,11 @@
   1. ТЕКУЩИЙ СТАТУС ПРОЕКТА
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Фаза:          Phase 1 завершена частично → Phase 2 (Deep Analysis + UX) начата
+  Фаза:          Phase 2 (Deep Analysis + UX)
   Задач всего:   35
-  Выполнено:     0 / 35
+  Выполнено:     1 / 35  (TASK-001)
   В работе:      0
-  Готовность:    ~40% (Phase 1 — базовый функционал реализован до PRD/tasks)
+  Готовность:    ~43%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   2. ЧТО СДЕЛАНО (до начала tasks.json)
@@ -38,8 +38,7 @@
 
   ── CRITICAL (блокирующие) ──
 
-  [ ] TASK-001  Рефакторинг analysis service → модульный rule engine
-                Блокирует: TASK-002..008, TASK-034
+  [✓] TASK-001  Рефакторинг analysis service → модульный rule engine
   [ ] TASK-002  Structural правила: S04 fan-in, S05 missing data, S06 frontend→DB
   [ ] TASK-003  Structural правила: S07 no gateway, S08 disconnected, S09 SPOF, S10 redundant
   [ ] TASK-004  Pattern правила: P01 god service, P02 coupling, P03 missing cache, P04 UI→State
@@ -94,11 +93,10 @@
      Задачи TASK-009 и TASK-010 — ключевые для юзабилити.
      Файл: client/src/pages/editor/ui/properties/node-properties-sheet.tsx
 
-  ⚠  МОНОЛИТНЫЙ ANALYSIS SERVICE
-     Все 4 правила анализа зашиты inline в один метод analyze().
-     Добавлять новые правила в таком формате — хрупко и нетестируемо.
-     TASK-001 (рефакторинг в rule engine) — критический путь.
-     Файл: server/src/analysis/analysis.service.ts
+  ✅ МОНОЛИТНЫЙ ANALYSIS SERVICE — РЕШЕНО (TASK-001)
+     Рефакторинг завершён. Модульная архитектура:
+     interfaces/ → engine/ (RuleEngine, GraphContext, MetricsCalc, ScoreCalc) → rules/structural/
+     4 правила вынесены в отдельные классы. Пороги в analysis.config.ts.
 
   ⚠  ОТСУТСТВИЕ ВАЛИДАЦИИ НА БЭКЕ
      DTO (architecture-graph.dto.ts) не имеют декораторов class-validator.
@@ -176,8 +174,17 @@
     shared/      — ui (shadcn), model (types), api, lib, hooks, config
 
   Структура server/src:
-    analysis/    — controller, service, dto
-    app.*        — root module
+    analysis/
+      interfaces/    — AnalysisRule, GraphContext, AnalysisIssue, AnalysisResult
+      engine/        — RuleEngine, GraphContext builder, Metrics/Score calculators
+      rules/
+        structural/  — OrphanNodes, CyclicDeps, HighFanOut, DirectUiState
+        (pattern/)   — будет в TASK-004, TASK-005
+        (load/)      — будет в TASK-006, TASK-007
+      analysis.config.ts — пороговые значения
+      analysis.service.ts — тонкий оркестратор
+      analysis.controller.ts, dto/
+    app.*            — root module
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   7. ИСТОРИЯ ИЗМЕНЕНИЙ
@@ -185,12 +192,17 @@
 
   2026-02-19  Создан PRD (PRD-ArchLens-2026-02-19.md)
               Создан tasks.json (35 задач)
-              Создан progress.md
-              Создан report.txt
-              Инициализирован git-репозиторий (монорепо)
-              Удалены вложенные .git из client/ и server/
-              Коммит: 84e0d56 init: project setup with editor, analysis and docs
-              Добавлен git-workflow в tasks.json и report.txt
-              Статус: планирование завершено, готовность к Phase 2
+              Создан progress.md, report.txt
+              Инициализирован git (монорепо), husky перенесён в корень
+              Коммиты: init → chore: update husky
+
+              TASK-001: Рефакторинг analysis service → модульный rule engine
+                - Создана архитектура: interfaces/ → engine/ → rules/structural/
+                - 4 правила вынесены в отдельные классы (AnalysisRule)
+                - RuleEngine, GraphContext builder, Metrics/Score calculators
+                - Пороги в analysis.config.ts
+                - tsc --noEmit ✓, nest build ✓, API тест ✓
+
+              code_style.md приведён в порядок и структурирован
 
 ================================================================================

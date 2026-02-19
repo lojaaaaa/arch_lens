@@ -54,7 +54,7 @@
         "Шаг 4: Убедиться, что score вычисляется как раньше"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-002",
