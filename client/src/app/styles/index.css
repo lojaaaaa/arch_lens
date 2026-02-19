@@ -42,6 +42,11 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    --edge: oklch(0.7 0 0);
+    --edge-selected: oklch(0.45 0 0);
+    --edge-label: oklch(0.55 0 0);
+    --handle: oklch(0.7 0 0);
 }
 
 @theme inline {
@@ -117,6 +122,11 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    --edge: oklch(0.6 0 0);
+    --edge-selected: oklch(0.8 0 0);
+    --edge-label: oklch(0.65 0 0);
+    --handle: oklch(0.55 0 0);
 }
 
 @layer base {
@@ -126,4 +136,47 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+.react-flow__edge-text {
+    font-size: 10px;
+    fill: var(--edge-label);
+}
+
+.react-flow__edge-textbg {
+    fill: transparent;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+    stroke: var(--edge-selected);
+}
+
+.react-flow__handle {
+    width: 6px;
+    height: 6px;
+    background: var(--handle);
+    border: none;
+}
+
+.react-flow__minimap {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.react-flow__controls {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: none;
+}
+
+.react-flow__controls button {
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
+    color: var(--foreground);
+}
+
+.react-flow__controls button:hover {
+    background: var(--accent);
 }

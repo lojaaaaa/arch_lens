@@ -9,10 +9,11 @@ export type SafeParseArchitectureGraphResult =
     | { success: false; error: z.ZodError };
 
 export type ParseResult =
-    | { success: true; data: ArchitectureGraphInput }
+    | { success: true; data: ArchitectureGraphInput; warnings?: string[] }
     | { success: false; error: string };
 
 export type UseSchemaImportOptions = {
     onSuccess: (schema: ArchitectureGraphInput) => void;
     onError?: (message: string) => void;
+    onWarnings?: (warnings: string[]) => void;
 };

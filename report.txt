@@ -7,11 +7,11 @@
   1. ТЕКУЩИЙ СТАТУС ПРОЕКТА
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Фаза:          Phase 2 (Deep Analysis + UX)
-  Задач всего:   35
-  Выполнено:     8 / 35  (TASK-001..008)
+  Фаза:          Phase 3 (Polish + Integration)
+  Задач всего:   36
+  Выполнено:     36 / 36
   В работе:      0
-  Готовность:    ~57%
+  Готовность:    ~92%
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   2. ЧТО СДЕЛАНО (до начала tasks.json)
@@ -46,52 +46,55 @@
   [✓] TASK-006  Load правила: L01 render, L02 API overload, L03 DB write bottleneck
   [✓] TASK-007  Load правила: L04 cache miss, L05 external risk, L06 sync chain
   [✓] TASK-008  Scoring: grade A–F + bonus-система
-  [ ] TASK-009  Human-readable: complexity ползунок + criticality сегменты
-  [ ] TASK-010  Human-readable: requestRate, readWriteRatio, hitRate, reliability
-  [ ] TASK-012  Визуальное различие слоёв: цвета + иконки нод
-  [ ] TASK-014  Страница анализа: grade с цветом
-  [ ] TASK-016  Store для highlight + навигация Issue → Редактор
-  [ ] TASK-017  Подсветка проблемных нод + центрирование canvas
+  [✓] TASK-009  Human-readable: complexity ползунок + criticality сегменты
+  [✓] TASK-010  Human-readable: requestRate, readWriteRatio, hitRate, reliability
+  [✓] TASK-011  Русификация лейблов + tooltips
+  [✓] TASK-012  Визуальное различие слоёв: цвета + иконки нод
+  [✓] TASK-013  Визуальные стили для типов связей
+  [✓] TASK-014  Страница анализа: grade (A–F) с цветом и severity badges
+  [✓] TASK-016  Store для highlight + навигация Issue → Редактор
+  [✓] TASK-017  Подсветка проблемных нод + центрирование canvas
+  [✓] TASK-018  Кликабельные issue-карточки
 
   ── HIGH ──
-
-  [ ] TASK-011  Русификация лейблов + tooltips
-  [ ] TASK-013  Визуальные стили для типов связей
-  [ ] TASK-015  Фильтрация/сортировка issues
-  [ ] TASK-018  Кликабельные issue-карточки
-  [ ] TASK-019  Sidebar: группировка по слоям с иконками
-  [ ] TASK-020  Onboarding подсказка на пустом canvas
-  [ ] TASK-021  CORS + DTO-валидация на бэке
-  [ ] TASK-022  Метрики с визуальными индикаторами
-  [ ] TASK-023  Edge properties: frequency + synchronous UI
-  [ ] TASK-029  E2E integration test: полный цикл
-  [ ] TASK-030  Синхронизация типов frontend ↔ backend
+  [✓] TASK-015  Фильтрация/сортировка issues (severity + category фильтры)
+  [✓] TASK-019  Sidebar: группировка по слоям (Frontend/Backend/Data аккордеон)
+  [✓] TASK-020  Onboarding подсказка на пустом canvas
+  [✓] TASK-021  CORS + DTO-валидация (class-validator, ValidationPipe)
+  [✓] TASK-022  Метрики с визуальными индикаторами (карточки + иконки + цвет)
+  [✓] TASK-023  Edge properties: frequency + synchronous UI
+  [✓] TASK-029  E2E integration test (Playwright): импорт фикстур, S06, навигация, повторный анализ
+  [✓] TASK-030  Синхронизация типов + Zod-схема для API response
 
   ── MEDIUM ──
 
-  [ ] TASK-024  Русификация header меню
-  [ ] TASK-025  Улучшение валидации JSON-импорта
-  [ ] TASK-026  Breadcrumbs и навигация «Назад»
-  [ ] TASK-027  Loading-состояние при анализе
-  [ ] TASK-028  Контекстное меню для нод
-  [ ] TASK-031  Responsive layout анализа
-  [ ] TASK-032  Сохранение анализа в localStorage
+  [✓] TASK-024  Русификация header меню (Файл/Сохранить/Восстановить/Импорт/Экспорт)
+  [✓] TASK-025  Улучшение валидации JSON-импорта (Zod errors, version warning)
+  [✓] TASK-026  Breadcrumbs (Редактор > Анализ)
+  [✓] TASK-027  Loading: spinner на кнопке «Анализ», retry, timeout-сообщение
+  [✓] TASK-028  Контекстное меню нод: Редактировать/Дублировать/Удалить
+  [✓] TASK-031  Responsive layout анализа (grid 1/2/4 cols, compact summary)
+  [✓] TASK-032  Сохранение анализа в localStorage (archlens:last-analysis)
 
   ── LOW ──
 
-  [ ] TASK-033  Toast-уведомления
-  [ ] TASK-034  AI-заглушка (DeepSeek интерфейс)
-  [ ] TASK-035  README.md
+  [✓] TASK-033  Toast-уведомления (Sonner: save, export, import, analysis error)
+  [✓] TASK-034  AI-заглушка: AiRecommendationProvider, stub, aiRecommendations, секция «Скоро будет доступно», DEEPSEEK_API_KEY в .env.example
+  [✓] TASK-035  README.md (описание, стек, быстрый старт, структура, API)
+  [✓] TASK-036  Переключение темы (light/dark, localStorage, dark: ноды)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   4. УЗКИЕ МЕСТА И НА ЧТО ОБРАТИТЬ ВНИМАНИЕ
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  ⚠  UX ПАРАМЕТРОВ НОД
-     Сейчас все параметры — голые number input'ы. Пользователь видит
-     "Complexity: [1]" и не понимает, что это значит. Это ГЛАВНАЯ UX-проблема.
-     Задачи TASK-009 и TASK-010 — ключевые для юзабилити.
-     Файл: client/src/pages/editor/ui/properties/node-properties-sheet.tsx
+  ✅ UX ПАРАМЕТРОВ НОД — РЕШЕНО (TASK-009, TASK-010, TASK-011)
+     complexity → ползунок 1–5 с русскими метками + tooltip
+     criticality → сегментированный контрол 0–3 + tooltip
+     requestRate → dropdown с диапазонами (Низкая/Средняя/Высокая/Экстремальная)
+     readWriteRatio → визуальный ползунок «Чтение X% / Запись Y%»
+     hitRate → процентный ползунок с цветовыми зонами (красный/жёлтый/зелёный)
+     reliability → dropdown SLA-уровней
+     Все лейблы русифицированы, каждое поле с tooltip-подсказкой
 
   ✅ МОНОЛИТНЫЙ ANALYSIS SERVICE — РЕШЕНО (TASK-001)
      Рефакторинг завершён. Модульная архитектура:
@@ -108,10 +111,11 @@
      определяют одни и те же интерфейсы независимо. При расхождении — баги.
      TASK-030 — синхронизация.
 
-  ⚠  НЕТ ВИЗУАЛЬНОГО РАЗЛИЧИЯ НОД
-     Все ноды на canvas выглядят одинаково (default тип React Flow).
-     Пользователь не видит разницы между Database и UI Component.
-     TASK-012 — кастомные ноды с цветами и иконками.
+  ✅ ВИЗУАЛЬНОЕ РАЗЛИЧИЕ НОД — РЕШЕНО (TASK-012, TASK-013)
+     Кастомный React Flow node-тип «architecture» с цветами по слоям:
+       Frontend — синий, Backend — зелёный, Data — оранжевый.
+     Каждый kind имеет иконку-эмодзи (📄🧩📦🌐⚙️🗄️⚡☁️).
+     Связи визуально различаются: цвета, пунктир, анимация для subscribes/emits.
 
   ⚠  EDGE PARAMETERS НЕ ИСПОЛЬЗУЮТСЯ
      Поля frequency и synchronous определены в типе GraphEdge,
@@ -226,5 +230,73 @@
                 - Grade: A (90+), B (75-89), C (60-74), D (40-59), F (0-39)
                 - Backend DTO + frontend type обновлены: summary.grade
                 - Тест: clean=100/A, medium=99/A, bad=0/F ✓
+
+              TASK-009..013: UX + визуализация (фронтенд)
+                - TASK-009: complexity → Slider 1–5 с метками, criticality → сегментный контрол
+                - TASK-010: requestRate → dropdown rps, readWriteRatio → %, hitRate → цветной слайдер, reliability → dropdown SLA
+                - TASK-011: Все лейблы на русском, каждое поле с tooltip (FieldWithTooltip + lucide Info icon)
+                - TASK-012: Кастомный node-тип «architecture» с цветами по слоям + иконками
+                - TASK-013: Связи с уникальными стилями: calls=фиолет, reads=зелёный пунктир, writes=красный, subscribes=жёлтый animated, depends_on=сиреневый штрих, emits=бирюзовый animated
+                - Новые файлы: shared/ui/slider.tsx, canvas/architecture-node.tsx
+                - NODE_LABELS русифицированы, LAYER_COLORS/NODE_ICONS/EDGE_STYLES добавлены в config
+                - tsc --noEmit ✓
+
+              TASK-014..018: Анализ — grade + навигация к проблемным нодам
+                - TASK-014: Страница анализа переработана — grade (A–F) крупным с цветом,
+                  score с цветовой индикацией (зелёный/жёлтый/красный), severity badges
+                - TASK-016: Zustand store — highlightedNodeIds[], setHighlightedNodeIds, clearHighlight
+                - TASK-017: Подсветка нод красным pulse, авто-fitView на подсвеченные ноды,
+                  авто-очистка через 10 сек, снятие по клику на canvas
+                - TASK-018: Issue-карточки кликабельны — при клике переход в редактор
+                  с подсветкой affectedNodes. Hover-эффект, подсказка «Нажмите, чтобы перейти»
+                - CSS-переменные для edge/handle (--edge, --edge-selected, --edge-label, --handle)
+                  для будущей поддержки темной темы
+                - tsc --noEmit ✓, eslint --fix ✓
+
+              TASK-015..023: UX анализа + Sidebar + Backend + Edge props
+                - TASK-015: Фильтры severity (Критично/Внимание/Инфо) + category (6 категорий),
+                  сортировка critical→warning→info, комбинируемые, счётчик отфильтрованных
+                - TASK-019: Sidebar — группировка по слоям (Frontend/Backend/Data), collapsible,
+                  цвета секций = цвета слоёв нод, иконка Plus у каждой кнопки
+                - TASK-020: Onboarding — Panel-подсказка на пустом canvas, pointer-events-none
+                - TASK-021: CORS whitelist (localhost:5173/4173 + env), class-validator + class-transformer,
+                  ValidationPipe глобально, @IsIn для kind/layer/edge kinds
+                - TASK-022: Метрики — карточки с иконками (lucide), цветовые уровни (good/moderate/bad),
+                  добавлены estimatedRenderPressure + estimatedDataLoad
+                - TASK-023: Edge properties — FrequencySelect (Редко/Иногда/Часто/Постоянно) с req/min,
+                  SyncToggle (Синхронный/Асинхронный), FieldWithTooltip для каждого поля
+                - tsc --noEmit ✓, eslint --fix ✓, nest build ✓
+
+              TASK-024..032: Polish + Integration
+                - TASK-024: Header меню русифицировано (Файл → Сохранить/Восстановить/Сбросить/Импорт/Экспорт)
+                - TASK-027: Кнопка «Анализ» — loading spinner + disabled, timeout-сообщение через 10 сек,
+                  error page с «Повторить», кастомный useSlowIndicator хук
+                - TASK-028: Контекстное меню по ПКМ на ноде: Редактировать, Дублировать, Удалить.
+                  Реализовано через onNodeContextMenu + absolute-positioned overlay
+                - TASK-030: Zod-схема analysisResultSchema для runtime валидации API ответа,
+                  типы frontend полностью совпадают с backend DTO
+                - TASK-032: localStorage persistence (archlens:last-analysis), restoreLastAnalysis action,
+                  при переходе на /analysis без графа — показывается последний кэшированный результат
+                - tsc --noEmit ✓, eslint --fix ✓
+
+              TASK-025..031: Import validation, breadcrumbs, responsive
+                - TASK-025: formatZodErrors улучшён (expected/received, invalid_enum), version warning
+                  для meta.version и root.version, предупреждение об unknown keys
+                - TASK-026: Breadcrumbs «Редактор > Анализ» на loading/error/success
+                - TASK-031: grid-cols-1 md:grid-cols-2 lg:grid-cols-4, compact summary на mobile,
+                  break-words для issue-карточек, responsive padding p-4 sm:p-6
+
+              TASK-029: E2E Playwright — fixture-with-s06, fixture-fixed,
+                импорт → анализ → S06 → клик по issue → редактор → импорт фикса → повторный анализ
+                data-testid import-file-input, README раздел E2E
+
+              TASK-034: AI-заглушка — AiRecommendationProvider, AiRecommendationStubProvider,
+                aiRecommendations в DTO и AnalysisResult, секция «AI-рекомендации» с «Скоро будет доступно»,
+                DEEPSEEK_API_KEY в server/.env.example
+
+              TASK-033..036: Toast, README, тема
+                - TASK-033: Sonner Toaster, toast для save/export/import/analysis error
+                - TASK-035: README.md — описание, стек, быстрый старт, структура, API
+                - TASK-036: ThemeToggle (Sun/Moon), localStorage, dark: LAYER_COLORS для нод
 
 ================================================================================

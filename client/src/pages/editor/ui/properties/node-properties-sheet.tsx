@@ -1,4 +1,5 @@
 import { type ReactNode, useMemo } from 'react';
+import { Info } from 'lucide-react';
 
 import type { ArchitectureNode, TypeOrNull } from '@/shared/model/types';
 import { Button } from '@/shared/ui/button';
@@ -12,18 +13,251 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/shared/ui/sheet';
+import { Slider } from '@/shared/ui/slider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
+import { NODE_LABELS } from '../../lib/config';
 import {
     useArchitectureActions,
     useArchitectureSelectors,
 } from '../../model/selectors';
 
-const Field = ({ label, children }: { label: string; children: ReactNode }) => {
+const COMPLEXITY_LABELS = [
+    'Минимальная',
+    'Низкая',
+    'Средняя',
+    'Высокая',
+    'Очень высокая',
+] as const;
+
+const CRITICALITY_LABELS = [
+    'Некритичный',
+    'Важный',
+    'Критичный',
+    'Ключевой',
+] as const;
+
+const FieldWithTooltip = ({
+    label,
+    tooltip,
+    children,
+}: {
+    label: string;
+    tooltip: string;
+    children: ReactNode;
+}) => {
     return (
         <div className="space-y-1.5">
-            <div className="text-sm font-medium">{label}</div>
+            <div className="flex items-center gap-1.5">
+                <span className="text-sm font-medium">{label}</span>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Info className="text-muted-foreground size-3.5 shrink-0 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-60">
+                        {tooltip}
+                    </TooltipContent>
+                </Tooltip>
+            </div>
             {children}
         </div>
+    );
+};
+
+const ComplexitySlider = ({
+    value,
+    onChange,
+}: {
+    value: number;
+    onChange: (newValue: number) => void;
+}) => {
+    const clamped = Math.max(1, Math.min(5, value));
+    return (
+        <div className="space-y-2">
+            <Slider
+                min={1}
+                max={5}
+                step={1}
+                value={[clamped]}
+                onValueChange={([nextValue]) => onChange(nextValue)}
+            />
+            <div className="flex justify-between text-[10px] text-muted-foreground">
+                {COMPLEXITY_LABELS.map((label) => (
+                    <span
+                        key={label}
+                        className="w-0 text-center first:text-left last:text-right"
+                    >
+                        {label}
+                    </span>
+                ))}
+            </div>
+            <div className="text-xs text-center font-medium">
+                {COMPLEXITY_LABELS[clamped - 1]} ({clamped})
+            </div>
+        </div>
+    );
+};
+
+const CriticalityControl = ({
+    value,
+    onChange,
+}: {
+    value: number;
+    onChange: (newValue: number) => void;
+}) => {
+    const clamped = Math.max(0, Math.min(3, value));
+    return (
+        <div className="flex rounded-md border overflow-hidden">
+            {CRITICALITY_LABELS.map((label, index) => (
+                <button
+                    key={label}
+                    type="button"
+                    onClick={() => onChange(index)}
+                    className={`flex-1 px-1 py-1.5 text-xs font-medium transition-colors border-r last:border-r-0 ${
+                        clamped === index
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-background text-muted-foreground hover:bg-muted'
+                    }`}
+                >
+                    {label}
+                </button>
+            ))}
+        </div>
+    );
+};
+
+const REQUEST_RATE_OPTIONS = [
+    { label: 'Низкая (<10 rps)', value: 5 },
+    { label: 'Средняя (10–100 rps)', value: 50 },
+    { label: 'Высокая (100–1000 rps)', value: 500 },
+    { label: 'Экстремальная (>1000 rps)', value: 2000 },
+] as const;
+
+const RequestRateSelect = ({
+    value,
+    onChange,
+}: {
+    value: number;
+    onChange: (newValue: number) => void;
+}) => {
+    const closest = REQUEST_RATE_OPTIONS.reduce((prev, curr) =>
+        Math.abs(curr.value - value) < Math.abs(prev.value - value)
+            ? curr
+            : prev,
+    );
+    return (
+        <select
+            value={closest.value}
+            onChange={(event) => onChange(Number(event.target.value))}
+            className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+        >
+            {REQUEST_RATE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                </option>
+            ))}
+        </select>
+    );
+};
+
+const ReadWriteRatioSlider = ({
+    value,
+    onChange,
+}: {
+    value: number;
+    onChange: (newValue: number) => void;
+}) => {
+    const clamped = Math.max(0, Math.min(1, value));
+    const percent = Math.round(clamped * 100);
+    return (
+        <div className="space-y-2">
+            <Slider
+                min={0}
+                max={100}
+                step={5}
+                value={[percent]}
+                onValueChange={([nextPercent]) => onChange(nextPercent / 100)}
+            />
+            <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>Больше записи</span>
+                <span>Больше чтения</span>
+            </div>
+            <div className="text-xs text-center font-medium">
+                Чтение {percent}% / Запись {100 - percent}%
+            </div>
+        </div>
+    );
+};
+
+const HitRateSlider = ({
+    value,
+    onChange,
+}: {
+    value: number;
+    onChange: (newValue: number) => void;
+}) => {
+    const clamped = Math.max(0, Math.min(1, value));
+    const percent = Math.round(clamped * 100);
+
+    const zoneColor =
+        percent < 50
+            ? 'text-red-500'
+            : percent < 80
+              ? 'text-yellow-500'
+              : 'text-green-500';
+
+    return (
+        <div className="space-y-2">
+            <Slider
+                min={0}
+                max={100}
+                step={5}
+                value={[percent]}
+                onValueChange={([nextPercent]) => onChange(nextPercent / 100)}
+            />
+            <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span className="text-red-500">0%</span>
+                <span className="text-yellow-500">50%</span>
+                <span className="text-green-500">100%</span>
+            </div>
+            <div className={`text-xs text-center font-medium ${zoneColor}`}>
+                {percent}% попаданий
+            </div>
+        </div>
+    );
+};
+
+const RELIABILITY_OPTIONS = [
+    { label: 'Низкая (<95%)', value: 0.9 },
+    { label: 'Стандартная (95–99%)', value: 0.97 },
+    { label: 'Высокая (99–99.9%)', value: 0.995 },
+    { label: 'Максимальная (>99.9%)', value: 0.999 },
+] as const;
+
+const ReliabilitySelect = ({
+    value,
+    onChange,
+}: {
+    value: number;
+    onChange: (newValue: number) => void;
+}) => {
+    const closest = RELIABILITY_OPTIONS.reduce((prev, curr) =>
+        Math.abs(curr.value - value) < Math.abs(prev.value - value)
+            ? curr
+            : prev,
+    );
+    return (
+        <select
+            value={closest.value}
+            onChange={(event) => onChange(Number(event.target.value))}
+            className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+        >
+            {RELIABILITY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                </option>
+            ))}
+        </select>
     );
 };
 
@@ -127,7 +361,9 @@ export const NodePropertiesSheet = () => {
                     <SheetDescription>
                         Тип:{' '}
                         <span className="font-medium">
-                            {selectedArchitectureNode?.kind}
+                            {selectedArchitectureNode
+                                ? NODE_LABELS[selectedArchitectureNode.kind]
+                                : ''}
                         </span>
                     </SheetDescription>
                 </SheetHeader>
@@ -142,49 +378,52 @@ export const NodePropertiesSheet = () => {
 
                         return (
                             <div className="flex flex-col gap-4 p-4">
-                                <Field label="Complexity">
-                                    <Input
-                                        type="number"
+                                <FieldWithTooltip
+                                    label="Сложность"
+                                    tooltip="Оценка вычислительной и архитектурной сложности узла. Влияет на расчёт нагрузки рендеринга и общий score."
+                                >
+                                    <ComplexitySlider
                                         value={
                                             selectedArchitectureNode.complexity
                                         }
-                                        onChange={(event) =>
+                                        onChange={(complexity) =>
                                             updateNode(
                                                 selectedArchitectureNode.id,
                                                 {
-                                                    complexity: Number(
-                                                        event.target.value,
-                                                    ),
+                                                    complexity,
                                                 },
                                             )
                                         }
                                     />
-                                </Field>
+                                </FieldWithTooltip>
 
-                                <Field label="Criticality">
-                                    <Input
-                                        type="number"
+                                <FieldWithTooltip
+                                    label="Критичность"
+                                    tooltip="Насколько отказ узла повлияет на систему. Ключевые узлы с высокой входящей связностью отмечаются как единая точка отказа."
+                                >
+                                    <CriticalityControl
                                         value={
                                             selectedArchitectureNode.criticality
                                         }
-                                        onChange={(event) =>
+                                        onChange={(criticality) =>
                                             updateNode(
                                                 selectedArchitectureNode.id,
                                                 {
-                                                    criticality: Number(
-                                                        event.target.value,
-                                                    ),
+                                                    criticality,
                                                 },
                                             )
                                         }
                                     />
-                                </Field>
+                                </FieldWithTooltip>
 
                                 <Separator />
 
                                 {archNode.kind === 'ui_page' && (
                                     <>
-                                        <Field label="Route">
+                                        <FieldWithTooltip
+                                            label="Маршрут"
+                                            tooltip="URL-путь страницы в приложении (например, /dashboard)."
+                                        >
                                             <Input
                                                 value={archNode.route}
                                                 onChange={(event) =>
@@ -194,8 +433,11 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Components count">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Кол-во компонентов"
+                                            tooltip="Сколько дочерних UI-компонентов отображает страница. Влияет на оценку render pressure."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.componentsCount}
@@ -207,34 +449,40 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="State usage">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Использование состояния"
+                                            tooltip="Тип управления состоянием: нет, локальное или глобальное. Влияет на анализ связности."
+                                        >
                                             <Select
                                                 value={archNode.stateUsage}
-                                                onChange={(value) =>
+                                                onChange={(stateUsage) =>
                                                     updateNode(archNode.id, {
-                                                        stateUsage: value,
+                                                        stateUsage,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'none',
-                                                            label: 'none',
+                                                            label: 'Нет',
                                                         },
                                                         {
                                                             value: 'local',
-                                                            label: 'local',
+                                                            label: 'Локальное',
                                                         },
                                                         {
                                                             value: 'global',
-                                                            label: 'global',
+                                                            label: 'Глобальное',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Update frequency">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Частота обновления"
+                                            tooltip="Как часто данные на странице обновляются (условные единицы). Влияет на render pressure."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.updateFrequency}
@@ -246,43 +494,49 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'ui_component' && (
                                     <>
-                                        <Field label="Component type">
+                                        <FieldWithTooltip
+                                            label="Тип компонента"
+                                            tooltip="Функциональный тип: ввод, таблица, кнопка или кастомный."
+                                        >
                                             <Select
                                                 value={archNode.componentType}
-                                                onChange={(value) =>
+                                                onChange={(componentType) =>
                                                     updateNode(archNode.id, {
-                                                        componentType: value,
+                                                        componentType,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'input',
-                                                            label: 'input',
+                                                            label: 'Поле ввода',
                                                         },
                                                         {
                                                             value: 'table',
-                                                            label: 'table',
+                                                            label: 'Таблица',
                                                         },
                                                         {
                                                             value: 'button',
-                                                            label: 'button',
+                                                            label: 'Кнопка',
                                                         },
                                                         {
                                                             value: 'custom',
-                                                            label: 'custom',
+                                                            label: 'Кастомный',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Nested components">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Вложенные компоненты"
+                                            tooltip="Количество дочерних компонентов. Большое число может указывать на чрезмерную вложенность."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={
@@ -298,8 +552,11 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Props count">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Количество props"
+                                            tooltip="Количество входных свойств. Много props может говорить о необходимости декомпозиции."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.propsCount}
@@ -311,38 +568,44 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="State type">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Тип состояния"
+                                            tooltip="Источник состояния: нет, локальное, context или глобальный стор."
+                                        >
                                             <Select
                                                 value={archNode.stateType}
-                                                onChange={(value) =>
+                                                onChange={(stateType) =>
                                                     updateNode(archNode.id, {
-                                                        stateType: value,
+                                                        stateType,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'none',
-                                                            label: 'none',
+                                                            label: 'Нет',
                                                         },
                                                         {
                                                             value: 'local',
-                                                            label: 'local',
+                                                            label: 'Локальное',
                                                         },
                                                         {
                                                             value: 'context',
-                                                            label: 'context',
+                                                            label: 'Context',
                                                         },
                                                         {
                                                             value: 'global',
-                                                            label: 'global',
+                                                            label: 'Глобальное',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Render frequency">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Частота ре-рендера"
+                                            tooltip="Как часто компонент перерисовывается (условные единицы). Влияет на render pressure."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.renderFrequency}
@@ -354,47 +617,53 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'state_store' && (
                                     <>
-                                        <Field label="Store type">
+                                        <FieldWithTooltip
+                                            label="Тип хранилища"
+                                            tooltip="Технология управления состоянием: Redux, Zustand, Context, localStorage или sessionStorage."
+                                        >
                                             <Select
                                                 value={archNode.storeType}
-                                                onChange={(value) =>
+                                                onChange={(storeType) =>
                                                     updateNode(archNode.id, {
-                                                        storeType: value,
+                                                        storeType,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'redux',
-                                                            label: 'redux',
+                                                            label: 'Redux',
                                                         },
                                                         {
                                                             value: 'zustand',
-                                                            label: 'zustand',
+                                                            label: 'Zustand',
                                                         },
                                                         {
                                                             value: 'context',
-                                                            label: 'context',
+                                                            label: 'Context API',
                                                         },
                                                         {
                                                             value: 'local_storage',
-                                                            label: 'local_storage',
+                                                            label: 'localStorage',
                                                         },
                                                         {
                                                             value: 'session_storage',
-                                                            label: 'session_storage',
+                                                            label: 'sessionStorage',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Subscribers count">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Кол-во подписчиков"
+                                            tooltip="Сколько компонентов подписано на это хранилище. Большое число усиливает каскадный ре-рендер."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={
@@ -410,8 +679,11 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Update frequency">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Частота обновления"
+                                            tooltip="Как часто обновляется стор (условные единицы). Влияет на render pressure подписчиков."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.updateFrequency}
@@ -423,13 +695,16 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'api_gateway' && (
                                     <>
-                                        <Field label="Endpoints count">
+                                        <FieldWithTooltip
+                                            label="Кол-во эндпоинтов"
+                                            tooltip="Количество API-маршрутов. Более 15 — признак монолитного API."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.endpointsCount}
@@ -441,36 +716,42 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Request rate">
-                                            <Input
-                                                type="number"
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Нагрузка (req/s)"
+                                            tooltip="Ожидаемое количество запросов в секунду. Влияет на оценку масштабируемости и нагрузки API."
+                                        >
+                                            <RequestRateSelect
                                                 value={archNode.requestRate}
-                                                onChange={(event) =>
+                                                onChange={(requestRate) =>
                                                     updateNode(archNode.id, {
-                                                        requestRate: Number(
-                                                            event.target.value,
-                                                        ),
+                                                        requestRate,
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Auth required">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Требуется авторизация"
+                                            tooltip="Нужна ли аутентификация для доступа к API."
+                                        >
                                             <Toggle
                                                 value={archNode.authRequired}
-                                                onChange={(value) =>
+                                                onChange={(authRequired) =>
                                                     updateNode(archNode.id, {
-                                                        authRequired: value,
+                                                        authRequired,
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'service' && (
                                     <>
-                                        <Field label="Operations count">
+                                        <FieldWithTooltip
+                                            label="Кол-во операций"
+                                            tooltip="Количество бизнес-операций в сервисе. Более 10 — признак god-сервиса."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.operationsCount}
@@ -482,8 +763,11 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="External calls">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Внешние вызовы"
+                                            tooltip="Количество вызовов к внешним системам. Увеличивает зависимость от сторонних сервисов."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.externalCalls}
@@ -495,45 +779,54 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Stateful">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="С состоянием (stateful)"
+                                            tooltip="Хранит ли сервис состояние между запросами. Stateful-сервисы сложнее масштабировать."
+                                        >
                                             <Toggle
                                                 value={archNode.stateful}
-                                                onChange={(value) =>
+                                                onChange={(stateful) =>
                                                     updateNode(archNode.id, {
-                                                        stateful: value,
+                                                        stateful,
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'database' && (
                                     <>
-                                        <Field label="DB type">
+                                        <FieldWithTooltip
+                                            label="Тип БД"
+                                            tooltip="Реляционная (SQL) или документная (NoSQL) база данных."
+                                        >
                                             <Select
                                                 value={archNode.dbType}
-                                                onChange={(value) =>
+                                                onChange={(dbType) =>
                                                     updateNode(archNode.id, {
-                                                        dbType: value,
+                                                        dbType,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'SQL',
-                                                            label: 'SQL',
+                                                            label: 'SQL (реляционная)',
                                                         },
                                                         {
                                                             value: 'NoSQL',
-                                                            label: 'NoSQL',
+                                                            label: 'NoSQL (документная)',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Tables count">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Кол-во таблиц / коллекций"
+                                            tooltip="Количество таблиц (SQL) или коллекций (NoSQL) в базе."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.tablesCount}
@@ -545,111 +838,118 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Read/write ratio">
-                                            <Input
-                                                type="number"
-                                                step="0.01"
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Соотношение чтение/запись"
+                                            tooltip="Доля операций чтения. Например, 80% чтения — типично для каталогов, 20% — для логирования."
+                                        >
+                                            <ReadWriteRatioSlider
                                                 value={archNode.readWriteRatio}
-                                                onChange={(event) =>
+                                                onChange={(readWriteRatio) =>
                                                     updateNode(archNode.id, {
-                                                        readWriteRatio: Number(
-                                                            event.target.value,
-                                                        ),
+                                                        readWriteRatio,
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'cache' && (
                                     <>
-                                        <Field label="Cache type">
+                                        <FieldWithTooltip
+                                            label="Тип кэша"
+                                            tooltip="Технология кэширования: Redis (распределённый) или in-memory (локальный)."
+                                        >
                                             <Select
                                                 value={archNode.cacheType}
-                                                onChange={(value) =>
+                                                onChange={(cacheType) =>
                                                     updateNode(archNode.id, {
-                                                        cacheType: value,
+                                                        cacheType,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'redis',
-                                                            label: 'redis',
+                                                            label: 'Redis',
                                                         },
                                                         {
                                                             value: 'memory',
-                                                            label: 'memory',
+                                                            label: 'In-memory',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Hit rate">
-                                            <Input
-                                                type="number"
-                                                step="0.01"
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Hit Rate"
+                                            tooltip="Процент запросов, обслуженных из кэша. <50% — плохо (красный), 50-80% — средне (жёлтый), >80% — хорошо (зелёный)."
+                                        >
+                                            <HitRateSlider
                                                 value={archNode.hitRate}
-                                                onChange={(event) =>
+                                                onChange={(hitRate) =>
                                                     updateNode(archNode.id, {
-                                                        hitRate: Number(
-                                                            event.target.value,
-                                                        ),
+                                                        hitRate,
                                                     })
                                                 }
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
 
                                 {archNode.kind === 'external_system' && (
                                     <>
-                                        <Field label="System type">
+                                        <FieldWithTooltip
+                                            label="Тип системы"
+                                            tooltip="Назначение внешней системы: авторизация, платежи, аналитика, хранилище, уведомления или другое."
+                                        >
                                             <Select
                                                 value={archNode.systemType}
-                                                onChange={(value) =>
+                                                onChange={(systemType) =>
                                                     updateNode(archNode.id, {
-                                                        systemType: value,
+                                                        systemType,
                                                     })
                                                 }
                                                 options={
                                                     [
                                                         {
                                                             value: 'auth',
-                                                            label: 'auth',
+                                                            label: 'Авторизация',
                                                         },
                                                         {
                                                             value: 'payment',
-                                                            label: 'payment',
+                                                            label: 'Платежи',
                                                         },
                                                         {
                                                             value: 'analytics',
-                                                            label: 'analytics',
+                                                            label: 'Аналитика',
                                                         },
                                                         {
                                                             value: 'storage',
-                                                            label: 'storage',
+                                                            label: 'Хранилище',
                                                         },
                                                         {
                                                             value: 'notification',
-                                                            label: 'notification',
+                                                            label: 'Уведомления',
                                                         },
                                                         {
                                                             value: 'other',
-                                                            label: 'other',
+                                                            label: 'Другое',
                                                         },
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Protocol">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Протокол"
+                                            tooltip="Протокол взаимодействия с внешней системой."
+                                        >
                                             <Select
                                                 value={archNode.protocol}
-                                                onChange={(value) =>
+                                                onChange={(protocol) =>
                                                     updateNode(archNode.id, {
-                                                        protocol: value,
+                                                        protocol,
                                                     })
                                                 }
                                                 options={
@@ -673,22 +973,24 @@ export const NodePropertiesSheet = () => {
                                                     ] as const
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Reliability (0..1)">
-                                            <Input
-                                                type="number"
-                                                step="0.01"
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Надёжность (SLA)"
+                                            tooltip="Уровень доступности внешней системы. Низкая надёжность на критическом пути генерирует предупреждение."
+                                        >
+                                            <ReliabilitySelect
                                                 value={archNode.reliability}
-                                                onChange={(event) =>
+                                                onChange={(reliability) =>
                                                     updateNode(archNode.id, {
-                                                        reliability: Number(
-                                                            event.target.value,
-                                                        ),
+                                                        reliability,
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Latency (ms)">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Задержка (мс)"
+                                            tooltip="Среднее время ответа внешней системы в миллисекундах. Влияет на оценку latency синхронных цепочек."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.latencyMs}
@@ -700,8 +1002,11 @@ export const NodePropertiesSheet = () => {
                                                     })
                                                 }
                                             />
-                                        </Field>
-                                        <Field label="Rate limit (optional)">
+                                        </FieldWithTooltip>
+                                        <FieldWithTooltip
+                                            label="Rate limit (необязательно)"
+                                            tooltip="Ограничение количества запросов к внешней системе (req/s). Оставьте пустым, если лимита нет."
+                                        >
                                             <Input
                                                 type="number"
                                                 value={archNode.rateLimit ?? ''}
@@ -718,7 +1023,7 @@ export const NodePropertiesSheet = () => {
                                                     });
                                                 }}
                                             />
-                                        </Field>
+                                        </FieldWithTooltip>
                                     </>
                                 )}
                             </div>

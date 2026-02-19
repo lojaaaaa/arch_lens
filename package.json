@@ -4,13 +4,18 @@
   "scripts": {
     "prepare": "husky",
     "dev:client": "cd client && npm run dev",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "dev:server": "cd server && npm run start:dev",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "lint:client": "cd client && npm run lint",
     "lint:server": "cd server && npm run lint",
     "typecheck:client": "cd client && npx tsc -b --noEmit",
     "typecheck:server": "cd server && npx tsc --noEmit"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "husky": "^9.1.7"
   }
 }

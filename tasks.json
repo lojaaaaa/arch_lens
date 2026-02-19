@@ -222,7 +222,7 @@
         "Шаг 5: Запустить анализ → score меняется в зависимости от criticality"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-010",
@@ -244,7 +244,7 @@
         "Шаг 5: Экспортировать JSON → все значения числовые"
       ],
       "dependencies": ["TASK-009"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-011",
@@ -264,7 +264,7 @@
         "Шаг 4: Значения в dropdown-ах — понятны без технического контекста"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-012",
@@ -286,7 +286,7 @@
         "Шаг 4: Проверить читаемость при 10+ нодах на canvas"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-013",
@@ -308,7 +308,7 @@
         "Шаг 3: Сменить тип связи через properties panel → стиль обновляется"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-014",
@@ -328,7 +328,7 @@
         "Шаг 4: Убедиться в визуальной читаемости на мобильном viewport"
       ],
       "dependencies": ["TASK-008"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-015",
@@ -350,7 +350,7 @@
         "Шаг 5: Убрать все фильтры → полный список"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-016",
@@ -370,7 +370,7 @@
         "Шаг 4: Повторить для issue с affectedEdges"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-017",
@@ -392,7 +392,7 @@
         "Шаг 5: Проверить с несколькими нодами в разных частях canvas"
       ],
       "dependencies": ["TASK-016", "TASK-012"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-018",
@@ -412,7 +412,7 @@
         "Шаг 4: Issue без affectedNodes → кнопка отсутствует"
       ],
       "dependencies": ["TASK-016"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-019",
@@ -433,7 +433,7 @@
         "Шаг 4: Цвета секций визуально совпадают с цветами нод на canvas"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-020",
@@ -453,7 +453,7 @@
         "Шаг 4: Кликнуть на canvas через подсказку → canvas реагирует нормально"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-021",
@@ -474,7 +474,7 @@
         "Шаг 4: Отправить запрос с неразрешённого origin → CORS rejection"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-022",
@@ -495,12 +495,13 @@
         "Шаг 4: Сузить viewport → grid адаптируется"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-023",
       "category": "functional",
       "priority": "high",
+      "status": "done",
       "description": "Edge properties: frequency и synchronous параметры с human-readable UI",
       "acceptance_criteria": [
         "При выборе ребра в edge-properties-sheet отображаются поля frequency и synchronous",
@@ -516,8 +517,7 @@
         "Шаг 4: Изменить значения, экспортировать JSON → frequency и synchronous присутствуют",
         "Шаг 5: Запустить анализ → правила L06 (sync chain) учитывают synchronous"
       ],
-      "dependencies": [],
-      "status": "pending"
+      "dependencies": []
     },
     {
       "id": "TASK-024",
@@ -538,7 +538,7 @@
         "Шаг 4: Изменить схему → «Не сохранено» отображается"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-025",
@@ -558,7 +558,7 @@
         "Шаг 4: Импорт JSON с отсутствующим полем → fallback + предупреждение"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-026",
@@ -578,7 +578,7 @@
         "Шаг 4: Breadcrumbs отображаются корректно (если реализованы)"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-027",
@@ -598,7 +598,7 @@
         "Шаг 4: Нажать «Повторить» → повторный запрос"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-028",
@@ -619,7 +619,7 @@
         "Шаг 5: Клик вне меню → меню закрылось"
       ],
       "dependencies": ["TASK-012"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-029",
@@ -641,7 +641,7 @@
         "Шаг 6: Проверить что ноды и связи на месте"
       ],
       "dependencies": ["TASK-002", "TASK-008", "TASK-017"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-030",
@@ -662,7 +662,7 @@
         "Шаг 4: Поле grade присутствует и отображается"
       ],
       "dependencies": ["TASK-008"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-031",
@@ -683,7 +683,7 @@
         "Шаг 4: Длинное описание issue → не обрезается"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-032",
@@ -703,7 +703,7 @@
         "Шаг 4: Очистить localStorage → страница анализа пустая (redirect)"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-033",
@@ -724,7 +724,7 @@
         "Шаг 4: Импортировать невалидный JSON → toast с ошибкой"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-034",
@@ -745,7 +745,7 @@
         "Шаг 4: TypeScript компилируется без ошибок"
       ],
       "dependencies": ["TASK-001"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-035",
@@ -764,7 +764,30 @@
         "Шаг 3: Структура проекта в README соответствует реальной"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
+    },
+    {
+      "id": "TASK-036",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Переключение темы: светлая и тёмная",
+      "acceptance_criteria": [
+        "В header добавлена кнопка переключения темы (иконка солнце/луна)",
+        "Тема переключается между light и dark",
+        "Тема сохраняется в localStorage и восстанавливается при перезагрузке",
+        "Все UI-элементы корректно отображаются в обеих темах (canvas, sheet, sidebar, анализ)",
+        "Цвета слоёв нод адаптированы для тёмной темы (видны на тёмном фоне)",
+        "Используются CSS-переменные Tailwind (dark: prefix), без дублирования стилей"
+      ],
+      "test_steps": [
+        "Шаг 1: Кликнуть на кнопку темы → тема меняется",
+        "Шаг 2: Перезагрузить страницу → тема сохранилась",
+        "Шаг 3: Проверить canvas, ноды, связи, properties panel в тёмной теме",
+        "Шаг 4: Проверить страницу анализа в тёмной теме",
+        "Шаг 5: Проверить что нет белых/чёрных «вспышек» при переключении"
+      ],
+      "dependencies": [],
+      "status": "done"
     }
   ]
 }

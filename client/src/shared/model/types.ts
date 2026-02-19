@@ -214,6 +214,7 @@ export interface AnalysisResult {
     metrics: ArchitectureMetrics;
 
     issues: ArchitectureIssue[];
+    aiRecommendations: string[];
 
     generatedAt: string;
     modelVersion: string;

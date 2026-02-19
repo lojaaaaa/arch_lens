@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "name": "E2E: ui_page → database (S06)",
+    "version": 1,
+    "createdAt": "2026-02-19T00:00:00.000Z"
+  },
+  "nodes": [
+    {
+      "id": "ui-page-1",
+      "kind": "ui_page",
+      "layer": "frontend",
+      "position": { "x": 100, "y": 150 },
+      "complexity": 1,
+      "criticality": 0,
+      "route": "/",
+      "componentsCount": 1,
+      "stateUsage": "local",
+      "updateFrequency": 1
+    },
+    {
+      "id": "db-1",
+      "kind": "database",
+      "layer": "data",
+      "position": { "x": 350, "y": 150 },
+      "complexity": 1,
+      "criticality": 0,
+      "dbType": "SQL",
+      "tablesCount": 5,
+      "readWriteRatio": 0.7
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "ui-page-1",
+      "target": "db-1",
+      "kind": "reads"
+    }
+  ]
+}

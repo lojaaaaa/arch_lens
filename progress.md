@@ -69,3 +69,43 @@
 **Статус:** done
 **Summary:** Score formula: 100 - penalty + bonus (clamped 0..100). Penalty: info=2, warning=5, critical=15. Bonus: cache_present=+3, gateway_present=+3, no_cycles=+5, all_connected=+3. Grade: A(90+), B(75-89), C(60-74), D(40-59), F(0-39). Backend DTO и frontend тип обновлены — добавлен summary.grade.
 **Файлы:** server/src/analysis/engine/score.calculator.ts, analysis.config.ts, interfaces/analysis-result.interface.ts, analysis.service.ts, client/src/shared/model/types.ts
+
+---
+
+### TASK-009 — Human-readable: complexity ползунок + criticality сегменты
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** complexity заменён на Radix Slider (1–5 с русскими метками: Минимальная..Очень высокая). criticality заменён на сегментированный контрол (0–3: Некритичный..Ключевой). Оба с tooltip через FieldWithTooltip + lucide Info icon. Создан shared/ui/slider.tsx (Shadcn-style на Radix).
+**Файлы:** client/src/shared/ui/slider.tsx, client/src/pages/editor/ui/properties/node-properties-sheet.tsx
+
+---
+
+### TASK-010 — Human-readable: requestRate, readWriteRatio, hitRate, reliability
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** requestRate → dropdown 4 уровня (5/50/500/2000 rps). readWriteRatio → ползунок 0–100% с метками «Больше записи/чтения». hitRate → процентный ползунок с цветовыми зонами (красный<50%, жёлтый 50-80%, зелёный>80%). reliability → dropdown SLA (0.9/0.97/0.995/0.999). Все с FieldWithTooltip.
+**Файлы:** client/src/pages/editor/ui/properties/node-properties-sheet.tsx
+
+---
+
+### TASK-011 — Русификация лейблов + tooltips
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Все лейблы полей во всех 8 секциях нод переведены на русский. Все select-опции русифицированы (Локальное, Глобальное, Поле ввода, Таблица, etc.). Каждое поле обёрнуто в FieldWithTooltip с контекстным пояснением. Убран неиспользуемый компонент Field. NODE_LABELS в config.ts русифицированы.
+**Файлы:** client/src/pages/editor/ui/properties/node-properties-sheet.tsx, client/src/pages/editor/lib/config.ts
+
+---
+
+### TASK-012 — Визуальное различие слоёв: цвета + иконки нод
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Создан кастомный React Flow node-тип «architecture» (ArchitectureNodeComponent). Цвета по слоям: frontend=синий, backend=зелёный, data=оранжевый (bg + border + text). Иконки-эмодзи для каждого kind (📄🧩📦🌐⚙️🗄️⚡☁️). toFlowNode переключён на type:'architecture'. NODE_KINDS русифицированы.
+**Файлы:** client/src/pages/editor/ui/canvas/architecture-node.tsx, architecture-canvas.tsx, lib/config.ts, lib/utils.ts
+
+---
+
+### TASK-013 — Визуальные стили для типов связей
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлен EDGE_STYLES в config.ts с уникальными цветами и паттернами: calls=#6366f1 сплошная, reads=#22c55e пунктир, writes=#ef4444 сплошная, subscribes=#f59e0b пунктир+animated, depends_on=#8b5cf6 штрих, emits=#06b6d4 animated. toFlowEdge обновлён — стили и цвет маркеров применяются. EDGE_KIND_LABELS русифицированы.
+**Файлы:** client/src/pages/editor/lib/config.ts, client/src/pages/editor/lib/utils.ts

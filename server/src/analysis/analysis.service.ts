@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
+import type { AiRecommendationProvider } from './ai/index.js';
 import type { ArchitectureGraphDto } from './dto/architecture-graph.dto.js';
 import {
   RuleEngine,
@@ -15,12 +16,15 @@ export class AnalysisService {
   private readonly modelVersion = '1.0';
   private readonly engine: RuleEngine;
 
-  constructor() {
+  constructor(
+    @Inject('AiRecommendationProvider')
+    private readonly aiProvider: AiRecommendationProvider,
+  ) {
     this.engine = new RuleEngine();
     this.engine.registerAll(allRules);
   }
 
-  analyze(graph: ArchitectureGraphDto): AnalysisResultDto {
+  async analyze(graph: ArchitectureGraphDto): Promise<AnalysisResultDto> {
     const context = buildGraphContext(graph);
     const issues = this.engine.run(context);
     const metrics = calculateMetrics(context);
@@ -29,6 +33,11 @@ export class AnalysisService {
     const criticalCount = issues.filter(
       (i) => i.severity === 'critical',
     ).length;
+
+    const aiRecommendations = await this.aiProvider.getRecommendations(
+      graph,
+      issues,
+    );
 
     return {
       summary: {
@@ -39,6 +48,7 @@ export class AnalysisService {
       },
       metrics,
       issues,
+      aiRecommendations,
       generatedAt: new Date().toISOString(),
       modelVersion: this.modelVersion,
     };

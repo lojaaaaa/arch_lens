@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "name": "E2E: fixed — ui_page → api_gateway → service → database",
+    "version": 1,
+    "createdAt": "2026-02-19T00:00:00.000Z"
+  },
+  "nodes": [
+    {
+      "id": "ui-page-1",
+      "kind": "ui_page",
+      "layer": "frontend",
+      "position": { "x": 80, "y": 150 },
+      "complexity": 1,
+      "criticality": 0,
+      "route": "/",
+      "componentsCount": 1,
+      "stateUsage": "local",
+      "updateFrequency": 1
+    },
+    {
+      "id": "gateway-1",
+      "kind": "api_gateway",
+      "layer": "backend",
+      "position": { "x": 220, "y": 150 },
+      "complexity": 1,
+      "criticality": 0,
+      "endpointsCount": 5,
+      "requestRate": 100,
+      "authRequired": false
+    },
+    {
+      "id": "service-1",
+      "kind": "service",
+      "layer": "backend",
+      "position": { "x": 360, "y": 150 },
+      "complexity": 1,
+      "criticality": 0,
+      "operationsCount": 3,
+      "externalCalls": 0,
+      "stateful": false
+    },
+    {
+      "id": "db-1",
+      "kind": "database",
+      "layer": "data",
+      "position": { "x": 500, "y": 150 },
+      "complexity": 1,
+      "criticality": 0,
+      "dbType": "SQL",
+      "tablesCount": 5,
+      "readWriteRatio": 0.7
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "ui-page-1", "target": "gateway-1", "kind": "calls" },
+    { "id": "e2", "source": "gateway-1", "target": "service-1", "kind": "calls" },
+    { "id": "e3", "source": "service-1", "target": "db-1", "kind": "reads" }
+  ]
+}

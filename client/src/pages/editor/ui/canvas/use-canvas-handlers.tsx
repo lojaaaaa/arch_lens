@@ -8,6 +8,8 @@ import {
     type OnNodesChange,
 } from '@xyflow/react';
 
+import { useAnalysisStore } from '@/pages/analysis/model/store';
+
 import {
     useArchitectureActions,
     useArchitectureSelectors,
@@ -19,6 +21,8 @@ export const useArchitectureCanvasHandlers = () => {
 
     const { setNodes, setEdges, selectEdge, selectNode, addEdge } =
         useArchitectureActions();
+
+    const clearHighlight = useAnalysisStore((state) => state.clearHighlight);
 
     const onNodesChange: OnNodesChange<ArchitectureFlowNode> = useCallback(
         (changes) => {
@@ -55,7 +59,10 @@ export const useArchitectureCanvasHandlers = () => {
         [selectNode],
     );
 
-    const onPaneClick = useCallback((): void => selectNode(null), [selectNode]);
+    const onPaneClick = useCallback((): void => {
+        selectNode(null);
+        clearHighlight();
+    }, [selectNode, clearHighlight]);
 
     return {
         onNodesChange,

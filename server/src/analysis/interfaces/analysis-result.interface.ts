@@ -22,6 +22,7 @@ export interface AnalysisResultDto {
   };
   metrics: AnalysisMetrics;
   issues: AnalysisIssue[];
+  aiRecommendations: string[];
   generatedAt: string;
   modelVersion: string;
 }

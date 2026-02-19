@@ -1,5 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import type { ArchitectureGraphInput } from '@/features/architecture-graph-io';
 import {
@@ -18,6 +20,7 @@ import {
     MenubarTrigger,
 } from '@/shared/ui/menubar';
 import { SidebarTrigger } from '@/shared/ui/sidebar';
+import { ThemeToggle } from '@/shared/ui/theme-toggle';
 
 import { useAnalysisStore } from '../../../analysis/model/store';
 import { useEditorPersistence } from '../../lib/use-editor-persistence';
@@ -46,8 +49,15 @@ export const Header = () => {
 
     const { fileInputRef, handleFileChange, triggerFileSelect } =
         useSchemaImport({
-            onSuccess: handleImportSuccess,
-            onError: (message) => window.alert(message),
+            onSuccess: (schema) => {
+                handleImportSuccess(schema);
+                toast.success('Схема импортирована');
+            },
+            onError: (message) => toast.error(message),
+            onWarnings: (warnings) =>
+                toast.warning(
+                    `Импорт с предупреждениями: ${warnings.join('; ')}`,
+                ),
         });
 
     const { exportToFile } = useSchemaExport();
@@ -55,6 +65,8 @@ export const Header = () => {
     const setGraphToAnalyze = useAnalysisStore(
         (state) => state.setGraphToAnalyze,
     );
+    const analysisStatus = useAnalysisStore((state) => state.analysisStatus);
+    const isAnalyzing = analysisStatus === 'loading';
 
     const { save, restore, reset, isDirty, hasStoredFlow } =
         useEditorPersistence();
@@ -75,6 +87,7 @@ export const Header = () => {
         }
         const graph = buildExportableGraph(nodes, edges);
         exportToFile(graph);
+        toast.success('Файл экспортирован');
     }, [nodes, edges, exportToFile]);
 
     const handleImportClick = useCallback(() => {
@@ -83,6 +96,7 @@ export const Header = () => {
 
     const handleSave = useCallback(() => {
         save();
+        toast.success('Схема сохранена');
     }, [save]);
 
     const handleRestore = useCallback(() => {
@@ -117,33 +131,34 @@ export const Header = () => {
                 type="file"
                 accept=".json,application/json"
                 className="hidden"
+                data-testid="import-file-input"
                 onChange={handleFileChange}
             />
             <SidebarTrigger />
             <Menubar>
                 <MenubarMenu>
-                    <MenubarTrigger>File</MenubarTrigger>
+                    <MenubarTrigger>Файл</MenubarTrigger>
                     <MenubarContent>
                         <MenubarGroup>
                             <MenubarItem onClick={handleSave}>
-                                Save <MenubarShortcut>⌘S</MenubarShortcut>
+                                Сохранить <MenubarShortcut>⌘S</MenubarShortcut>
                             </MenubarItem>
                             <MenubarItem
                                 onClick={handleRestore}
                                 disabled={!hasStoredFlow}
                             >
-                                Restore
+                                Восстановить
                             </MenubarItem>
                             <MenubarItem
                                 onClick={reset}
                                 disabled={!hasStoredFlow}
                             >
-                                Save Reset
+                                Сбросить сохранение
                             </MenubarItem>
                         </MenubarGroup>
                         <MenubarGroup>
                             <MenubarItem onClick={handleImportClick}>
-                                Import from JSON{' '}
+                                Импорт из JSON{' '}
                                 <MenubarShortcut>⌘O</MenubarShortcut>
                             </MenubarItem>
                             <MenubarItem
@@ -152,7 +167,7 @@ export const Header = () => {
                                     nodes.length === 0 && edges.length === 0
                                 }
                             >
-                                Export to JSON{' '}
+                                Экспорт в JSON{' '}
                                 <MenubarShortcut>⇧⌘S</MenubarShortcut>
                             </MenubarItem>
                         </MenubarGroup>
@@ -162,13 +177,20 @@ export const Header = () => {
             <div className="font-medium">
                 Редактор{isDirty ? ' • Не сохранено' : ''}
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-1">
+                <ThemeToggle />
                 <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleAnalysisClick}
-                    disabled={nodes.length === 0 && edges.length === 0}
+                    disabled={
+                        isAnalyzing ||
+                        (nodes.length === 0 && edges.length === 0)
+                    }
                 >
+                    {isAnalyzing && (
+                        <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+                    )}
                     Анализ
                 </Button>
             </div>

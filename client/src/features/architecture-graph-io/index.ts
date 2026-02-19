@@ -10,6 +10,7 @@ export { useSchemaImport } from './lib/use-schema-import';
 
 export {
     architectureGraphSchema,
+    architectureNodeSchema,
     edgeKindSchema,
     nodeKindSchema,
 } from './model/schema';

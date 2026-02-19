@@ -9,6 +9,7 @@ export const useAnalysisSelectors = () =>
             analysisResult: state.analysisResult,
             analysisStatus: state.analysisStatus,
             analysisError: state.analysisError,
+            highlightedNodeIds: state.highlightedNodeIds,
         })),
     );
 
@@ -16,7 +17,10 @@ export const useAnalysisActions = () =>
     useAnalysisStore(
         useShallow((state) => ({
             runAnalysis: state.runAnalysis,
+            restoreLastAnalysis: state.restoreLastAnalysis,
             clearAnalysis: state.clearAnalysis,
             setGraphToAnalyze: state.setGraphToAnalyze,
+            setHighlightedNodeIds: state.setHighlightedNodeIds,
+            clearHighlight: state.clearHighlight,
         })),
     );

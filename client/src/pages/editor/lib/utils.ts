@@ -10,7 +10,7 @@ import type {
     NodeKind,
 } from '@/shared/model/types';
 
-import { EDGE_KIND_LABELS, NODE_LABELS } from './config';
+import { EDGE_KIND_LABELS, EDGE_STYLES, NODE_LABELS } from './config';
 import type { ArchitectureFlowNode } from '../model/types';
 
 export interface FlowEdgeData extends Record<string, unknown> {
@@ -173,15 +173,26 @@ export const createGraphEdge = (
     kind,
 });
 
-export const toFlowEdge = (graphEdge: GraphEdge): Edge<FlowEdgeData> => ({
-    id: graphEdge.id,
-    source: graphEdge.source,
-    target: graphEdge.target,
-    label: EDGE_KIND_LABELS[graphEdge.kind] ?? graphEdge.kind,
-    type: 'smoothstep',
-    markerEnd: { type: 'arrowclosed' },
-    data: { edge: graphEdge },
-});
+export const toFlowEdge = (graphEdge: GraphEdge): Edge<FlowEdgeData> => {
+    const edgeStyle = EDGE_STYLES[graphEdge.kind];
+    return {
+        id: graphEdge.id,
+        source: graphEdge.source,
+        target: graphEdge.target,
+        label: EDGE_KIND_LABELS[graphEdge.kind] ?? graphEdge.kind,
+        type: 'smoothstep',
+        animated: edgeStyle?.animated ?? false,
+        style: {
+            stroke: edgeStyle?.color,
+            strokeWidth: edgeStyle?.strokeWidth ?? 1.5,
+            ...(edgeStyle?.strokeDasharray
+                ? { strokeDasharray: edgeStyle.strokeDasharray }
+                : {}),
+        },
+        markerEnd: { type: 'arrowclosed', color: edgeStyle?.color },
+        data: { edge: graphEdge },
+    };
+};
 
 export const toFlowNode = (
     archNode: ArchitectureNode,
@@ -190,7 +201,7 @@ export const toFlowNode = (
     const pos = position ?? archNode.position;
     return {
         id: archNode.id,
-        type: 'default',
+        type: 'architecture',
         position: pos,
         data: {
             label: NODE_LABELS[archNode.kind] ?? archNode.kind,

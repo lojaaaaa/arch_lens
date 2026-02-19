@@ -13,7 +13,7 @@ export const useSchemaImport = (options: UseSchemaImportOptions) => {
     const [isImporting, setIsImporting] = useState(false);
     const [error, setError] = useState<TypeOrNull<string>>(null);
 
-    const { onSuccess, onError } = options;
+    const { onSuccess, onError, onWarnings } = options;
 
     const triggerFileSelect = useCallback(() => {
         fileInputRef.current?.click();
@@ -37,6 +37,9 @@ export const useSchemaImport = (options: UseSchemaImportOptions) => {
 
                 if (parseResult.success) {
                     onSuccess(parseResult.data);
+                    if (parseResult.warnings) {
+                        onWarnings?.(parseResult.warnings);
+                    }
                 } else {
                     const message = parseResult.error;
                     setError(message);
@@ -54,7 +57,7 @@ export const useSchemaImport = (options: UseSchemaImportOptions) => {
                 setIsImporting(false);
             }
         },
-        [onSuccess, onError],
+        [onSuccess, onError, onWarnings],
     );
 
     return {
