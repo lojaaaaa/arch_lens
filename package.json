@@ -1,0 +1,16 @@
+{
+  "name": "archlens",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run start:dev",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint",
+    "typecheck:client": "cd client && npx tsc -b --noEmit",
+    "typecheck:server": "cd server && npx tsc --noEmit"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
