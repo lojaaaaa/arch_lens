@@ -9,7 +9,7 @@ import {
   calculateScore,
 } from './engine/index.js';
 import type { AnalysisResultDto } from './interfaces/index.js';
-import { allRules } from './rules/index.js';
+import { allRules, RULES_VERSION } from './rules/index.js';
 
 @Injectable()
 export class AnalysisService {
@@ -51,6 +51,7 @@ export class AnalysisService {
       aiRecommendations,
       generatedAt: new Date().toISOString(),
       modelVersion: this.modelVersion,
+      rulesVersion: RULES_VERSION,
     };
   }
 }

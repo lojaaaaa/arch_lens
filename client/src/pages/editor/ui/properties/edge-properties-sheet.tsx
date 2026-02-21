@@ -4,7 +4,6 @@ import { Info } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { EdgeKind } from '@/shared/model/types';
 import { Button } from '@/shared/ui/button';
-import { Separator } from '@/shared/ui/separator';
 import {
     Sheet,
     SheetContent,
@@ -47,12 +46,14 @@ const FieldWithTooltip = ({
     tooltip: string;
     children: ReactNode;
 }) => (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
         <div className="flex items-center gap-1.5">
-            <span className="text-sm font-medium">{label}</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {label}
+            </span>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Info className="text-muted-foreground size-3.5 shrink-0 cursor-help" />
+                    <Info className="text-muted-foreground/70 size-3.5 shrink-0 cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-60">
                     {tooltip}
@@ -181,74 +182,81 @@ export const EdgePropertiesSheet = () => {
             }}
         >
             <SheetContent side="right" className="sm:max-w-xs">
-                <SheetHeader>
+                <SheetHeader className="space-y-1">
                     <SheetTitle>Связь</SheetTitle>
                     <SheetDescription>
-                        Параметры связи между узлами. Двойной клик по связи
-                        открывает это меню.
+                        Двойной клик по связи открывает параметры.
                     </SheetDescription>
                 </SheetHeader>
 
                 {graphEdge && (
-                    <div className="flex flex-col gap-4 py-4">
-                        <FieldWithTooltip
-                            label="Тип связи"
-                            tooltip="Семантический тип связи: вызов, чтение, запись, подписка, зависимость или событие."
-                        >
-                            <select
-                                value={graphEdge.kind}
-                                onChange={(event) =>
-                                    handleKindChange(
-                                        event.target.value as EdgeKind,
-                                    )
-                                }
-                                className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                    <div className="flex flex-col gap-3 py-4">
+                        <div className="rounded-lg border bg-card/60 p-3">
+                            <FieldWithTooltip
+                                label="Тип связи"
+                                tooltip="Семантический тип: вызов, чтение, запись, подписка, зависимость или событие."
                             >
-                                {EDGE_KINDS.map((kind) => (
-                                    <option key={kind} value={kind}>
-                                        {EDGE_KIND_LABELS[kind]}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="text-muted-foreground text-xs">
-                                {EDGE_KIND_HINTS[graphEdge.kind]}
-                            </p>
-                        </FieldWithTooltip>
+                                <select
+                                    value={graphEdge.kind}
+                                    onChange={(event) =>
+                                        handleKindChange(
+                                            event.target.value as EdgeKind,
+                                        )
+                                    }
+                                    className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-none outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                >
+                                    {EDGE_KINDS.map((kind) => (
+                                        <option key={kind} value={kind}>
+                                            {EDGE_KIND_LABELS[kind]}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="text-muted-foreground mt-1 text-xs">
+                                    {EDGE_KIND_HINTS[graphEdge.kind]}
+                                </p>
+                            </FieldWithTooltip>
+                        </div>
 
-                        <Separator />
+                        <div className="rounded-lg border bg-card/60 p-3">
+                            <FieldWithTooltip
+                                label="Частота"
+                                tooltip="Оценка частоты взаимодействия (запросы в минуту)."
+                            >
+                                <FrequencySelect
+                                    value={graphEdge.frequency ?? 10}
+                                    onChange={(frequency) =>
+                                        updateEdge(graphEdge.id, {
+                                            frequency,
+                                        })
+                                    }
+                                />
+                            </FieldWithTooltip>
+                        </div>
 
-                        <FieldWithTooltip
-                            label="Частота вызовов"
-                            tooltip="Насколько часто происходит обращение по этой связи. Влияет на оценку нагрузки на API и данные."
-                        >
-                            <FrequencySelect
-                                value={graphEdge.frequency ?? 10}
-                                onChange={(frequency) =>
-                                    updateEdge(graphEdge.id, { frequency })
-                                }
-                            />
-                        </FieldWithTooltip>
-
-                        <FieldWithTooltip
-                            label="Тип взаимодействия"
-                            tooltip="Синхронный — ожидание ответа (блокирующий). Асинхронный — fire-and-forget, очереди, события."
-                        >
-                            <SyncToggle
-                                value={graphEdge.synchronous ?? true}
-                                onChange={(synchronous) =>
-                                    updateEdge(graphEdge.id, { synchronous })
-                                }
-                            />
-                        </FieldWithTooltip>
+                        <div className="rounded-lg border bg-card/60 p-3">
+                            <FieldWithTooltip
+                                label="Взаимодействие"
+                                tooltip="Синхронный — ожидание ответа (блокирующий). Асинхронный — очереди и события."
+                            >
+                                <SyncToggle
+                                    value={graphEdge.synchronous ?? true}
+                                    onChange={(synchronous) =>
+                                        updateEdge(graphEdge.id, {
+                                            synchronous,
+                                        })
+                                    }
+                                />
+                            </FieldWithTooltip>
+                        </div>
                     </div>
                 )}
 
-                <SheetFooter>
+                <SheetFooter className="mt-auto">
                     <Button
                         type="button"
-                        variant="destructive"
                         disabled={!graphEdge}
                         onClick={handleRemove}
+                        className="w-full"
                     >
                         Удалить связь
                     </Button>

@@ -6,6 +6,7 @@ export type NodeKind =
     | 'ui_page'
     | 'ui_component'
     | 'state_store'
+    | 'system'
     | 'api_gateway'
     | 'service'
     | 'database'
@@ -24,6 +25,7 @@ export interface BaseNode {
     id: string;
     kind: NodeKind;
     layer: LayerType;
+    displayName?: string;
 
     position: { x: number; y: number };
 
@@ -50,6 +52,13 @@ export interface UIPageNode extends FrontendNodeBase {
     componentsCount: number;
     stateUsage: 'none' | 'local' | 'global';
     updateFrequency: number;
+}
+
+export interface SystemNode extends FrontendNodeBase {
+    kind: 'system';
+
+    pagesCount: number;
+    description?: string;
 }
 
 export interface UIComponentNode extends FrontendNodeBase {
@@ -107,7 +116,7 @@ export interface CacheNode extends DataNodeBase {
     hitRate: number;
 }
 
-export interface ExternalSystemNode extends BackendNodeBase {
+export interface ExternalSystemNode extends DataNodeBase {
     kind: 'external_system';
 
     systemType:
@@ -128,6 +137,7 @@ export interface ExternalSystemNode extends BackendNodeBase {
 
 export type ArchitectureNode =
     | UIPageNode
+    | SystemNode
     | UIComponentNode
     | StateStoreNode
     | APIGatewayNode
@@ -218,6 +228,7 @@ export interface AnalysisResult {
 
     generatedAt: string;
     modelVersion: string;
+    rulesVersion: string;
 }
 
 export interface AnalysisRule {

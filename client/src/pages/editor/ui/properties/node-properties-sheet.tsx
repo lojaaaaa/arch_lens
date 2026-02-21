@@ -345,6 +345,7 @@ export const NodePropertiesSheet = () => {
     }, [selectedFlowNode]);
 
     const isSheetOpen = Boolean(selectedNodeId && selectedArchitectureNode);
+    const isSystemNode = selectedArchitectureNode?.kind === 'system';
 
     return (
         <Sheet
@@ -378,6 +379,28 @@ export const NodePropertiesSheet = () => {
 
                         return (
                             <div className="flex flex-col gap-4 p-4">
+                                <FieldWithTooltip
+                                    label="Название"
+                                    tooltip="Пользовательское имя узла. Например, Auth API."
+                                >
+                                    <Input
+                                        placeholder={
+                                            NODE_LABELS[archNode.kind] ??
+                                            'Название'
+                                        }
+                                        value={archNode.displayName ?? ''}
+                                        onChange={(event) => {
+                                            const nextValue =
+                                                event.target.value;
+                                            updateNode(archNode.id, {
+                                                displayName:
+                                                    nextValue.trim().length > 0
+                                                        ? nextValue
+                                                        : undefined,
+                                            });
+                                        }}
+                                    />
+                                </FieldWithTooltip>
                                 <FieldWithTooltip
                                     label="Сложность"
                                     tooltip="Оценка вычислительной и архитектурной сложности узла. Влияет на расчёт нагрузки рендеринга и общий score."
@@ -1034,9 +1057,9 @@ export const NodePropertiesSheet = () => {
                 <SheetFooter>
                     <Button
                         type="button"
-                        disabled={!selectedArchitectureNode}
+                        disabled={!selectedArchitectureNode || isSystemNode}
                         onClick={() => {
-                            if (!selectedArchitectureNode) {
+                            if (!selectedArchitectureNode || isSystemNode) {
                                 return;
                             }
                             removeNode(selectedArchitectureNode.id);

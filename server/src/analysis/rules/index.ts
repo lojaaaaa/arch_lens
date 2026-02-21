@@ -8,3 +8,5 @@ export const allRules: AnalysisRule[] = [
   ...patternRules,
   ...loadRules,
 ];
+
+export const RULES_VERSION = '1.0';

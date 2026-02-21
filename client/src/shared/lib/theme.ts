@@ -1,4 +1,5 @@
-const STORAGE_KEY = 'archlens:theme';
+export const STORAGE_KEY = 'archlens:theme';
+export const THEME_EVENT = 'archlens:theme-change';
 
 export type Theme = 'light' | 'dark';
 
@@ -21,4 +22,9 @@ export const applyTheme = (theme: Theme) => {
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+            new CustomEvent(THEME_EVENT, { detail: { theme } }),
+        );
+    }
 };

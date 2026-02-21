@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 
 const NODE_KINDS = [
+  'system',
   'ui_page',
   'ui_component',
   'state_store',

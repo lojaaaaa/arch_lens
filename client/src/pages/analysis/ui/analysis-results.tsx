@@ -54,15 +54,45 @@ const SEVERITY_ORDER: Record<IssueSeverity, number> = {
 };
 
 const SEVERITY_STYLES: Record<IssueSeverity, string> = {
-    info: 'border-l-blue-400 bg-blue-50/30 dark:border-l-blue-500 dark:bg-blue-950/30',
-    warning: 'border-l-amber-400 bg-amber-50/30 dark:border-l-amber-500 dark:bg-amber-950/30',
-    critical: 'border-l-red-400 bg-red-50/30 dark:border-l-red-500 dark:bg-red-950/30',
+    info: [
+        'border-l-blue-400',
+        'bg-blue-50/30',
+        'dark:border-l-blue-500',
+        'dark:bg-blue-950/30',
+    ].join(' '),
+    warning: [
+        'border-l-amber-400',
+        'bg-amber-50/30',
+        'dark:border-l-amber-500',
+        'dark:bg-amber-950/30',
+    ].join(' '),
+    critical: [
+        'border-l-red-400',
+        'bg-red-50/30',
+        'dark:border-l-red-500',
+        'dark:bg-red-950/30',
+    ].join(' '),
 };
 
 const SEVERITY_BADGE: Record<IssueSeverity, string> = {
-    info: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
-    warning: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
-    critical: 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+    info: [
+        'bg-blue-100',
+        'text-blue-700',
+        'dark:bg-blue-900/50',
+        'dark:text-blue-300',
+    ].join(' '),
+    warning: [
+        'bg-amber-100',
+        'text-amber-700',
+        'dark:bg-amber-900/50',
+        'dark:text-amber-300',
+    ].join(' '),
+    critical: [
+        'bg-red-100',
+        'text-red-700',
+        'dark:bg-red-900/50',
+        'dark:text-red-300',
+    ].join(' '),
 };
 
 const SEVERITY_LABELS: Record<IssueSeverity, string> = {
@@ -98,10 +128,25 @@ type AnalysisResultsProps = {
 type MetricLevel = 'good' | 'moderate' | 'bad' | 'neutral';
 
 const LEVEL_STYLES: Record<MetricLevel, string> = {
-    good: 'text-green-600 bg-green-50/50 dark:text-green-400 dark:bg-green-950/40',
-    moderate: 'text-amber-600 bg-amber-50/50 dark:text-amber-400 dark:bg-amber-950/40',
-    bad: 'text-red-600 bg-red-50/50 dark:text-red-400 dark:bg-red-950/40',
-    neutral: 'text-foreground bg-muted/30 dark:bg-muted/50',
+    good: [
+        'text-green-600',
+        'bg-green-50/50',
+        'dark:text-green-400',
+        'dark:bg-green-950/40',
+    ].join(' '),
+    moderate: [
+        'text-amber-600',
+        'bg-amber-50/50',
+        'dark:text-amber-400',
+        'dark:bg-amber-950/40',
+    ].join(' '),
+    bad: [
+        'text-red-600',
+        'bg-red-50/50',
+        'dark:text-red-400',
+        'dark:bg-red-950/40',
+    ].join(' '),
+    neutral: ['text-foreground', 'bg-muted/30', 'dark:bg-muted/50'].join(' '),
 };
 
 const LEVEL_DOT: Record<MetricLevel, string> = {
@@ -215,6 +260,7 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
     const navigate = useNavigate();
     const { setHighlightedNodeIds } = useAnalysisActions();
     const { summary, metrics, issues } = result;
+    const aiRecommendations = result.aiRecommendations ?? [];
 
     const [severityFilter, setSeverityFilter] = useState<IssueSeverity | null>(
         null,
@@ -540,19 +586,28 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
                     <Sparkles className="size-4" />
                     AI-рекомендации
                 </h2>
-                <p className="text-muted-foreground text-sm">
-                    {(result.aiRecommendations ?? []).length > 0
-                        ? (result.aiRecommendations ?? []).map((rec, idx) => (
-                              <span key={idx} className="block">
-                                  {rec}
-                              </span>
-                          ))
-                        : 'Скоро будет доступно'}
-                </p>
+                {aiRecommendations.length > 0 ? (
+                    <ul className="space-y-1 text-sm">
+                        {aiRecommendations.map((recommendation) => (
+                            <li
+                                key={recommendation}
+                                className="text-muted-foreground"
+                            >
+                                {recommendation}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-muted-foreground text-sm">
+                        Скоро будет доступно
+                    </p>
+                )}
             </section>
 
             <p className="text-muted-foreground text-xs">
                 {result.generatedAt} &middot; модель v{result.modelVersion}
+                {' · '}
+                правила v{result.rulesVersion}
             </p>
         </div>
     );

@@ -1,7 +1,7 @@
 import type { NodeKind } from './types';
 
 export const allowedConnections: Record<NodeKind, NodeKind[]> = {
-    ui_page: ['ui_component', 'api_gateway'],
+    ui_page: ['ui_component', 'api_gateway', 'system'],
     ui_component: ['state_store', 'api_gateway'],
     state_store: ['ui_component'],
     api_gateway: ['service'],
@@ -9,4 +9,5 @@ export const allowedConnections: Record<NodeKind, NodeKind[]> = {
     database: [],
     cache: [],
     external_system: [],
+    system: [],
 } as const;

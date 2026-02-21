@@ -82,6 +82,9 @@ feature-name/
 
 `camelCase`: `buildExportableGraph`, `handleAnalysisClick`
 
+**Запрет на однобуквенные имена** (кроме стандартных индексов в простых циклах).
+Пиши читаемо: `value`, `event`, `nodeId`, `requestRate`, а не `v`, `e`, `id`, `r`.
+
 ### Типы и интерфейсы
 
 `PascalCase`: `ArchitectureNode`, `AnalysisResult`, `EdgeKind`
@@ -184,6 +187,8 @@ const nodes = useArchitectureStore((s) => s.nodes);
 - Shadcn UI компоненты как база
 - Поддержка тёмной и светлой темы (CSS-переменные через Tailwind)
 - Цвета слоёв: Frontend `blue`, Backend `green`, Data `amber` — используем мягкие оттенки с прозрачностью (`bg-blue-50/60`)
+- Избегать избыточной визуальной «шумности»: ярких акцентов, тяжёлых бордеров, лишних иконок
+- Цвета и прозрачности — через CSS-переменные, чтобы темы переключались без переписывания классов
 
 ---
 

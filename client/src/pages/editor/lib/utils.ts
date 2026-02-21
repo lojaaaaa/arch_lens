@@ -2,6 +2,7 @@ import type { Node } from '@xyflow/react';
 import type { Edge } from '@xyflow/react';
 import { nanoid } from 'nanoid';
 
+import type { ArchitectureGraphInput } from '@/features/architecture-graph-io';
 import type {
     ArchitectureGraph,
     ArchitectureNode,
@@ -48,6 +49,14 @@ export const createNode = (
     const baseNode = getBaseNode(kind, position);
 
     switch (kind) {
+        case 'system':
+            return {
+                ...baseNode,
+                kind: 'system',
+                layer: 'frontend',
+                pagesCount: 0,
+                description: '',
+            };
         case 'ui_page':
             return {
                 ...baseNode,
@@ -117,7 +126,7 @@ export const createNode = (
             return {
                 ...baseNode,
                 kind: 'external_system',
-                layer: 'backend',
+                layer: 'data',
                 systemType: 'other',
                 protocol: 'REST',
                 reliability: 0.99,
@@ -128,7 +137,47 @@ export const createNode = (
     }
 };
 
-import type { ArchitectureGraphInput } from '@/features/architecture-graph-io';
+export const ensureSystemNode = (
+    nodes: ArchitectureNode[],
+): ArchitectureNode[] => {
+    const systemIndex = nodes.findIndex((node) => node.kind === 'system');
+    if (systemIndex === -1) {
+        const systemNode = createNode('system', { x: 80, y: 80 });
+        return [systemNode, ...nodes];
+    }
+    const systemNode = nodes[systemIndex];
+    const remaining = nodes.filter((node) => node.kind !== 'system');
+    return [systemNode, ...remaining];
+};
+
+export const ensureSystemEdges = (
+    nodes: ArchitectureNode[],
+    edges: GraphEdge[],
+): GraphEdge[] => {
+    const systemNode = nodes.find((node) => node.kind === 'system');
+    if (!systemNode) {
+        return edges;
+    }
+    const existingPairs = new Set(
+        edges.map((edge) => `${edge.source}->${edge.target}:${edge.kind}`),
+    );
+    const pageIds = nodes
+        .filter((node) => node.kind === 'ui_page')
+        .map((node) => node.id);
+    const nextEdges = [...edges];
+    pageIds.forEach((pageId) => {
+        const key = `${pageId}->${systemNode.id}:depends_on`;
+        if (!existingPairs.has(key)) {
+            nextEdges.push({
+                id: nanoid(),
+                source: pageId,
+                target: systemNode.id,
+                kind: 'depends_on',
+            });
+        }
+    });
+    return nextEdges;
+};
 
 export const architectureGraphToFlow = (
     graph: ArchitectureGraphInput,
@@ -136,19 +185,20 @@ export const architectureGraphToFlow = (
     nodes: ReturnType<typeof toFlowNode>[];
     edges: ReturnType<typeof toFlowEdge>[];
 } => {
-    const flowNodes = graph.nodes.map((node) => {
+    const normalizedNodes = graph.nodes.map((node) => {
         const normalized = normalizeImportedNode(node);
-        return toFlowNode(normalized);
+        return normalized;
     });
-    const flowEdges = graph.edges.map((edge) =>
-        toFlowEdge({
-            id: edge.id,
-            source: edge.source,
-            target: edge.target,
-            kind: edge.kind,
-        }),
+    const ensuredNodes = ensureSystemNode(normalizedNodes);
+    const nodeIds = new Set(ensuredNodes.map((node) => node.id));
+    const filteredEdges = graph.edges.filter(
+        (edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target),
     );
-    return { nodes: flowNodes, edges: flowEdges };
+    const ensuredEdges = ensureSystemEdges(ensuredNodes, filteredEdges);
+    return {
+        nodes: ensuredNodes.map((node) => toFlowNode(node)),
+        edges: ensuredEdges.map((edge) => toFlowEdge(edge)),
+    };
 };
 
 export const normalizeImportedNode = (
@@ -204,7 +254,10 @@ export const toFlowNode = (
         type: 'architecture',
         position: pos,
         data: {
-            label: NODE_LABELS[archNode.kind] ?? archNode.kind,
+            label:
+                archNode.displayName ??
+                NODE_LABELS[archNode.kind] ??
+                archNode.kind,
             node: archNode,
         },
     };
@@ -216,6 +269,7 @@ export const allowedEdgeKinds: Record<
 > = {
     ui_page: {
         ui_component: ['depends_on'],
+        system: ['depends_on'],
         api_gateway: ['calls'],
     },
 
@@ -242,6 +296,21 @@ export const allowedEdgeKinds: Record<
     database: {},
     cache: {},
     external_system: {},
+    system: {},
+};
+
+export const isEdgeAllowed = (
+    sourceKind: NodeKind,
+    targetKind: NodeKind,
+): boolean => {
+    return (allowedEdgeKinds[sourceKind]?.[targetKind]?.length ?? 0) > 0;
+};
+
+export const getDefaultEdgeKind = (
+    sourceKind: NodeKind,
+    targetKind: NodeKind,
+): EdgeKind | null => {
+    return allowedEdgeKinds[sourceKind]?.[targetKind]?.[0] ?? null;
 };
 
 export const buildArchitectureGraph = (
@@ -267,6 +336,22 @@ export const buildArchitectureGraph = (
                 kind: graphEdge?.kind ?? 'calls',
             };
         }),
+    };
+};
+
+export const ensureSystemFlowGraph = (
+    nodes: ArchitectureFlowNode[],
+    edges: Edge[],
+): {
+    nodes: ReturnType<typeof toFlowNode>[];
+    edges: ReturnType<typeof toFlowEdge>[];
+} => {
+    const graph = buildArchitectureGraph(nodes, edges);
+    const ensuredNodes = ensureSystemNode(graph.nodes);
+    const ensuredEdges = ensureSystemEdges(ensuredNodes, graph.edges);
+    return {
+        nodes: ensuredNodes.map((node) => toFlowNode(node)),
+        edges: ensuredEdges.map((edge) => toFlowEdge(edge)),
     };
 };
 

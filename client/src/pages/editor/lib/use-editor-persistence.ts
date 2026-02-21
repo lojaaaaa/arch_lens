@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     clearFlowFromStorage,
+    ensureSystemFlowGraph,
     hasStoredFlow,
     loadFlowFromStorage,
     saveFlowToStorage,
@@ -48,8 +49,12 @@ export const useEditorPersistence = () => {
         if (!stored) {
             return;
         }
-        setNodes(stored.nodes as Parameters<typeof setNodes>[0]);
-        setEdges(stored.edges as Parameters<typeof setEdges>[0]);
+        const { nodes: nextNodes, edges: nextEdges } = ensureSystemFlowGraph(
+            stored.nodes as Parameters<typeof setNodes>[0],
+            stored.edges as Parameters<typeof setEdges>[0],
+        );
+        setNodes(nextNodes as Parameters<typeof setNodes>[0]);
+        setEdges(nextEdges as Parameters<typeof setEdges>[0]);
         (
             flowInstance as {
                 setViewport?: (viewport: unknown) => Promise<unknown>;
@@ -77,8 +82,13 @@ export const useEditorPersistence = () => {
             hasRestoredRef.current = true;
             const stored = loadFlowFromStorage();
             if (stored) {
-                setNodes(stored.nodes as Parameters<typeof setNodes>[0]);
-                setEdges(stored.edges as Parameters<typeof setEdges>[0]);
+                const { nodes: nextNodes, edges: nextEdges } =
+                    ensureSystemFlowGraph(
+                        stored.nodes as Parameters<typeof setNodes>[0],
+                        stored.edges as Parameters<typeof setEdges>[0],
+                    );
+                setNodes(nextNodes as Parameters<typeof setNodes>[0]);
+                setEdges(nextEdges as Parameters<typeof setEdges>[0]);
                 (
                     flowInstance as {
                         setViewport?: (viewport: unknown) => Promise<unknown>;

@@ -1,15 +1,16 @@
 import { type MouseEvent, useCallback } from 'react';
 import {
-    applyEdgeChanges,
-    applyNodeChanges,
     type NodeMouseHandler,
     type OnConnect,
     type OnEdgesChange,
     type OnNodesChange,
 } from '@xyflow/react';
+import { toast } from 'sonner';
 
 import { useAnalysisStore } from '@/pages/analysis/model/store';
 
+import { NODE_LABELS } from '../../lib/config';
+import { getDefaultEdgeKind, isEdgeAllowed } from '../../lib/utils';
 import {
     useArchitectureActions,
     useArchitectureSelectors,
@@ -17,34 +18,58 @@ import {
 import type { ArchitectureFlowNode } from '../../model/types';
 
 export const useArchitectureCanvasHandlers = () => {
-    const { nodes, edges } = useArchitectureSelectors();
-
-    const { setNodes, setEdges, selectEdge, selectNode, addEdge } =
-        useArchitectureActions();
+    const { nodes } = useArchitectureSelectors();
+    const {
+        applyNodeChanges,
+        applyEdgeChanges,
+        selectEdge,
+        selectNode,
+        addEdge,
+    } = useArchitectureActions();
 
     const clearHighlight = useAnalysisStore((state) => state.clearHighlight);
 
     const onNodesChange: OnNodesChange<ArchitectureFlowNode> = useCallback(
-        (changes) => {
-            setNodes(applyNodeChanges(changes, nodes));
+        (nodeChanges) => {
+            applyNodeChanges(nodeChanges);
         },
-        [nodes, setNodes],
+        [applyNodeChanges],
     );
 
     const onEdgesChange: OnEdgesChange = useCallback(
-        (changes) => {
-            setEdges(applyEdgeChanges(changes, edges));
+        (edgeChanges) => {
+            applyEdgeChanges(edgeChanges);
         },
-        [edges, setEdges],
+        [applyEdgeChanges],
     );
 
     const onConnect: OnConnect = useCallback(
         (connection) => {
-            if (connection.source && connection.target) {
-                addEdge(connection.source, connection.target, 'calls');
+            const sourceId = connection.source;
+            const targetId = connection.target;
+            if (!sourceId || !targetId) {
+                return;
             }
+            const sourceNode = nodes.find((node) => node.id === sourceId);
+            const targetNode = nodes.find((node) => node.id === targetId);
+            const sourceKind = sourceNode?.data?.node?.kind;
+            const targetKind = targetNode?.data?.node?.kind;
+
+            if (!sourceKind || !targetKind) {
+                return;
+            }
+
+            const defaultKind = getDefaultEdgeKind(sourceKind, targetKind);
+            if (defaultKind && isEdgeAllowed(sourceKind, targetKind)) {
+                addEdge(sourceId, targetId, defaultKind);
+                return;
+            }
+
+            const sourceLabel = NODE_LABELS[sourceKind] ?? sourceKind;
+            const targetLabel = NODE_LABELS[targetKind] ?? targetKind;
+            toast(`Недопустимая связь между ${sourceLabel} и ${targetLabel}`);
         },
-        [addEdge],
+        [addEdge, nodes],
     );
 
     const onEdgeDoubleClick = useCallback(

@@ -788,6 +788,460 @@
       ],
       "dependencies": [],
       "status": "done"
+    },
+    {
+      "id": "TASK-037",
+      "category": "ui",
+      "priority": "high",
+      "description": "MiniMap: обновление темы при переключении (без перезагрузки)",
+      "acceptance_criteria": [
+        "MiniMap обновляет цвета при клике на toggle темы",
+        "Нет необходимости перезагружать страницу",
+        "Стили задаются через CSS-переменные/props"
+      ],
+      "test_steps": [
+        "Шаг 1: Открыть редактор",
+        "Шаг 2: Переключить тему → MiniMap сразу обновился"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-038",
+      "category": "ui",
+      "priority": "high",
+      "description": "Видимость верхнего handle у нод",
+      "acceptance_criteria": [
+        "Верхняя точка соединения видна в светлой и тёмной теме",
+        "Handle не сливается с фоном"
+      ],
+      "test_steps": [
+        "Шаг 1: Добавить ноду → верхний handle виден",
+        "Шаг 2: Переключить тему → handle остаётся видимым"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-039",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Обводка нод — менее заметная, с прозрачностью",
+      "acceptance_criteria": [
+        "Обводка более мягкая в обеих темах",
+        "Фокус/hover остаются различимыми"
+      ],
+      "test_steps": [
+        "Шаг 1: Сравнить ноды до/после — обводка менее акцентная",
+        "Шаг 2: При наведении/выборе видно состояние"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-040",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Убрать иконки из нод (минимализм)",
+      "acceptance_criteria": [
+        "Иконки на нодах скрыты",
+        "Тип ноды всё ещё понятен по тексту/стилю"
+      ],
+      "test_steps": [
+        "Шаг 1: Добавить ноду → иконка не отображается",
+        "Шаг 2: Тип ноды читается по заголовку/подписи"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-041",
+      "category": "ui",
+      "priority": "high",
+      "description": "Лаконичные стили связей на CSS-переменных",
+      "acceptance_criteria": [
+        "Цвет линий и стрелок задаётся через CSS-переменные",
+        "Стили нейтральные, без ярко-синего акцента",
+        "Возможна настройка через тему"
+      ],
+      "test_steps": [
+        "Шаг 1: Проверить цвет ребра в светлой теме",
+        "Шаг 2: Переключить тему → цвет корректно меняется"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-042",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Редизайн панели редактора связи",
+      "acceptance_criteria": [
+        "Панель выглядит современно и минималистично",
+        "Поля сгруппированы, отступы и типографика аккуратные"
+      ],
+      "test_steps": [
+        "Шаг 1: Открыть свойства связи",
+        "Шаг 2: Проверить визуальную целостность панели"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-043",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Контекстное меню для связей (ПКМ)",
+      "acceptance_criteria": [
+        "ПКМ по связи открывает меню",
+        "Есть действия: редактировать, удалить"
+      ],
+      "test_steps": [
+        "Шаг 1: ПКМ по ребру → меню открывается",
+        "Шаг 2: Удалить ребро через меню"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-044",
+      "category": "ui",
+      "priority": "high",
+      "description": "Убрать лишний вертикальный скролл справа",
+      "acceptance_criteria": [
+        "По умолчанию нет лишнего скроллбара",
+        "Layout не выходит за высоту экрана"
+      ],
+      "test_steps": [
+        "Шаг 1: Открыть редактор → скролл справа отсутствует",
+        "Шаг 2: Открыть анализ → скролл появляется только при необходимости"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-045",
+      "category": "ui",
+      "priority": "high",
+      "description": "Undo/Redo в редакторе",
+      "acceptance_criteria": [
+        "Поддержка Ctrl+Z / Ctrl+Y",
+        "Работает для добавления, удаления, перемещения нод/ребер"
+      ],
+      "test_steps": [
+        "Шаг 1: Добавить ноду → Ctrl+Z удаляет",
+        "Шаг 2: Ctrl+Y возвращает ноду"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-046",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Горячие клавиши редактора (Delete, Escape, Ctrl+D)",
+      "acceptance_criteria": [
+        "Delete удаляет выбранную ноду/ребро",
+        "Escape снимает выделение",
+        "Ctrl+D дублирует выделенную ноду"
+      ],
+      "test_steps": [
+        "Шаг 1: Выбрать ноду → Delete удаляет",
+        "Шаг 2: Выбрать ноду → Escape снимает выделение"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-047",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Экспорт схемы в PNG/SVG",
+      "acceptance_criteria": [
+        "Кнопка экспорта в изображение доступна в UI",
+        "Экспорт корректно сохраняет canvas как PNG/SVG"
+      ],
+      "test_steps": [
+        "Шаг 1: Нажать «Экспорт PNG» → файл скачан",
+        "Шаг 2: Нажать «Экспорт SVG» → файл скачан"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-048",
+      "category": "ui",
+      "priority": "high",
+      "description": "Выделение группы элементов и совместное перемещение",
+      "acceptance_criteria": [
+        "Multi-select через Ctrl+клик",
+        "Рамка выделения (drag-select)",
+        "Перемещение группы переносит все выбранные ноды"
+      ],
+      "test_steps": [
+        "Шаг 1: Выделить 2+ ноды → все подсвечены",
+        "Шаг 2: Потянуть одну → перемещаются все"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-049",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Drag-and-drop нод из сайдбара на canvas",
+      "acceptance_criteria": [
+        "Ноду можно перетащить из сайдбара",
+        "Новая нода появляется рядом с курсором"
+      ],
+      "test_steps": [
+        "Шаг 1: Перетащить элемент → нода создаётся на canvas",
+        "Шаг 2: Проверить позицию рядом с курсором"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-050",
+      "category": "ui",
+      "priority": "low",
+      "description": "Счётчик элементов и связей в редакторе",
+      "acceptance_criteria": [
+        "В UI отображается количество нод и ребер",
+        "Счётчик не мешает работе"
+      ],
+      "test_steps": [
+        "Шаг 1: Добавить ноду → счётчик увеличился",
+        "Шаг 2: Добавить связь → счётчик ребер увеличился"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-051",
+      "category": "functional",
+      "priority": "high",
+      "description": "Приоритизация issues на странице анализа",
+      "acceptance_criteria": [
+        "Issues сортируются по важности",
+        "Визуально видно, что исправить в первую очередь"
+      ],
+      "test_steps": [
+        "Шаг 1: Получить issues разных severity → сортировка корректна",
+        "Шаг 2: Есть визуальный индикатор приоритета"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-052",
+      "category": "functional",
+      "priority": "high",
+      "description": "Дополнительные метрики + объяснения расчётов",
+      "acceptance_criteria": [
+        "Добавлены новые метрики анализа",
+        "Для каждой метрики есть tooltip с формулой/описанием"
+      ],
+      "test_steps": [
+        "Шаг 1: Проверить наличие новых метрик",
+        "Шаг 2: Навести на tooltip → видна формула"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-053",
+      "category": "functional",
+      "priority": "high",
+      "description": "Пересмотр механизма score/grade и углубление анализа",
+      "acceptance_criteria": [
+        "Описаны и реализованы новые формулы score/grade",
+        "Серьёзные ошибки сильнее влияют на оценку",
+        "Результаты выглядят реалистично для «плохих» графов"
+      ],
+      "test_steps": [
+        "Шаг 1: Прогнать плохой граф → низкий score",
+        "Шаг 2: Исправить ошибки → score растёт"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-054",
+      "category": "functional",
+      "priority": "medium",
+      "description": "Ограничение недопустимых связей на клиенте",
+      "acceptance_criteria": [
+        "Недопустимые связи блокируются на уровне UI",
+        "Пользователь получает понятное сообщение"
+      ],
+      "test_steps": [
+        "Шаг 1: Попробовать недопустимую связь → блокировка",
+        "Шаг 2: Допустимая связь создаётся"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-055",
+      "category": "integration",
+      "priority": "medium",
+      "description": "Валидация связей при импорте",
+      "acceptance_criteria": [
+        "Импорт проверяет связи по allowedEdgeKinds",
+        "Недопустимые связи не создаются и отображаются в предупреждениях"
+      ],
+      "test_steps": [
+        "Шаг 1: Импорт с недопустимой связью → предупреждение",
+        "Шаг 2: Допустимые связи импортируются"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-056",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Дополнительные подсказки (tooltips/hints) в редакторе",
+      "acceptance_criteria": [
+        "Критические параметры имеют подсказки",
+        "Подсказки читаемы и лаконичны"
+      ],
+      "test_steps": [
+        "Шаг 1: Навести на поле → подсказка отображается",
+        "Шаг 2: Текст подсказки соответствует смыслу"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-057",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Кастомные названия нод при сохранении типа",
+      "acceptance_criteria": [
+        "Пользователь задаёт название ноды",
+        "Тип остаётся видимым (badge/подпись/hover)"
+      ],
+      "test_steps": [
+        "Шаг 1: Задать имя → отображается",
+        "Шаг 2: Тип ноды всё ещё понятен"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-058",
+      "category": "functional",
+      "priority": "medium",
+      "description": "Корневой элемент «System» (уникальный)",
+      "acceptance_criteria": [
+        "Добавлен тип узла system",
+        "На схеме может быть только один system",
+        "У system отдельные параметры"
+      ],
+      "test_steps": [
+        "Шаг 1: Добавить system → создаётся",
+        "Шаг 2: Попытаться добавить второй → блокируется"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-059",
+      "category": "functional",
+      "priority": "medium",
+      "description": "Шаблоны архитектур (presets)",
+      "acceptance_criteria": [
+        "Доступны 2-3 шаблона (CRUD, микросервисы, событийная)",
+        "Загрузка шаблона заполняет canvas"
+      ],
+      "test_steps": [
+        "Шаг 1: Выбрать шаблон → ноды/связи созданы",
+        "Шаг 2: Запустить анализ → работает"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-060",
+      "category": "infrastructure",
+      "priority": "medium",
+      "description": "Unit-тесты для правил анализа",
+      "acceptance_criteria": [
+        "Есть unit-тесты на ключевые правила",
+        "Тесты запускаются через npm script"
+      ],
+      "test_steps": [
+        "Шаг 1: Запустить тесты → проходят",
+        "Шаг 2: Негативный кейс → тесты ловят ошибку"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-061",
+      "category": "integration",
+      "priority": "low",
+      "description": "rulesVersion в AnalysisResult",
+      "acceptance_criteria": [
+        "AnalysisResult содержит rulesVersion",
+        "Фронтенд отображает версию правил"
+      ],
+      "test_steps": [
+        "Шаг 1: Запустить анализ → rulesVersion приходит",
+        "Шаг 2: Версия отображается на странице анализа"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-062",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Поиск по графу (по имени/типу ноды)",
+      "acceptance_criteria": [
+        "Есть поле поиска",
+        "Результаты подсвечиваются и центрируются"
+      ],
+      "test_steps": [
+        "Шаг 1: Ввести имя ноды → подсветка",
+        "Шаг 2: Поиск по типу → найденные ноды"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-063",
+      "category": "ui",
+      "priority": "low",
+      "description": "Zoom-to-fit / Center для больших схем",
+      "acceptance_criteria": [
+        "Кнопка «Fit to view» в UI",
+        "Схема центрируется и масштабируется"
+      ],
+      "test_steps": [
+        "Шаг 1: Разнести ноды по canvas",
+        "Шаг 2: Нажать Fit → схема в кадре"
+      ],
+      "dependencies": [],
+      "status": "pending"
+    },
+    {
+      "id": "TASK-064",
+      "category": "integration",
+      "priority": "low",
+      "description": "AI-агент (DeepSeek) для рекомендаций",
+      "acceptance_criteria": [
+        "Реализация провайдера AI вместо заглушки",
+        "Рекомендации приходят в AnalysisResult"
+      ],
+      "test_steps": [
+        "Шаг 1: Запустить анализ → aiRecommendations заполнены",
+        "Шаг 2: Рекомендации отображаются на UI"
+      ],
+      "dependencies": ["TASK-034"],
+      "status": "pending"
     }
   ]
 }

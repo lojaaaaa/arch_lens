@@ -4,14 +4,16 @@ import {
     applyTheme,
     getStoredTheme,
     setStoredTheme,
+    STORAGE_KEY,
     type Theme,
+    THEME_EVENT,
 } from './theme';
 
 export const useTheme = () => {
-    const [theme, setThemeState] = useState<Theme>(() => {
-        const stored = getStoredTheme();
-        if (stored) {
-            return stored;
+    const resolveInitialTheme = () => {
+        const storedTheme = getStoredTheme();
+        if (storedTheme) {
+            return storedTheme;
         }
         if (
             typeof window !== 'undefined' &&
@@ -20,12 +22,42 @@ export const useTheme = () => {
             return 'dark';
         }
         return 'light';
-    });
+    };
+
+    const [theme, setThemeState] = useState<Theme>(resolveInitialTheme);
 
     useEffect(() => {
         applyTheme(theme);
         setStoredTheme(theme);
     }, [theme]);
+
+    useEffect(() => {
+        const handleThemeEvent = (event: Event) => {
+            const customEvent = event as CustomEvent<{ theme?: Theme }>;
+            const nextTheme = customEvent.detail?.theme;
+            if (nextTheme) {
+                setThemeState(nextTheme);
+            }
+        };
+
+        const handleStorageEvent = (event: StorageEvent) => {
+            if (event.key !== STORAGE_KEY) {
+                return;
+            }
+            const storedTheme = getStoredTheme();
+            if (storedTheme) {
+                setThemeState(storedTheme);
+            }
+        };
+
+        window.addEventListener(THEME_EVENT, handleThemeEvent);
+        window.addEventListener('storage', handleStorageEvent);
+
+        return () => {
+            window.removeEventListener(THEME_EVENT, handleThemeEvent);
+            window.removeEventListener('storage', handleStorageEvent);
+        };
+    }, []);
 
     const toggleTheme = useCallback(() => {
         setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));

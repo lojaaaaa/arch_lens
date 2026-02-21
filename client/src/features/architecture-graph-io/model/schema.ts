@@ -6,6 +6,7 @@ const positionSchema = z.object({
 });
 
 export const nodeKindSchema = z.enum([
+    'system',
     'ui_page',
     'ui_component',
     'state_store',
@@ -32,6 +33,7 @@ const baseFields = {
     position: positionSchema,
     complexity: z.number().min(0).default(1),
     criticality: z.number().min(0).max(1).default(0.5),
+    displayName: z.string().min(1).optional(),
 };
 
 const uiPageNodeSchema = z.object({
@@ -42,6 +44,14 @@ const uiPageNodeSchema = z.object({
     componentsCount: z.number().min(0).default(1),
     stateUsage: z.enum(['none', 'local', 'global']).default('local'),
     updateFrequency: z.number().min(0).default(1),
+});
+
+const systemNodeSchema = z.object({
+    ...baseFields,
+    kind: z.literal('system'),
+    layer: z.literal('frontend').default('frontend'),
+    pagesCount: z.number().min(0).default(0),
+    description: z.string().optional(),
 });
 
 const uiComponentNodeSchema = z.object({
@@ -112,7 +122,7 @@ const cacheNodeSchema = z.object({
 const externalSystemNodeSchema = z.object({
     ...baseFields,
     kind: z.literal('external_system'),
-    layer: layerSchema.default('backend'),
+    layer: z.literal('data').default('data'),
     systemType: z
         .enum([
             'auth',
@@ -130,6 +140,7 @@ const externalSystemNodeSchema = z.object({
 });
 
 export const architectureNodeSchema = z.discriminatedUnion('kind', [
+    systemNodeSchema,
     uiPageNodeSchema,
     uiComponentNodeSchema,
     stateStoreNodeSchema,

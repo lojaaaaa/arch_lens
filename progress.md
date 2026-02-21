@@ -109,3 +109,78 @@
 **Статус:** done
 **Summary:** Добавлен EDGE_STYLES в config.ts с уникальными цветами и паттернами: calls=#6366f1 сплошная, reads=#22c55e пунктир, writes=#ef4444 сплошная, subscribes=#f59e0b пунктир+animated, depends_on=#8b5cf6 штрих, emits=#06b6d4 animated. toFlowEdge обновлён — стили и цвет маркеров применяются. EDGE_KIND_LABELS русифицированы.
 **Файлы:** client/src/pages/editor/lib/config.ts, client/src/pages/editor/lib/utils.ts
+
+---
+
+### TASK-049 — Drag-and-drop нод из сайдбара на canvas
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлен drag-and-drop из сайдбара на canvas через HTML5 DnD. Drop учитывает зум/панораму и ставит ноду под курсором; при добавлении нода автоматически выделяется.
+**Файлы:** client/src/pages/editor/ui/sidebar/sidebar.tsx, client/src/pages/editor/ui/canvas/architecture-canvas.tsx
+
+---
+
+### TASK-050 — Счётчик элементов и связей в редакторе
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлен компактный счётчик нод и связей внизу слева на canvas через React Flow Panel (иконки + числа).
+**Файлы:** client/src/pages/editor/ui/canvas/architecture-canvas.tsx
+
+---
+
+### TASK-048 — Multi-select + external_system color
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Включен drag-select и multi-select (Ctrl/Cmd+клик) на canvas. `external_system` приведен к Data layer, чтобы отображаться оранжевым.
+**Файлы:** client/src/pages/editor/ui/canvas/architecture-canvas.tsx, client/src/pages/editor/lib/utils.ts, client/src/shared/model/types.ts, client/src/features/architecture-graph-io/model/schema.ts
+
+---
+
+### TASK-047 — Экспорт PNG/SVG
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** В меню «Файл» добавлены экспорт PNG/SVG и чекбокс «Прозрачный фон». Экспорт использует текущий canvas.
+**Файлы:** client/src/pages/editor/ui/header/header.tsx, client/src/pages/editor/lib/export-image.ts
+
+---
+
+### TASK-056 — Дополнительные подсказки в редакторе
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлены подсказки средней длины для действий в Header и кнопок типов нод в Sidebar; существующие подсказки в свойствах сохранены.
+**Файлы:** client/src/pages/editor/ui/header/header.tsx, client/src/pages/editor/ui/sidebar/sidebar.tsx
+
+---
+
+### TASK-057 — Кастомные названия нод
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлены кастомные имена нод с inline‑редактированием по двойному клику и полем в свойствах. Тип отображается в виде badge рядом с именем.
+**Файлы:** client/src/shared/model/types.ts, client/src/features/architecture-graph-io/model/schema.ts, client/src/pages/editor/lib/utils.ts, client/src/pages/editor/ui/canvas/architecture-node.tsx, client/src/pages/editor/ui/properties/node-properties-sheet.tsx
+
+---
+
+### TASK-058 — Корневой элемент «System»
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлен тип узла system, обеспечена уникальность, автоматическое создание и авто‑связи ui_page → system (depends_on) при добавлении и импорте/восстановлении.
+**Файлы:** client/src/shared/model/types.ts, client/src/shared/model/config.ts, client/src/features/architecture-graph-io/model/schema.ts, client/src/pages/editor/lib/config.ts, client/src/pages/editor/lib/utils.ts, client/src/pages/editor/model/types.ts, client/src/pages/editor/model/store.ts, client/src/pages/editor/model/selectors.ts, client/src/pages/editor/ui/canvas/architecture-canvas.tsx, client/src/pages/editor/editor-page.tsx, client/src/pages/editor/lib/use-editor-persistence.ts
+
+---
+
+### TASK-059 — Шаблоны архитектур (presets)
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлены 3 шаблона (CRUD, микросервисы, событийная) и панель их применения в сайдбаре. Загрузка шаблона заменяет canvas нодами и связями.
+**Файлы:** client/src/pages/editor/lib/presets.ts, client/src/pages/editor/ui/sidebar/sidebar.tsx
+
+---
+
+### TASK-061 — rulesVersion в AnalysisResult
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлена версия правил анализа в API-ответ и отображение на странице анализа.
+**Файлы:** server/src/analysis/rules/index.ts, server/src/analysis/interfaces/analysis-result.interface.ts, server/src/analysis/analysis.service.ts, client/src/shared/model/types.ts, client/src/shared/api/analysis/analysis-result.schema.ts, client/src/pages/analysis/ui/analysis-results.tsx
+
+---
+

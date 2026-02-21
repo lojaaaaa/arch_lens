@@ -25,4 +25,5 @@ export interface AnalysisResultDto {
   aiRecommendations: string[];
   generatedAt: string;
   modelVersion: string;
+  rulesVersion: string;
 }

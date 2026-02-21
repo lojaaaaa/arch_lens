@@ -48,4 +48,5 @@ export const analysisResultSchema = z.object({
     aiRecommendations: z.array(z.string()).default([]),
     generatedAt: z.string(),
     modelVersion: z.string(),
+    rulesVersion: z.string(),
 });

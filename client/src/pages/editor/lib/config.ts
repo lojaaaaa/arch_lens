@@ -4,6 +4,7 @@ export const NODE_LABELS: Record<NodeKind, string> = {
     ui_page: 'Страница',
     ui_component: 'Компонент',
     state_store: 'Хранилище',
+    system: 'Система',
     api_gateway: 'API Gateway',
     service: 'Сервис',
     database: 'База данных',
@@ -17,17 +18,17 @@ export const LAYER_COLORS: Record<
 > = {
     frontend: {
         bg: 'bg-blue-50/60 dark:bg-blue-950/40',
-        border: 'border-blue-300 dark:border-blue-700',
+        border: 'border-blue-200/60 dark:border-blue-800/40',
         text: 'text-blue-600 dark:text-blue-400',
     },
     backend: {
         bg: 'bg-green-50/60 dark:bg-green-950/40',
-        border: 'border-green-300 dark:border-green-700',
+        border: 'border-green-200/60 dark:border-green-800/40',
         text: 'text-green-600 dark:text-green-400',
     },
     data: {
         bg: 'bg-amber-50/60 dark:bg-amber-950/40',
-        border: 'border-amber-300 dark:border-amber-700',
+        border: 'border-amber-200/60 dark:border-amber-800/40',
         text: 'text-amber-600 dark:text-amber-400',
     },
 };

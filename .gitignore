@@ -49,3 +49,8 @@ server/.git
 # Playwright
 playwright-report/
 test-results/
+
+# Worktrees
+.worktrees/
+docs/
+.cursor/

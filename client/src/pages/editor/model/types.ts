@@ -1,7 +1,6 @@
-import type { Edge, Node } from '@xyflow/react';
+import type { Edge, EdgeChange, Node, NodeChange } from '@xyflow/react';
 
 import type {
-    ArchitectureNode,
     ArchitectureNodeData,
     EdgeKind,
     GraphEdge,
@@ -21,11 +20,21 @@ export type ArchitectureState = {
     flowInstance: unknown;
     isDirty: boolean;
 
+    history: {
+        past: { nodes: ArchitectureFlowNode[]; edges: Edge[] }[];
+        future: { nodes: ArchitectureFlowNode[]; edges: Edge[] }[];
+    };
+
     setFlowInstance: (instance: unknown) => void;
     markDirty: () => void;
     markSaved: () => void;
 
     addNode: (kind: NodeKind) => void;
+    addNodeAtPosition: (
+        kind: NodeKind,
+        position?: { x: number; y: number },
+        options?: { select?: boolean },
+    ) => void;
     addEdge: (source: string, target: string, kind?: EdgeKind) => void;
     setNodes: (nodes: ArchitectureFlowNode[]) => void;
     setEdges: (edges: Edge[]) => void;
@@ -37,9 +46,13 @@ export type ArchitectureState = {
         id: string,
         patch: Partial<ArchitectureFlowNode['data']>,
     ) => void;
-    updateArchitectureNode: (
-        id: string,
-        patch: Partial<ArchitectureNode>,
-    ) => void;
     updateEdge: (id: string, patch: Partial<GraphEdge>) => void;
+
+    applyNodeChanges: (changes: NodeChange[]) => void;
+    applyEdgeChanges: (changes: EdgeChange[]) => void;
+
+    undo: () => void;
+    redo: () => void;
+    canUndo: () => boolean;
+    canRedo: () => boolean;
 };
