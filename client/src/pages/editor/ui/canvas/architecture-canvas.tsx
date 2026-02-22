@@ -164,9 +164,9 @@ export const ArchitectureCanvas = () => {
                     nodesCount={nodes.length}
                     edgesCount={edges.length}
                 />
-
-                {nodes.length === 0 ? <CanvasEmptyState /> : null}
             </ReactFlow>
+
+            {nodes.length === 0 ? <CanvasEmptyState /> : null}
 
             {contextMenu && (
                 <CanvasContextMenu
