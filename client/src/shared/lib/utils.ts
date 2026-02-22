@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import type { TypeOrNull } from './../model/types';
+
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 export const handleError = (
@@ -16,4 +18,16 @@ export const handleError = (
     }
 
     return fallbackMessage;
+};
+
+export const isEditableTarget = (target: TypeOrNull<EventTarget>) => {
+    if (!(target instanceof HTMLElement)) {
+        return false;
+    }
+
+    return (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+    );
 };

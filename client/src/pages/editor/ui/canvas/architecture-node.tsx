@@ -55,10 +55,14 @@ export const ArchitectureNodeComponent = memo(
 
         return (
             <>
-                <Handle type="target" position={Position.Top} />
+                <Handle
+                    type="target"
+                    position={Position.Top}
+                    className="!z-10 !top-0 !h-1.5 !w-1.5 !opacity-50"
+                />
                 <div
                     className={cn(
-                        'rounded-lg border px-3 pb-2 pt-4 min-w-[120px] max-w-[500px] transition-shadow backdrop-blur-sm relative',
+                        'rounded-lg border px-3 pb-3 pt-4 min-w-[120px] max-w-[500px] transition-shadow backdrop-blur-sm relative',
                         colors.bg,
                         colors.border,
                         selected &&
@@ -69,10 +73,9 @@ export const ArchitectureNodeComponent = memo(
                 >
                     <span
                         className={cn(
-                            'text-[7px] leading-none rounded px-0.5 py-0.5 absolute top-0 right-0 translate-x-3 -translate-y-3 whitespace-nowrap',
-                            'border bg-background/80',
+                            'text-[7px] text-gray-600 leading-none rounded px-0.5 py-0.5 absolute top-[-1px] left-[-15px] translate-x-3 -translate-y-3 whitespace-nowrap',
+                            ' bg-background/80',
                             colors.border,
-                            colors.text,
                         )}
                         title={typeLabel}
                     >
@@ -123,7 +126,11 @@ export const ArchitectureNodeComponent = memo(
                         </div>
                     </div>
                 </div>
-                <Handle type="source" position={Position.Bottom} />
+                <Handle
+                    type="source"
+                    position={Position.Bottom}
+                    className="!z-10 !bottom-0 !h-1.5 !w-1.5 !opacity-50"
+                />
             </>
         );
     },

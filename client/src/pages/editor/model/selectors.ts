@@ -38,3 +38,19 @@ export const useArchitectureActions = () =>
             setFlowInstance: state.setFlowInstance,
         })),
     );
+
+export const useArchitectureHotkeysActions = () =>
+    useArchitectureStore(
+        useShallow((state) => ({
+            setNodes: state.setNodes,
+            setEdges: state.setEdges,
+            selectNode: state.selectNode,
+            selectEdge: state.selectEdge,
+            removeNode: state.removeNode,
+            removeEdge: state.removeEdge,
+            undo: state.undo,
+            redo: state.redo,
+            canUndo: state.canUndo,
+            canRedo: state.canRedo,
+        })),
+    );

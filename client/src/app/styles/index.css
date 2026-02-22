@@ -137,7 +137,6 @@
     }
     body {
         @apply bg-background text-foreground m-0;
-        overflow-y: hidden;
     }
 }
 

@@ -9,7 +9,7 @@ import {
     createNode,
     ensureSystemEdges,
     ensureSystemNode,
-} from './utils';
+} from '../../lib/utils';
 
 export type ArchitecturePreset = {
     id: 'crud' | 'microservices' | 'event-driven';
