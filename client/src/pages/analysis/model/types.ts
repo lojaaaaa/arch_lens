@@ -12,12 +12,14 @@ export type AnalysisState = {
     analysisStatus: AnalysisStatus;
     analysisError: TypeOrNull<string>;
     highlightedNodeIds: string[];
+    highlightPreventAutoClear: boolean;
 
     setGraphToAnalyze: (graph: TypeOrNull<ArchitectureGraph>) => void;
     setAnalysisResult: (result: TypeOrNull<AnalysisResult>) => void;
     setAnalysisStatus: (status: AnalysisStatus) => void;
     setAnalysisError: (error: TypeOrNull<string>) => void;
     setHighlightedNodeIds: (nodeIds: string[]) => void;
+    setHighlightPreventAutoClear: (value: boolean) => void;
     clearHighlight: () => void;
     runAnalysis: (graph: ArchitectureGraph) => Promise<void>;
     restoreLastAnalysis: () => void;

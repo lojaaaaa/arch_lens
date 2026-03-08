@@ -157,7 +157,7 @@ function SidebarProvider({
                         } as CSSProperties
                     }
                     className={cn(
-                        'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full',
+                        'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex h-full min-h-svh w-full min-w-0',
                         className,
                     )}
                     {...props}
@@ -266,7 +266,12 @@ function Sidebar({
                 <div
                     data-sidebar="sidebar"
                     data-slot="sidebar-inner"
-                    className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+                    className={cn(
+                        'flex h-full w-full flex-col',
+                        'bg-sidebar',
+                        'group-data-[variant=inset]:rounded-xl group-data-[variant=inset]:border group-data-[variant=inset]:border-sidebar-border/40 group-data-[variant=inset]:bg-sidebar/60 dark:group-data-[variant=inset]:bg-sidebar/40 group-data-[variant=inset]:shadow-sm group-data-[variant=inset]:backdrop-blur-sm',
+                        'group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm',
+                    )}
                 >
                     {children}
                 </div>

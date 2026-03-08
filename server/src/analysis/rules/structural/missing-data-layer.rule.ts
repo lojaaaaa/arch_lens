@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class MissingDataLayerRule implements AnalysisRule {
   readonly id = 'S05';
-  readonly description =
-    'Сервисы бэкенда без связей с БД или кэшем';
+  readonly description = 'Сервисы бэкенда без связей с БД или кэшем';
 
   check(ctx: GraphContext): AnalysisIssue[] {
     const issues: AnalysisIssue[] = [];

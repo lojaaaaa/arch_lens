@@ -11,6 +11,9 @@ export interface AnalysisMetrics {
   estimatedRenderPressure: number;
   estimatedApiLoad: number;
   estimatedDataLoad: number;
+  stateStoreCount: number;
+  maxFanOut: number;
+  eventDrivenEdgesCount: number;
 }
 
 export interface AnalysisResultDto {

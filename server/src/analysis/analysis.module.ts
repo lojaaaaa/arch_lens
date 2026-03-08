@@ -1,7 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AiRecommendationStubProvider } from './ai/index.js';
+import {
+  AiRecommendationGroqProvider,
+  AiRecommendationStubProvider,
+} from './ai/index.js';
 import { AnalysisController } from './analysis.controller';
 import { AnalysisService } from './analysis.service';
+
+function createAiProvider() {
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  return apiKey
+    ? new AiRecommendationGroqProvider(apiKey)
+    : new AiRecommendationStubProvider();
+}
 
 @Module({
   controllers: [AnalysisController],
@@ -9,7 +19,7 @@ import { AnalysisService } from './analysis.service';
     AnalysisService,
     {
       provide: 'AiRecommendationProvider',
-      useClass: AiRecommendationStubProvider,
+      useFactory: createAiProvider,
     },
   ],
 })

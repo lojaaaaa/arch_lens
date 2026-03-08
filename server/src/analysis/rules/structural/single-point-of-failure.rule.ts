@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class SinglePointOfFailureRule implements AnalysisRule {
   readonly id = 'S09';

@@ -13,6 +13,7 @@ const issueCategorySchema = z.enum([
 
 const architectureIssueSchema = z.object({
     id: z.string(),
+    ruleId: z.string().optional(),
     severity: issueSeveritySchema,
     category: issueCategorySchema,
     title: z.string(),
@@ -32,6 +33,9 @@ const architectureMetricsSchema = z.object({
     estimatedRenderPressure: z.number(),
     estimatedApiLoad: z.number(),
     estimatedDataLoad: z.number(),
+    stateStoreCount: z.number().optional().default(0),
+    maxFanOut: z.number().optional().default(0),
+    eventDrivenEdgesCount: z.number().optional().default(0),
 });
 
 const gradeSchema = z.enum(['A', 'B', 'C', 'D', 'F']);

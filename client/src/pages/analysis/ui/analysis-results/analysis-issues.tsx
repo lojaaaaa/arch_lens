@@ -106,13 +106,21 @@ export const AnalysisIssues = ({
     return (
         <section className="rounded-lg border bg-card p-5">
             <div className="mb-4 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Замечания
-                    </h2>
-                    <span className="text-muted-foreground text-xs tabular-nums">
-                        {filteredIssues.length} из {issues.length}
-                    </span>
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                            Замечания
+                        </h2>
+                        <span className="text-muted-foreground text-xs tabular-nums">
+                            {filteredIssues.length} из {issues.length}
+                        </span>
+                    </div>
+                    {severityCounts.critical > 0 && (
+                        <p className="text-foreground/80 text-xs">
+                            Сначала исправьте критические (
+                            {severityCounts.critical})
+                        </p>
+                    )}
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
@@ -150,8 +158,9 @@ export const AnalysisIssues = ({
                 </p>
             ) : (
                 <ul className="space-y-2">
-                    {filteredIssues.map((issue) => {
+                    {filteredIssues.map((issue, index) => {
                         const hasNodes = issue.affectedNodes.length > 0;
+                        const isHighPriority = issue.severity === 'critical';
                         return (
                             <li
                                 key={issue.id}
@@ -178,12 +187,36 @@ export const AnalysisIssues = ({
                                 <div className="flex items-start gap-2">
                                     <span
                                         className={cn(
+                                            'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold tabular-nums',
+                                            isHighPriority
+                                                ? 'bg-red-500/20 text-red-700 dark:text-red-400'
+                                                : 'bg-muted/60 text-muted-foreground',
+                                        )}
+                                        title={
+                                            index === 0 && isHighPriority
+                                                ? 'Исправьте в первую очередь'
+                                                : undefined
+                                        }
+                                    >
+                                        {index + 1}
+                                    </span>
+                                    <span
+                                        className={cn(
                                             'mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium leading-none',
                                             SEVERITY_BADGE[issue.severity],
                                         )}
                                     >
-                                        {CATEGORY_LABELS[issue.category] ??
-                                            issue.category}
+                                        {SEVERITY_LABELS[issue.severity]}
+                                        {CATEGORY_LABELS[issue.category] && (
+                                            <>
+                                                {' · '}
+                                                {
+                                                    CATEGORY_LABELS[
+                                                        issue.category
+                                                    ]
+                                                }
+                                            </>
+                                        )}
                                     </span>
                                     <div className="min-w-0 flex-1 overflow-hidden">
                                         <p className="break-words text-sm font-medium">

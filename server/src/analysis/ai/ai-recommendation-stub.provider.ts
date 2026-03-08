@@ -3,10 +3,12 @@ import type { ArchitectureGraphDto } from '../dto/architecture-graph.dto.js';
 import type { AnalysisIssue } from '../interfaces/analysis-issue.interface.js';
 
 export class AiRecommendationStubProvider implements AiRecommendationProvider {
-  async getRecommendations(
+  /* eslint-disable @typescript-eslint/no-unused-vars -- stub implements interface but ignores args */
+  getRecommendations(
     _graph: ArchitectureGraphDto,
     _issues: AnalysisIssue[],
   ): Promise<string[]> {
-    return [];
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+    return Promise.resolve([]);
   }
 }

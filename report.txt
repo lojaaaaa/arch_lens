@@ -85,7 +85,12 @@
 
   ── НОВЫЙ BACKLOG (TASK-037..064) ──
   [ ] UI/UX: MiniMap, handle, обводки, связи, контекстные меню, Undo/Redo, hotkeys
-  [ ] Анализ: новые метрики, пересмотр score/grade, приоритизация issues
+  [✓] TASK-051  Приоритизация issues
+  [✓] TASK-052  Дополнительные метрики + tooltips с формулами
+  [✓] TASK-062  Поиск по графу (имя/тип)
+  [✓] TASK-060  Unit-тесты для правил анализа
+  [✓] TASK-063  Zoom-to-fit / Center
+  [✓] TASK-053  Пересмотр score/grade
   [ ] Валидация: допустимые связи + проверка импорта
   [ ] Фичи: templates, поиск по графу, root system node, экспорт PNG/SVG, AI агент
   [ ] Подробности — в tasks.json
@@ -331,5 +336,34 @@
                 - TASK-058: System root (уникальный, авто-создание, Page → System depends_on)
                 - TASK-059: Шаблоны архитектур (CRUD, микросервисы, событийная)
                 - TASK-061: rulesVersion в AnalysisResult и отображение
+
+              2026-02-19: TASK-051 — Приоритизация issues
+                - Сортировка critical → warning → info (уже была, подтверждена)
+                - Порядковые номера (1, 2, 3…) у каждой issue, красный акцент для critical
+                - Badge: severity + категория (Критично · Архитектура)
+                - Подсказка «Сначала исправьте критические (N)» при наличии critical
+                - Tooltip «Исправьте в первую очередь» для первого critical
+
+              2026-02-19: TASK-052 — Дополнительные метрики + объяснения
+                - Новые метрики: stateStoreCount, maxFanOut, eventDrivenEdgesCount
+                - Tooltip с формулой/описанием у каждой из 11 метрик
+                - METRIC_TOOLTIPS на русском
+
+              2026-02-19: TASK-062 — Поиск по графу
+                - Поле «Поиск по графу…» в header
+                - Поиск по displayName, kind, русскому названию типа, id
+                - Подсветка + fitView, debounce 150ms
+                - highlightPreventAutoClear — поисковая подсветка не сбрасывается
+
+              2026-02-19: TASK-060 — Unit-тесты для правил анализа
+                - 11 тестов: OrphanNodesRule, FrontendDbDirectRule, CyclicDependenciesRule, RuleEngine
+                - npm run test / npm run test:rules
+
+              2026-02-19: TASK-063 — Zoom-to-fit / Center
+                - Кнопка «Вписать в экран» top-right, fitView
+
+              2026-02-19: TASK-053 — Пересмотр score/grade
+                - Штрафы: info=2, warning=10, critical=28
+                - ruleId в issues, SCORING.md
 
 ================================================================================

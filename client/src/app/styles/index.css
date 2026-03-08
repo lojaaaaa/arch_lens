@@ -135,18 +135,26 @@
     * {
         @apply border-border outline-ring/50;
     }
+    html,
+    body {
+        @apply h-full overflow-hidden;
+    }
     body {
         @apply bg-background text-foreground m-0;
+    }
+    #root {
+        @apply h-full overflow-hidden;
     }
 }
 
 .react-flow__edge-text {
     font-size: 10px;
-    fill: var(--edge-label);
+    fill: var(--foreground);
 }
 
 .react-flow__edge-textbg {
-    fill: transparent;
+    fill: var(--background);
+    fill-opacity: 0.95;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {

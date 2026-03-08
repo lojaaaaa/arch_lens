@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class HighFanOutRule implements AnalysisRule {
   readonly id = 'S03';
@@ -22,8 +26,7 @@ export class HighFanOutRule implements AnalysisRule {
         title: 'Слишком много исходящих связей у узла',
         description: `Узел "${nodeId}" имеет ${count} исходящих связей. Это может создавать bottleneck.`,
         affectedNodes: [nodeId],
-        recommendation:
-          'Рассмотрите декомпозицию узла или вынос части логики.',
+        recommendation: 'Рассмотрите декомпозицию узла или вынос части логики.',
       });
     }
 

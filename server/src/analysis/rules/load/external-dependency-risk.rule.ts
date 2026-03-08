@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class ExternalDependencyRiskRule implements AnalysisRule {
   readonly id = 'L05';
@@ -11,7 +15,8 @@ export class ExternalDependencyRiskRule implements AnalysisRule {
     const externals = ctx.nodesByKind.get('external_system') ?? [];
 
     for (const ext of externals) {
-      const reliability = Number(ext['reliability']) ?? 1;
+      const raw = Number(ext['reliability']);
+      const reliability = Number.isFinite(raw) ? raw : 1;
       if (reliability >= ANALYSIS_CONFIG.load.lowReliability) continue;
 
       const dependentEdges = ctx.edges.filter(

@@ -9,7 +9,11 @@ import { toast } from 'sonner';
 
 import { useAnalysisStore } from '@/pages/analysis/model/store';
 
-import { NODE_LABELS } from '../../lib/config';
+import {
+    EDGE_CONNECTION_HINTS,
+    EDGE_KIND_LABELS,
+    NODE_LABELS,
+} from '../../lib/config';
 import { getDefaultEdgeKind, isEdgeAllowed } from '../../lib/utils';
 import {
     useArchitectureActions,
@@ -62,6 +66,12 @@ export const useArchitectureCanvasHandlers = () => {
             const defaultKind = getDefaultEdgeKind(sourceKind, targetKind);
             if (defaultKind && isEdgeAllowed(sourceKind, targetKind)) {
                 addEdge(sourceId, targetId, defaultKind);
+                const hint = EDGE_CONNECTION_HINTS[sourceKind]?.[targetKind];
+                if (hint) {
+                    const kindLabel =
+                        EDGE_KIND_LABELS[defaultKind] ?? defaultKind;
+                    toast.info(`${kindLabel}. ${hint}`, { duration: 4000 });
+                }
                 return;
             }
 

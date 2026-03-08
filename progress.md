@@ -184,3 +184,51 @@
 
 ---
 
+### TASK-051 — Приоритизация issues на странице анализа
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Сортировка issues по severity (critical → warning → info) уже была реализована. Добавлены: порядковые номера (1, 2, 3…) для явного приоритета, badge с severity и категорией, подсказка «Сначала исправьте критические (N)» при наличии critical, tooltip «Исправьте в первую очередь» для первого critical.
+**Файлы:** client/src/pages/analysis/ui/analysis-results/analysis-issues.tsx
+
+---
+
+### TASK-052 — Дополнительные метрики + объяснения расчётов
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Добавлены 3 новые метрики: stateStoreCount, maxFanOut, eventDrivenEdgesCount. Для каждой из 11 метрик — tooltip с формулой/описанием расчёта. METRIC_TOOLTIPS с пояснениями на русском.
+**Файлы:** server/src/analysis/engine/metrics.calculator.ts, server/src/analysis/interfaces/analysis-result.interface.ts, client/src/shared/model/types.ts, client/src/shared/api/analysis/analysis-result.schema.ts, client/src/pages/analysis/ui/analysis-results/analysis-metrics.tsx
+
+---
+
+### TASK-062 — Поиск по графу
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Поле поиска в header. Поиск по displayName, kind, NODE_LABELS[kind], id. Результаты подсвечиваются (ring + pulse), fitView на найденные ноды. Debounce 150ms. highlightPreventAutoClear — подсветка от поиска не сбрасывается через 10 сек.
+**Файлы:** client/src/pages/editor/ui/header/graph-search.tsx, header.tsx, client/src/pages/analysis/model/store.ts, types.ts, client/src/pages/editor/ui/canvas/use-canvas-highlight.ts
+
+---
+
+### TASK-060 — Unit-тесты для правил анализа
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** 11 тестов на S01 (orphans), S02 (cycles), S06 (frontend-db-direct), RuleEngine. Fixture-хелперы createNode/createEdge/createGraph. Негативный кейс: исправление графа → issue исчезает. npm run test:rules.
+**Файлы:** server/src/analysis/rules/__tests__/rules.spec.ts, server/package.json
+
+---
+
+### TASK-063 — Zoom-to-fit / Center
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Кнопка «Вписать в экран» (top-right) с иконкой Maximize2. fitView с padding 0.2, duration 400ms. Tooltip «Центрировать и масштабировать схему». Fit view убран из default Controls.
+**Файлы:** client/src/pages/editor/ui/canvas/canvas-fit-view-button.tsx, canvas-controls.tsx, architecture-canvas.tsx
+
+---
+
+### TASK-053 — Пересмотр score/grade
+**Дата:** 2026-02-19
+**Статус:** done
+**Summary:** Новые штрафы: info=2, warning=10, critical=28. ruleId в issues (S01, S02, S08) для надёжной проверки бонусов. SCORING.md с описанием формул. Unit-тесты score calculator.
+**Файлы:** server/src/analysis/engine/score.calculator.ts, analysis.config.ts, interfaces/analysis-issue.interface.ts, rules/structural/{orphan,cyclic,disconnected}.ts, SCORING.md, engine/__tests__/score.calculator.spec.ts
+
+---
+

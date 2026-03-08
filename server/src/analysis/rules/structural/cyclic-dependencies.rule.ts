@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class CyclicDependenciesRule implements AnalysisRule {
   readonly id = 'S02';
@@ -13,6 +17,7 @@ export class CyclicDependenciesRule implements AnalysisRule {
     return [
       {
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'critical',
         category: 'architecture',
         title: 'Циклические зависимости',

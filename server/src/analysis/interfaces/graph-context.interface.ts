@@ -1,4 +1,7 @@
-import type { ArchitectureNodeDto, GraphEdgeDto } from '../dto/architecture-graph.dto.js';
+import type {
+  ArchitectureNodeDto,
+  GraphEdgeDto,
+} from '../dto/architecture-graph.dto.js';
 
 /**
  * Pre-computed graph data shared across all rules.

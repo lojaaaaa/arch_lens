@@ -182,6 +182,7 @@ export type IssueCategory =
 
 export interface ArchitectureIssue {
     id: string;
+    ruleId?: string;
 
     severity: IssueSeverity;
     category: IssueCategory;
@@ -209,6 +210,10 @@ export interface ArchitectureMetrics {
     estimatedRenderPressure: number;
     estimatedApiLoad: number;
     estimatedDataLoad: number;
+
+    stateStoreCount: number;
+    maxFanOut: number;
+    eventDrivenEdgesCount: number;
 }
 
 export type Grade = 'A' | 'B' | 'C' | 'D' | 'F';

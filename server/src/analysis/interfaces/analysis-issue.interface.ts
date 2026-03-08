@@ -10,6 +10,7 @@ export type IssueCategory =
 
 export interface AnalysisIssue {
   id: string;
+  ruleId?: string;
   severity: IssueSeverity;
   category: IssueCategory;
   title: string;

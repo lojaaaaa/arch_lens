@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class TightCouplingRule implements AnalysisRule {
   readonly id = 'P02';
@@ -22,7 +26,8 @@ export class TightCouplingRule implements AnalysisRule {
           title: 'Сильная связанность между узлами',
           description: `Узлы "${nodeA}" и "${nodeB}" связаны ${count} рёбрами — высокая степень связанности.`,
           affectedNodes: [nodeA, nodeB],
-          recommendation: 'Рассмотрите введение промежуточного слоя или уменьшение связей.',
+          recommendation:
+            'Рассмотрите введение промежуточного слоя или уменьшение связей.',
           metrics: { edgeCount: count },
         });
       }

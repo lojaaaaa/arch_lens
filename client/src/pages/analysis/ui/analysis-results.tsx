@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Routes } from '@/shared/model/routes';
@@ -9,7 +10,7 @@ import { AnalysisMetrics } from './analysis-results/analysis-metrics';
 import { AnalysisResultsFooter } from './analysis-results/analysis-results-footer';
 import { AnalysisResultsHeader } from './analysis-results/analysis-results-header';
 import { AnalysisSummaryCard } from './analysis-results/analysis-summary-card';
-import { useAnalysisActions } from '../model/selectors';
+import { useAnalysisActions, useAnalysisSelectors } from '../model/selectors';
 
 type AnalysisResultsProps = {
     result: AnalysisResult;
@@ -18,15 +19,28 @@ type AnalysisResultsProps = {
 
 export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
     const navigate = useNavigate();
-    const { setHighlightedNodeIds } = useAnalysisActions();
+    const { graphToAnalyze } = useAnalysisSelectors();
+    const { setHighlightedNodeIds, setHighlightPreventAutoClear } =
+        useAnalysisActions();
     const { summary, metrics, issues } = result;
     const aiRecommendations = result.aiRecommendations ?? [];
 
-    const handleIssueClick = (affectedNodes: string[]) => {
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
+    const validNodeIds = useMemo(() => {
+        const ids = new Set<string>();
+        if (graphToAnalyze?.nodes) {
+            graphToAnalyze.nodes.forEach((n) => ids.add(n.id));
+        }
+        issues.forEach((i) => i.affectedNodes.forEach((id) => ids.add(id)));
+        return ids;
+    }, [graphToAnalyze?.nodes, issues]);
+
+    const handleNodeClick = (affectedNodes: string[]) => {
         if (affectedNodes.length === 0) {
             return;
         }
         setHighlightedNodeIds(affectedNodes);
+        setHighlightPreventAutoClear(true);
         navigate(Routes.editor);
     };
 
@@ -46,8 +60,12 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
                 severityCounts={severityCounts}
             />
             <AnalysisMetrics metrics={metrics} />
-            <AnalysisIssues issues={issues} onIssueClick={handleIssueClick} />
-            <AnalysisAiRecommendations recommendations={aiRecommendations} />
+            <AnalysisIssues issues={issues} onIssueClick={handleNodeClick} />
+            <AnalysisAiRecommendations
+                recommendations={aiRecommendations}
+                validNodeIds={validNodeIds}
+                onRecommendationClick={handleNodeClick}
+            />
             <AnalysisResultsFooter result={result} />
         </div>
     );

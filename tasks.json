@@ -852,7 +852,7 @@
         "Шаг 2: Тип ноды читается по заголовку/подписи"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-041",
@@ -1031,7 +1031,7 @@
         "Шаг 2: Есть визуальный индикатор приоритета"
       ],
       "dependencies": [],
-      "status": "backlog"
+      "status": "done"
     },
     {
       "id": "TASK-052",
@@ -1047,7 +1047,7 @@
         "Шаг 2: Навести на tooltip → видна формула"
       ],
       "dependencies": [],
-      "status": "backlog"
+      "status": "done"
     },
     {
       "id": "TASK-053",
@@ -1064,7 +1064,7 @@
         "Шаг 2: Исправить ошибки → score растёт"
       ],
       "dependencies": [],
-      "status": "backlog"
+      "status": "done"
     },
     {
       "id": "TASK-054",
@@ -1080,7 +1080,7 @@
         "Шаг 2: Допустимая связь создаётся"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-055",
@@ -1096,7 +1096,7 @@
         "Шаг 2: Допустимые связи импортируются"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-056",
@@ -1177,7 +1177,7 @@
         "Шаг 2: Негативный кейс → тесты ловят ошибку"
       ],
       "dependencies": [],
-      "status": "backlog"
+      "status": "done"
     },
     {
       "id": "TASK-061",
@@ -1209,7 +1209,7 @@
         "Шаг 2: Поиск по типу → найденные ноды"
       ],
       "dependencies": [],
-      "status": "backlog"
+      "status": "done"
     },
     {
       "id": "TASK-063",
@@ -1225,7 +1225,7 @@
         "Шаг 2: Нажать Fit → схема в кадре"
       ],
       "dependencies": [],
-      "status": "backlog"
+      "status": "done"
     },
     {
       "id": "TASK-064",
@@ -1241,7 +1241,7 @@
         "Шаг 2: Рекомендации отображаются на UI"
       ],
       "dependencies": ["TASK-034"],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-065",
@@ -1260,7 +1260,7 @@
         "Шаг 3: Добавить/удалить ноды и связи → всё работает"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-066",
@@ -1278,7 +1278,7 @@
         "Шаг 3: Переключить тему → всё отображается корректно"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-067",
@@ -1296,7 +1296,7 @@
         "Шаг 3: Empty-state появляется при пустом canvas"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-068",
@@ -1313,7 +1313,7 @@
         "Шаг 2: Переключить тему → стиль не ломается"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-069",
@@ -1330,7 +1330,7 @@
         "Шаг 2: При зуме лейблы остаются на месте"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-070",
@@ -1348,7 +1348,7 @@
         "Шаг 3: Экспорт SVG → лейблы читаемы"
       ],
       "dependencies": [],
-      "status": "pending"
+      "status": "done"
     },
     {
       "id": "TASK-071",
@@ -1366,7 +1366,58 @@
         "Шаг 3: Score меняется в ожидаемую сторону"
       ],
       "dependencies": ["TASK-053"],
-      "status": "backlog"
+      "status": "done"
+    },
+    {
+      "id": "TASK-072",
+      "category": "ui",
+      "priority": "low",
+      "description": "Режим презентации: полноэкранный просмотр схемы без UI",
+      "acceptance_criteria": [
+        "Кнопка «Режим презентации» в header (иконка Presentation)",
+        "При включении: скрываются sidebar, header, properties — только canvas на весь экран",
+        "Кнопка «Выйти» (X) в углу и Escape для выхода",
+        "Zoom и pan работают для навигации по схеме"
+      ],
+      "test_steps": [
+        "Шаг 1: Нажать кнопку презентации → полноэкранный просмотр схемы",
+        "Шаг 2: Нажать Escape или X → возврат в редактор",
+        "Шаг 3: Zoom/pan в режиме презентации работают"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-073",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Fix: тема MiniMap обновляется при переключении без перезагрузки",
+      "acceptance_criteria": [
+        "MiniMap меняет цвета при клике на toggle темы",
+        "key={theme} для принудительного remount при смене темы"
+      ],
+      "test_steps": [
+        "Шаг 1: Открыть редактор с нодами",
+        "Шаг 2: Переключить тему → MiniMap сразу обновился"
+      ],
+      "dependencies": [],
+      "status": "done"
+    },
+    {
+      "id": "TASK-074",
+      "category": "ui",
+      "priority": "medium",
+      "description": "Смягчить обводку нод: менее заметная при фокусе и в целом",
+      "acceptance_criteria": [
+        "Ring при выделении: ring-primary/20 вместо /30, без тени",
+        "Базовые borders нод: более прозрачные (/40 и /30 для dark)"
+      ],
+      "test_steps": [
+        "Шаг 1: Выделить ноду → обводка мягче",
+        "Шаг 2: Сравнить в светлой и тёмной теме"
+      ],
+      "dependencies": [],
+      "status": "done"
     }
   ]
 }

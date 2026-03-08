@@ -35,11 +35,13 @@ export const Sidebar = () => {
 
     return (
         <UISidebar side="left" variant="inset">
-            <SidebarHeader>
-                <div className="text-sm font-medium">Элементы</div>
+            <SidebarHeader className="border-sidebar-border/40 border-b px-4 py-3">
+                <div className="text-sm font-semibold tracking-tight text-sidebar-foreground">
+                    Элементы
+                </div>
             </SidebarHeader>
 
-            <SidebarContent className="gap-2 p-2">
+            <SidebarContent className="gap-3 p-3">
                 <SidebarPresets
                     presets={ARCHITECTURE_PRESETS}
                     onApplyPreset={handleApplyPreset}
@@ -55,7 +57,7 @@ export const Sidebar = () => {
                 ))}
             </SidebarContent>
 
-            <SidebarFooter className="p-2">
+            <SidebarFooter className="border-sidebar-border/40 border-t p-3">
                 <SidebarClear onClear={handleClear} />
             </SidebarFooter>
         </UISidebar>

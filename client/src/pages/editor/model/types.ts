@@ -38,6 +38,7 @@ export type ArchitectureState = {
     addEdge: (source: string, target: string, kind?: EdgeKind) => void;
     setNodes: (nodes: ArchitectureFlowNode[]) => void;
     setEdges: (edges: Edge[]) => void;
+    restoreFlow: (nodes: ArchitectureFlowNode[], edges: Edge[]) => void;
     removeNode: (id: string) => void;
     removeEdge: (id: string) => void;
     selectNode: (id: TypeOrNull<string>) => void;

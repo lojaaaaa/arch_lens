@@ -21,6 +21,7 @@ export const useAnalysisActions = () =>
             clearAnalysis: state.clearAnalysis,
             setGraphToAnalyze: state.setGraphToAnalyze,
             setHighlightedNodeIds: state.setHighlightedNodeIds,
+            setHighlightPreventAutoClear: state.setHighlightPreventAutoClear,
             clearHighlight: state.clearHighlight,
         })),
     );

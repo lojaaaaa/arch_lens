@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class DirectUiStateRule implements AnalysisRule {
   readonly id = 'P04';
@@ -10,10 +14,7 @@ export class DirectUiStateRule implements AnalysisRule {
     for (const edge of ctx.edges) {
       const source = ctx.nodeById.get(edge.source);
       const target = ctx.nodeById.get(edge.target);
-      if (
-        source?.kind === 'ui_page' &&
-        target?.kind === 'state_store'
-      ) {
+      if (source?.kind === 'ui_page' && target?.kind === 'state_store') {
         issues.push({
           id: randomUUID(),
           severity: 'warning',
@@ -24,7 +25,7 @@ export class DirectUiStateRule implements AnalysisRule {
           affectedNodes: [edge.source, edge.target],
           affectedEdges: [edge.id],
           recommendation:
-            'Добавьте промежуточные UI компоненты между страницами и store.',
+            'Добавьте UI-компоненты между страницами и store — для переиспользуемости и тестирования.',
         });
       }
     }

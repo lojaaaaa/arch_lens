@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class DisconnectedLayersRule implements AnalysisRule {
   readonly id = 'S08';
@@ -28,6 +32,7 @@ export class DisconnectedLayersRule implements AnalysisRule {
 
       issues.push({
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'warning',
         category: 'architecture',
         title: 'Отключённый слой',

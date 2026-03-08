@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class RedundantEdgesRule implements AnalysisRule {
   readonly id = 'S10';
@@ -7,7 +11,10 @@ export class RedundantEdgesRule implements AnalysisRule {
     'Дублирующиеся рёбра между одними и теми же узлами — избыточность';
 
   check(ctx: GraphContext): AnalysisIssue[] {
-    const pairToEdges = new Map<string, { edges: string[]; source: string; target: string }>();
+    const pairToEdges = new Map<
+      string,
+      { edges: string[]; source: string; target: string }
+    >();
 
     for (const edge of ctx.edges) {
       const key = `${edge.source}|${edge.target}`;

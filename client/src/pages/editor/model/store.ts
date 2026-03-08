@@ -42,16 +42,22 @@ const ensureSystemFlowNodes = (
     return [systemNode, ...remaining];
 };
 
+/** Изменения, которые не считаются действиями пользователя (не история, не isDirty). */
+const isUserDrivenNodeChange = (change: NodeChange) => {
+    if (change.type === 'select') {
+        return false;
+    }
+    if (change.type === 'dimensions') {
+        return false;
+    } // внутреннее измерение React Flow
+    if (change.type === 'position' && 'dragging' in change) {
+        return !change.dragging; // только после окончания перетаскивания
+    }
+    return true;
+};
+
 const shouldRecordNodeHistory = (changes: NodeChange[]) =>
-    changes.some((change) => {
-        if (change.type === 'select') {
-            return false;
-        }
-        if (change.type === 'position' && 'dragging' in change) {
-            return !change.dragging;
-        }
-        return true;
-    });
+    changes.some(isUserDrivenNodeChange);
 
 const shouldRecordEdgeHistory = (changes: EdgeChange[]) =>
     changes.some((change) => ['add', 'remove', 'reset'].includes(change.type));
@@ -95,6 +101,15 @@ export const useArchitectureStore = create<ArchitectureState>()(
                 },
                 edges,
                 isDirty: true,
+            })),
+
+        restoreFlow: (nodes, edges) =>
+            set((state) => ({
+                ...state,
+                nodes: ensureSystemFlowNodes(nodes),
+                edges,
+                isDirty: false,
+                history: { past: [], future: [] },
             })),
 
         selectNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),

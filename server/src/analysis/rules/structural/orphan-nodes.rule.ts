@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class OrphanNodesRule implements AnalysisRule {
   readonly id = 'S01';
@@ -18,6 +22,7 @@ export class OrphanNodesRule implements AnalysisRule {
     return [
       {
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'info',
         category: 'architecture',
         title: 'Обнаружены изолированные узлы',

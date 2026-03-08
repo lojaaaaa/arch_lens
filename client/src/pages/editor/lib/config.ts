@@ -1,5 +1,27 @@
 import type { EdgeKind, LayerType, NodeKind } from '@/shared/model/types';
 
+/** Подсказки при создании связи: «Обычно между X и Y используют...» */
+export const EDGE_CONNECTION_HINTS: Partial<
+    Record<NodeKind, Partial<Record<NodeKind, string>>>
+> = {
+    ui_component: {
+        api_gateway:
+            'Тип calls — вызов API (request-response). Двойной клик по связи для смены типа.',
+        state_store:
+            'reads/writes для данных, subscribes для реактивных обновлений.',
+    },
+    service: {
+        database:
+            'reads — чтение, writes — запись. Для кэширования добавьте cache между service и database.',
+        cache: 'reads при промахе идёт в БД, writes — инвалидация кэша.',
+        service: 'calls для синхронных вызовов, emits/subscribes для событий.',
+        external_system: 'calls для REST/GraphQL, emits для webhook.',
+    },
+    api_gateway: {
+        service: 'calls — маршрутизация запросов к сервисам.',
+    },
+};
+
 export const NODE_LABELS: Record<NodeKind, string> = {
     ui_page: 'Страница',
     ui_component: 'Компонент',
@@ -18,17 +40,17 @@ export const LAYER_COLORS: Record<
 > = {
     frontend: {
         bg: 'bg-blue-50/60 dark:bg-blue-950/40',
-        border: 'border-blue-200/60 dark:border-blue-800/40',
+        border: 'border-blue-200/40 dark:border-blue-800/30',
         text: 'text-blue-600 dark:text-blue-400',
     },
     backend: {
         bg: 'bg-green-50/60 dark:bg-green-950/40',
-        border: 'border-green-200/60 dark:border-green-800/40',
+        border: 'border-green-200/40 dark:border-green-800/30',
         text: 'text-green-600 dark:text-green-400',
     },
     data: {
         bg: 'bg-amber-50/60 dark:bg-amber-950/40',
-        border: 'border-amber-200/60 dark:border-amber-800/40',
+        border: 'border-amber-200/40 dark:border-amber-800/30',
         text: 'text-amber-600 dark:text-amber-400',
     },
 };
@@ -59,6 +81,13 @@ export const EDGE_KIND_HINTS: Record<EdgeKind, string> = {
 
 const EDGE_COLOR = 'var(--edge)';
 
+/**
+ * Правила стилей связей (семантика):
+ * - Сплошная линия: синхронные вызовы (calls, writes) — immediate request-response
+ * - Пунктирная: асинхронные/события (subscribes, emits) или поток данных (reads)
+ * - Пунктир + animated: event-driven (subscribes, emits)
+ * - depends_on: пунктир — структурная зависимость
+ */
 export const EDGE_STYLES: Record<
     EdgeKind,
     {
@@ -72,8 +101,8 @@ export const EDGE_STYLES: Record<
     reads: { color: EDGE_COLOR, strokeDasharray: '6 3' },
     writes: { color: EDGE_COLOR, strokeWidth: 2.5 },
     subscribes: { color: EDGE_COLOR, strokeDasharray: '8 4', animated: true },
-    depends_on: { color: EDGE_COLOR, strokeDasharray: '3 3' },
-    emits: { color: EDGE_COLOR, animated: true },
+    depends_on: { color: EDGE_COLOR, strokeDasharray: '4 4' },
+    emits: { color: EDGE_COLOR, strokeDasharray: '8 4', animated: true },
 } as const;
 
 export const NODE_KINDS: { kind: NodeKind; label: string }[] = [

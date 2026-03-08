@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/shared/lib/utils';
 import type { LayerType, NodeKind } from '@/shared/model/types';
@@ -42,9 +42,10 @@ export const SidebarLayerGroup = ({
                 variant="none"
                 onClick={() => setIsOpen((prev) => !prev)}
                 className={cn(
-                    'flex items-center justify-between rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                    'flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-all',
                     colors.bg,
                     colors.text,
+                    'hover:opacity-90',
                 )}
             >
                 {label}
@@ -57,7 +58,7 @@ export const SidebarLayerGroup = ({
             </Button>
 
             {isOpen && (
-                <div className="mt-0.5 flex flex-col gap-0.5 pl-1">
+                <div className="mt-1 flex flex-col gap-0.5 pl-1">
                     {kinds.map(({ kind, label: kindLabel }) => (
                         <Tooltip key={kind}>
                             <TooltipTrigger asChild>
@@ -74,9 +75,8 @@ export const SidebarLayerGroup = ({
                                     draggable
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-full justify-start gap-2 text-xs"
+                                    className="h-8 w-full justify-start rounded-md text-xs hover:bg-sidebar-accent/50"
                                 >
-                                    <Plus className="size-3 opacity-50" />
                                     {kindLabel}
                                 </Button>
                             </TooltipTrigger>

@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class FrontendDbDirectRule implements AnalysisRule {
   readonly id = 'S06';
-  readonly description =
-    'Прямое обращение фронтенда к БД — нарушение слоёв';
+  readonly description = 'Прямое обращение фронтенда к БД — нарушение слоёв';
 
   check(ctx: GraphContext): AnalysisIssue[] {
     const issues: AnalysisIssue[] = [];
@@ -28,7 +31,7 @@ export class FrontendDbDirectRule implements AnalysisRule {
         affectedNodes: [edge.source, edge.target],
         affectedEdges: [edge.id],
         recommendation:
-          'Обеспечьте обращение к данным через бэкенд-сервисы.',
+          'Обратитесь к данным через бэкенд-сервис — для безопасности и разделения слоёв.',
       });
     }
 

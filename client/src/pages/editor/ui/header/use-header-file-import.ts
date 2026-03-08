@@ -5,17 +5,30 @@ import {
     useSchemaImport,
 } from '@/features/architecture-graph-io';
 
-import { architectureGraphToFlow } from '../../lib/utils';
+import {
+    architectureGraphToFlow,
+    filterInvalidEdgesOnImport,
+} from '../../lib/utils';
 import { useArchitectureActions } from '../../model/selectors';
 
 export const useHeaderFileImport = () => {
     const { setNodes, setEdges } = useArchitectureActions();
 
     const handleImportSuccess = (schema: ArchitectureGraphInput) => {
+        const { schema: filteredSchema, invalidWarnings } =
+            filterInvalidEdgesOnImport(schema);
+
         const { nodes: flowNodes, edges: flowEdges } =
-            architectureGraphToFlow(schema);
+            architectureGraphToFlow(filteredSchema);
         setNodes(flowNodes);
         setEdges(flowEdges);
+
+        if (invalidWarnings.length > 0) {
+            const unique = [...new Set(invalidWarnings)];
+            toast.warning(
+                `Удалено недопустимых связей (${invalidWarnings.length}): ${unique.join('; ')}`,
+            );
+        }
     };
 
     const { fileInputRef, handleFileChange, triggerFileSelect } =

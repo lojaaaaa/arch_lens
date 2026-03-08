@@ -16,9 +16,9 @@ export const useEditorPersistence = () => {
     const [, setStorageVersion] = useState(0);
     const hasRestoredRef = useRef(false);
 
-    const { nodes, isDirty, flowInstance } = useArchitectureSelectors();
+    const { nodes, edges, isDirty, flowInstance } = useArchitectureSelectors();
 
-    const { setNodes, setEdges, markSaved } = useArchitectureActions();
+    const { restoreFlow, markSaved } = useArchitectureActions();
 
     const save = useCallback(() => {
         const instance = flowInstance as
@@ -50,11 +50,10 @@ export const useEditorPersistence = () => {
             return;
         }
         const { nodes: nextNodes, edges: nextEdges } = ensureSystemFlowGraph(
-            stored.nodes as Parameters<typeof setNodes>[0],
-            stored.edges as Parameters<typeof setEdges>[0],
+            stored.nodes as Parameters<typeof restoreFlow>[0],
+            stored.edges as Parameters<typeof restoreFlow>[1],
         );
-        setNodes(nextNodes as Parameters<typeof setNodes>[0]);
-        setEdges(nextEdges as Parameters<typeof setEdges>[0]);
+        restoreFlow(nextNodes, nextEdges);
         (
             flowInstance as {
                 setViewport?: (viewport: unknown) => Promise<unknown>;
@@ -64,31 +63,31 @@ export const useEditorPersistence = () => {
             ?.catch(() => {
                 // viewport might be async, ignore
             });
-        markSaved();
-    }, [flowInstance, setNodes, setEdges, markSaved]);
+    }, [flowInstance, restoreFlow]);
 
     const reset = useCallback(() => {
         clearFlowFromStorage();
         setStorageVersion((version) => version + 1);
     }, []);
 
+    const isDefaultState = nodes.length <= 1 && edges.length === 0;
+
     useEffect(() => {
         if (
             hasStoredFlow() &&
             !hasRestoredRef.current &&
             flowInstance &&
-            nodes.length === 0
+            isDefaultState
         ) {
             hasRestoredRef.current = true;
             const stored = loadFlowFromStorage();
             if (stored) {
                 const { nodes: nextNodes, edges: nextEdges } =
                     ensureSystemFlowGraph(
-                        stored.nodes as Parameters<typeof setNodes>[0],
-                        stored.edges as Parameters<typeof setEdges>[0],
+                        stored.nodes as Parameters<typeof restoreFlow>[0],
+                        stored.edges as Parameters<typeof restoreFlow>[1],
                     );
-                setNodes(nextNodes as Parameters<typeof setNodes>[0]);
-                setEdges(nextEdges as Parameters<typeof setEdges>[0]);
+                restoreFlow(nextNodes, nextEdges);
                 (
                     flowInstance as {
                         setViewport?: (viewport: unknown) => Promise<unknown>;
@@ -96,10 +95,9 @@ export const useEditorPersistence = () => {
                 )
                     ?.setViewport?.(stored.viewport)
                     ?.catch(() => {});
-                markSaved();
             }
         }
-    }, [flowInstance, nodes.length, setNodes, setEdges, markSaved]);
+    }, [flowInstance, isDefaultState, restoreFlow]);
 
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {

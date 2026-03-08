@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class SyncChainLatencyRule implements AnalysisRule {
   readonly id = 'L06';
@@ -20,7 +24,11 @@ export class SyncChainLatencyRule implements AnalysisRule {
 
     let maxChain: string[] = [];
 
-    const dfs = (nodeId: string, visited: Set<string>, path: string[]): void => {
+    const dfs = (
+      nodeId: string,
+      visited: Set<string>,
+      path: string[],
+    ): void => {
       if (visited.has(nodeId)) return;
       visited.add(nodeId);
       path.push(nodeId);
@@ -39,7 +47,8 @@ export class SyncChainLatencyRule implements AnalysisRule {
       dfs(node.id, new Set(), []);
     }
 
-    if (maxChain.length < ANALYSIS_CONFIG.load.syncChainLengthThreshold) return [];
+    if (maxChain.length < ANALYSIS_CONFIG.load.syncChainLengthThreshold)
+      return [];
 
     const estimatedLatencyMs = maxChain.length * 100;
 

@@ -1,4 +1,8 @@
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../interfaces/index.js';
 
 export class RuleEngine {
   private readonly rules: AnalysisRule[] = [];

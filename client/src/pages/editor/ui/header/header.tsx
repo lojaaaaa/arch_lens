@@ -1,5 +1,6 @@
 import { SidebarTrigger } from '@/shared/ui/sidebar';
 
+import { GraphSearch } from './graph-search';
 import { HeaderActions } from './header-actions';
 import { HeaderFileMenu } from './header-file-menu';
 import { HeaderTitle } from './header-title';
@@ -10,6 +11,7 @@ export const Header = () => {
             <SidebarTrigger />
             <HeaderFileMenu />
             <HeaderTitle />
+            <GraphSearch />
             <HeaderActions />
         </header>
     );

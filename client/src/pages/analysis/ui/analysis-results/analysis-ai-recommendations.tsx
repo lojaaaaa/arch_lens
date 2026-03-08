@@ -1,33 +1,101 @@
-import { Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+
+import { cn } from '@/shared/lib/utils';
+
+/** Извлекает id узлов из текста. Формат: (id) или (id: xyz) */
+const extractNodeIds = (text: string): string[] => {
+    const matches = text.matchAll(/\((?:id:\s*)?([A-Za-z0-9_-]{8,40})\)/g);
+    return [...new Set([...matches].map((m) => m[1]))];
+};
 
 type AnalysisAiRecommendationsProps = {
     recommendations: string[];
+    validNodeIds: Set<string>;
+    onRecommendationClick: (nodeIds: string[]) => void;
 };
 
 export const AnalysisAiRecommendations = ({
     recommendations,
+    validNodeIds,
+    onRecommendationClick,
 }: AnalysisAiRecommendationsProps) => {
     return (
-        <section className="rounded-lg border border-dashed bg-muted/20 p-5">
-            <h2 className="text-muted-foreground mb-2 flex items-center gap-2 text-sm font-medium uppercase tracking-wide">
-                <Sparkles className="size-4" />
-                AI-рекомендации
-            </h2>
+        <section className="rounded-lg border bg-card p-5">
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-muted-foreground flex items-center gap-2 text-sm font-medium uppercase tracking-wide">
+                    <Sparkles className="size-4 text-amber-500/80" />
+                    AI-рекомендации
+                </h2>
+                {recommendations.length > 0 && (
+                    <span className="text-muted-foreground text-xs tabular-nums">
+                        {recommendations.length}
+                    </span>
+                )}
+            </div>
+
             {recommendations.length > 0 ? (
-                <ul className="space-y-1 text-sm">
-                    {recommendations.map((recommendation) => (
-                        <li
-                            key={recommendation}
-                            className="text-muted-foreground"
-                        >
-                            {recommendation}
-                        </li>
-                    ))}
-                </ul>
+                <ol className="flex flex-col gap-2">
+                    {recommendations.map((recommendation, index) => {
+                        const extractedIds = extractNodeIds(recommendation);
+                        const nodeIds = extractedIds.filter((id) =>
+                            validNodeIds.has(id),
+                        );
+                        const isClickable = nodeIds.length > 0;
+
+                        return (
+                            <li
+                                key={`${index}-${recommendation.slice(0, 30)}`}
+                                role={isClickable ? 'button' : undefined}
+                                tabIndex={isClickable ? 0 : undefined}
+                                onClick={() =>
+                                    isClickable &&
+                                    onRecommendationClick(nodeIds)
+                                }
+                                onKeyDown={(event) => {
+                                    if (
+                                        isClickable &&
+                                        (event.key === 'Enter' ||
+                                            event.key === ' ')
+                                    ) {
+                                        event.preventDefault();
+                                        onRecommendationClick(nodeIds);
+                                    }
+                                }}
+                                className={cn(
+                                    'flex items-start gap-3 rounded-lg border-l-4 border-l-amber-500/50 bg-muted/30 py-2.5 pl-3 pr-3',
+                                    isClickable &&
+                                        'cursor-pointer transition-colors hover:bg-muted/50',
+                                )}
+                            >
+                                <span
+                                    className={cn(
+                                        'mt-0.5 flex size-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+                                        'bg-amber-500/15 text-amber-700 dark:text-amber-400',
+                                    )}
+                                >
+                                    {index + 1}
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-sm leading-relaxed text-foreground">
+                                        {recommendation}
+                                    </p>
+                                    {isClickable && (
+                                        <p className="text-muted-foreground mt-1 flex items-center gap-1 text-[10px]">
+                                            <ArrowLeft className="size-2.5" />
+                                            Нажмите, чтобы перейти к узлам
+                                        </p>
+                                    )}
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ol>
             ) : (
-                <p className="text-muted-foreground text-sm">
-                    Скоро будет доступно
-                </p>
+                <div className="rounded-lg border border-dashed bg-muted/20 py-8">
+                    <p className="text-muted-foreground text-center text-sm">
+                        Скоро будет доступно
+                    </p>
+                </div>
             )}
         </section>
     );

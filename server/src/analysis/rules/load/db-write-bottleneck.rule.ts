@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class DbWriteBottleneckRule implements AnalysisRule {
   readonly id = 'L03';
@@ -11,7 +15,8 @@ export class DbWriteBottleneckRule implements AnalysisRule {
     const dbs = ctx.nodesByKind.get('database') ?? [];
 
     for (const db of dbs) {
-      const readWriteRatio = Number(db['readWriteRatio']) ?? 1;
+      const raw = Number(db['readWriteRatio']);
+      const readWriteRatio = Number.isFinite(raw) ? raw : 1;
       const writesCount = ctx.edges.filter(
         (e) => e.target === db.id && e.kind === 'writes',
       ).length;

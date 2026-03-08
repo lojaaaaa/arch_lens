@@ -36,6 +36,7 @@ export const useAnalysisStore = create<AnalysisState>()(
         analysisStatus: 'idle',
         analysisError: null,
         highlightedNodeIds: [],
+        highlightPreventAutoClear: false,
 
         setGraphToAnalyze: (graphToAnalyze) =>
             set({
@@ -49,7 +50,13 @@ export const useAnalysisStore = create<AnalysisState>()(
         setAnalysisError: (analysisError) => set({ analysisError }),
         setHighlightedNodeIds: (highlightedNodeIds) =>
             set({ highlightedNodeIds }),
-        clearHighlight: () => set({ highlightedNodeIds: [] }),
+        setHighlightPreventAutoClear: (highlightPreventAutoClear) =>
+            set({ highlightPreventAutoClear }),
+        clearHighlight: () =>
+            set({
+                highlightedNodeIds: [],
+                highlightPreventAutoClear: false,
+            }),
         runAnalysis: async (graph) => {
             set({ analysisStatus: 'loading', analysisError: null });
             try {
@@ -80,6 +87,7 @@ export const useAnalysisStore = create<AnalysisState>()(
                 analysisStatus: 'idle',
                 analysisError: null,
                 highlightedNodeIds: [],
+                highlightPreventAutoClear: false,
             }),
     })),
 );

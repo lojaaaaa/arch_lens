@@ -53,20 +53,30 @@ export const ArchitectureNodeComponent = memo(
             setIsEditing(false);
         };
 
+        const handleClass =
+            '!z-10 !h-4 !w-8 !opacity-0 group-hover:!opacity-100 !transform !-translate-x-1/2 !border-0 !bg-transparent group-hover:!border group-hover:!border-[var(--handle-border)] group-hover:!bg-[var(--handle)] group-hover:!rounded-full pointer-events-auto transition-opacity duration-150';
+
         return (
-            <>
-                <Handle
-                    type="target"
-                    position={Position.Top}
-                    className="!z-10 !top-0 !h-1.5 !w-1.5 !opacity-50"
-                />
+            <div className="group/node size-full">
+                {[0, 1, 2].map((idx) => (
+                    <Handle
+                        key={`top-${idx}`}
+                        type="target"
+                        id={`top-${idx}`}
+                        position={Position.Top}
+                        className={handleClass}
+                        style={{
+                            top: 0,
+                            left: `${25 + idx * 25}%`,
+                        }}
+                    />
+                ))}
                 <div
                     className={cn(
                         'rounded-lg border px-3 pb-3 pt-4 min-w-[120px] max-w-[500px] transition-shadow backdrop-blur-sm relative',
                         colors.bg,
                         colors.border,
-                        selected &&
-                            'ring-1 ring-primary/30 ring-offset-0 shadow-sm',
+                        selected && 'ring-1 ring-primary/20 ring-offset-0',
                         isHighlighted &&
                             'ring-2 ring-red-400 ring-offset-1 shadow-lg shadow-red-200/40 animate-pulse',
                     )}
@@ -126,12 +136,20 @@ export const ArchitectureNodeComponent = memo(
                         </div>
                     </div>
                 </div>
-                <Handle
-                    type="source"
-                    position={Position.Bottom}
-                    className="!z-10 !bottom-0 !h-1.5 !w-1.5 !opacity-50"
-                />
-            </>
+                {[0, 1, 2].map((idx) => (
+                    <Handle
+                        key={`bottom-${idx}`}
+                        type="source"
+                        id={`bottom-${idx}`}
+                        position={Position.Bottom}
+                        className={handleClass}
+                        style={{
+                            bottom: 0,
+                            left: `${25 + idx * 25}%`,
+                        }}
+                    />
+                ))}
+            </div>
         );
     },
 );

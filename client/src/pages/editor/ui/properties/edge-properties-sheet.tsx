@@ -1,10 +1,11 @@
+import { Link2, Trash2 } from 'lucide-react';
+
 import type { EdgeKind } from '@/shared/model/types';
 import { Button } from '@/shared/ui/button';
 import {
     Sheet,
     SheetContent,
     SheetDescription,
-    SheetFooter,
     SheetHeader,
     SheetTitle,
 } from '@/shared/ui/sheet';
@@ -55,17 +56,20 @@ export const EdgePropertiesSheet = () => {
                 }
             }}
         >
-            <SheetContent side="right" className="sm:max-w-xs">
-                <SheetHeader className="space-y-1">
-                    <SheetTitle>Связь</SheetTitle>
+            <SheetContent side="right" className="flex flex-col sm:max-w-sm">
+                <SheetHeader className="space-y-1.5">
+                    <div className="bg-muted/50 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                        <Link2 className="text-muted-foreground size-4" />
+                    </div>
+                    <SheetTitle>Параметры связи</SheetTitle>
                     <SheetDescription>
-                        Двойной клик по связи открывает параметры.
+                        Двойной клик или ПКМ → Редактировать
                     </SheetDescription>
                 </SheetHeader>
 
                 {graphEdge && (
-                    <div className="flex flex-col gap-3 py-4">
-                        <div className="rounded-lg border bg-card/60 p-3">
+                    <div className="flex flex-1 flex-col gap-6 px-4 py-6">
+                        <section className="space-y-3">
                             <FieldWithTooltip
                                 label="Тип связи"
                                 tooltip="Семантический тип: вызов, чтение, запись, подписка, зависимость или событие."
@@ -77,7 +81,7 @@ export const EdgePropertiesSheet = () => {
                                             event.target.value as EdgeKind,
                                         )
                                     }
-                                    className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-none outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                    className="border-input h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                                 >
                                     {EDGE_KINDS.map((kind) => (
                                         <option key={kind} value={kind}>
@@ -85,13 +89,13 @@ export const EdgePropertiesSheet = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <p className="text-muted-foreground mt-1 text-xs">
+                                <p className="text-muted-foreground mt-1.5 text-xs leading-relaxed">
                                     {EDGE_KIND_HINTS[graphEdge.kind]}
                                 </p>
                             </FieldWithTooltip>
-                        </div>
+                        </section>
 
-                        <div className="rounded-lg border bg-card/60 p-3">
+                        <section className="space-y-3">
                             <FieldWithTooltip
                                 label="Частота"
                                 tooltip="Оценка частоты взаимодействия (запросы в минуту)."
@@ -105,12 +109,12 @@ export const EdgePropertiesSheet = () => {
                                     }
                                 />
                             </FieldWithTooltip>
-                        </div>
+                        </section>
 
-                        <div className="rounded-lg border bg-card/60 p-3">
+                        <section className="space-y-3">
                             <FieldWithTooltip
-                                label="Взаимодействие"
-                                tooltip="Синхронный — ожидание ответа (блокирующий). Асинхронный — очереди и события."
+                                label="Режим взаимодействия"
+                                tooltip="Синхронный — ожидание ответа. Асинхронный — очереди и события."
                             >
                                 <SyncToggle
                                     value={graphEdge.synchronous ?? true}
@@ -121,20 +125,23 @@ export const EdgePropertiesSheet = () => {
                                     }
                                 />
                             </FieldWithTooltip>
-                        </div>
+                        </section>
                     </div>
                 )}
 
-                <SheetFooter className="mt-auto">
+                <div className="border-border mt-auto border-t px-4 py-4">
                     <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
                         disabled={!graphEdge}
                         onClick={handleRemove}
-                        className="w-full"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive w-full justify-start gap-2"
                     >
+                        <Trash2 className="size-4" />
                         Удалить связь
                     </Button>
-                </SheetFooter>
+                </div>
             </SheetContent>
         </Sheet>
     );

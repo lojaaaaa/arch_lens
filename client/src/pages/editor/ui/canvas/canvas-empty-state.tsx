@@ -6,9 +6,9 @@ export const CanvasEmptyState = () => {
             <div className="flex flex-col items-center gap-3 text-center">
                 <LayoutGrid className="text-muted-foreground/40 size-10" />
                 <p className="text-muted-foreground text-sm">
-                    Добавьте элемент из панели слева,
+                    Добавьте элемент из панели слева —
                     <br />
-                    чтобы начать проектирование
+                    начните с Frontend, затем Backend и Data
                 </p>
             </div>
         </div>

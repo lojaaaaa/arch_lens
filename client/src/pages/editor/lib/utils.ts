@@ -179,6 +179,46 @@ export const ensureSystemEdges = (
     return nextEdges;
 };
 
+export const filterInvalidEdgesOnImport = (
+    graph: ArchitectureGraphInput,
+): {
+    schema: ArchitectureGraphInput;
+    invalidWarnings: string[];
+} => {
+    const nodeMap = new Map(graph.nodes.map((node) => [node.id, node]));
+    const validEdges: ArchitectureGraphInput['edges'] = [];
+    const invalidWarnings: string[] = [];
+
+    for (const edge of graph.edges) {
+        const sourceNode = nodeMap.get(edge.source);
+        const targetNode = nodeMap.get(edge.target);
+        const sourceKind = sourceNode?.kind;
+        const targetKind = targetNode?.kind;
+
+        if (!sourceKind || !targetKind) {
+            invalidWarnings.push(
+                `Связь ${edge.source} → ${edge.target}: узел не найден`,
+            );
+            continue;
+        }
+
+        if (isEdgeAllowed(sourceKind, targetKind)) {
+            validEdges.push(edge);
+        } else {
+            const sourceLabel = NODE_LABELS[sourceKind] ?? sourceKind;
+            const targetLabel = NODE_LABELS[targetKind] ?? targetKind;
+            invalidWarnings.push(
+                `Недопустимая связь: ${sourceLabel} → ${targetLabel}`,
+            );
+        }
+    }
+
+    return {
+        schema: { ...graph, edges: validEdges },
+        invalidWarnings,
+    };
+};
+
 export const architectureGraphToFlow = (
     graph: ArchitectureGraphInput,
 ): {
@@ -223,6 +263,13 @@ export const createGraphEdge = (
     kind,
 });
 
+const EDGE_LABEL_STYLE = {
+    labelStyle: { fill: 'var(--foreground)', fontSize: 10 },
+    labelBgStyle: { fill: 'var(--background)', fillOpacity: 0.95 },
+    labelBgPadding: [2, 6] as [number, number],
+    labelBgBorderRadius: 4,
+};
+
 export const toFlowEdge = (graphEdge: GraphEdge): Edge<FlowEdgeData> => {
     const edgeStyle = EDGE_STYLES[graphEdge.kind];
     return {
@@ -240,6 +287,10 @@ export const toFlowEdge = (graphEdge: GraphEdge): Edge<FlowEdgeData> => {
                 : {}),
         },
         markerEnd: { type: 'arrowclosed', color: edgeStyle?.color },
+        labelStyle: EDGE_LABEL_STYLE.labelStyle,
+        labelBgStyle: EDGE_LABEL_STYLE.labelBgStyle,
+        labelBgPadding: EDGE_LABEL_STYLE.labelBgPadding,
+        labelBgBorderRadius: EDGE_LABEL_STYLE.labelBgBorderRadius,
         data: { edge: graphEdge },
     };
 };
@@ -274,6 +325,7 @@ export const allowedEdgeKinds: Record<
     },
 
     ui_component: {
+        ui_component: ['depends_on'],
         state_store: ['reads', 'writes', 'subscribes'],
         api_gateway: ['calls'],
     },

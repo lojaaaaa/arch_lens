@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class NoErrorBoundaryRule implements AnalysisRule {
   readonly id = 'P07';
@@ -14,7 +18,10 @@ export class NoErrorBoundaryRule implements AnalysisRule {
     for (const edge of ctx.edges) {
       if (edge.kind === 'calls' && gatewayIds.has(edge.target)) {
         const source = ctx.nodeById.get(edge.source);
-        if (source?.layer === 'frontend' && !reportedFrontends.has(edge.source)) {
+        if (
+          source?.layer === 'frontend' &&
+          !reportedFrontends.has(edge.source)
+        ) {
           reportedFrontends.add(edge.source);
           issues.push({
             id: randomUUID(),

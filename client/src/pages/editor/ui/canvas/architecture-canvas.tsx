@@ -2,16 +2,18 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ReactFlowInstance } from '@xyflow/react';
 import { Background, ReactFlow, SelectionMode } from '@xyflow/react';
 
-import type { TypeOrNull } from '@/shared/model/types';
+import type { NodeKind, TypeOrNull } from '@/shared/model/types';
 
 import { ArchitectureNodeComponent } from './architecture-node';
 import { CanvasContextMenu } from './canvas-context-menu';
 import { CanvasEmptyState } from './canvas-empty-state';
 import { CanvasStatsPanel } from './canvas-stats-panel';
+import { TutorialBanner } from './tutorial-banner';
 import { useCanvasContextMenu } from './use-canvas-context-menu';
 import { useCanvasDnd } from './use-canvas-dnd';
 import { useArchitectureCanvasHandlers } from './use-canvas-handlers';
 import { useCanvasHighlight } from './use-canvas-highlight';
+import { useTutorial } from '../../lib/use-tutorial';
 import {
     useArchitectureActions,
     useArchitectureSelectors,
@@ -44,6 +46,7 @@ export const ArchitectureCanvas = () => {
         useRef<TypeOrNull<ReactFlowInstance<ArchitectureFlowNode>>>(null);
 
     const [showExtras, setShowExtras] = useState(false);
+    const [flowReady, setFlowReady] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -82,7 +85,7 @@ export const ArchitectureCanvas = () => {
         };
     }, []);
 
-    useCanvasHighlight(flowRef);
+    useCanvasHighlight(flowRef, flowReady);
 
     const {
         onNodesChange,
@@ -107,13 +110,47 @@ export const ArchitectureCanvas = () => {
 
     const { handleDragOver, handleDrop } = useCanvasDnd(flowRef);
 
+    const nodeKinds = nodes
+        .map((n) => n.data?.node?.kind as NodeKind | undefined)
+        .filter((k): k is NodeKind => Boolean(k));
+    const { showBanner, hint, dismiss } = useTutorial(
+        nodes.length,
+        edges.length,
+        nodeKinds,
+    );
+
+    const pairCounts = new Map<string, number>();
+    for (const edge of edges) {
+        const key = `${edge.source}-${edge.target}`;
+        pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
+    }
+
+    const pairIndices = new Map<string, number>();
+
     const edgesWithLabels = edges.map((flowEdge) => {
         const data = flowEdge.data as { edge?: { kind: string } };
         const kind = data?.edge?.kind ?? 'calls';
+
+        const pairKey = `${flowEdge.source}-${flowEdge.target}`;
+        const pathTotal = pairCounts.get(pairKey) ?? 1;
+        const pathIndex = pairIndices.get(pairKey) ?? 0;
+        pairIndices.set(pairKey, pathIndex + 1);
+
+        const handleIdx =
+            pathTotal === 1
+                ? 1
+                : pathTotal === 2
+                  ? pathIndex === 0
+                      ? 0
+                      : 2
+                  : pathIndex;
+
         return {
             ...flowEdge,
             label: flowEdge.label ?? kind,
             markerEnd: flowEdge.markerEnd ?? { type: 'arrowclosed' },
+            sourceHandle: `bottom-${handleIdx}`,
+            targetHandle: `top-${handleIdx}`,
         };
     });
 
@@ -123,7 +160,7 @@ export const ArchitectureCanvas = () => {
     };
 
     return (
-        <div className="h-full w-full">
+        <div className="relative h-full w-full">
             <ReactFlow<ArchitectureFlowNode>
                 nodes={nodes}
                 edges={edgesWithLabels}
@@ -141,6 +178,7 @@ export const ArchitectureCanvas = () => {
                 onInit={(instance) => {
                     flowRef.current = instance;
                     setFlowInstance(instance);
+                    setFlowReady(true);
                 }}
                 selectionOnDrag
                 selectionMode={SelectionMode.Partial}
@@ -167,6 +205,12 @@ export const ArchitectureCanvas = () => {
             </ReactFlow>
 
             {nodes.length === 0 ? <CanvasEmptyState /> : null}
+
+            {showBanner && hint ? (
+                <div className="absolute top-4 left-1/2 z-20 -translate-x-1/2 px-4 max-w-md">
+                    <TutorialBanner hint={hint} onDismiss={dismiss} />
+                </div>
+            ) : null}
 
             {contextMenu && (
                 <CanvasContextMenu

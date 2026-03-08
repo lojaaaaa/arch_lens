@@ -189,6 +189,7 @@ ArchLens объединяет визуальный редактор архите
 | P06 | Excessive nesting | warning | UI Component с > 5 вложенными компонентами |
 | P07 | No error boundary | info | Frontend без обработки ошибок внешних вызовов |
 | P08 | Monolith API | warning | Один API Gateway обслуживает > 15 эндпоинтов |
+| P09 | Edge semantics | warning | Некорректная семантика связи (напр. reads/writes для БД, calls для сервисов) |
 
 #### 3.2.4 Правила анализа — Layer 3: Load Estimation
 

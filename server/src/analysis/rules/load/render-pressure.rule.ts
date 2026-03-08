@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class RenderPressureRule implements AnalysisRule {
   readonly id = 'L01';

@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class MissingCacheRule implements AnalysisRule {
   readonly id = 'P03';
@@ -28,7 +32,8 @@ export class MissingCacheRule implements AnalysisRule {
             title: 'Отсутствует кэш для нагруженной базы данных',
             description: `База данных "${node.id}" имеет высокий readWriteRatio (${ratio}), но не связана с кэшем.`,
             affectedNodes: [node.id],
-            recommendation: 'Добавьте слой кэширования для снижения нагрузки на БД.',
+            recommendation:
+              'Добавьте кэш между сервисом и БД — снизит нагрузку при частых чтениях.',
             metrics: { readWriteRatio: ratio },
           });
         }

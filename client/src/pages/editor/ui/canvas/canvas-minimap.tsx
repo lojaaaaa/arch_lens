@@ -20,6 +20,7 @@ export const CanvasMiniMap = () => {
 
     return (
         <MiniMap
+            key={theme}
             nodeColor={minimapColors.nodeColor}
             maskColor={minimapColors.maskColor}
             bgColor={minimapColors.bgColor}

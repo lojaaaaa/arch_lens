@@ -6,7 +6,7 @@ import { EditorCanvasArea } from './editor-canvas-area';
 
 export const EditorLayout = () => {
     return (
-        <SidebarInset className="h-svh min-h-svh">
+        <SidebarInset className="h-svh min-h-svh overflow-hidden">
             <Header />
             <Separator />
             <EditorCanvasArea />

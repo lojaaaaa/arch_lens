@@ -26,6 +26,15 @@ export function calculateMetrics(ctx: GraphContext): AnalysisMetrics {
     (edge) => edge.kind === 'reads' || edge.kind === 'writes',
   ).length;
 
+  const maxFanOut =
+    ctx.nodes.length > 0
+      ? Math.max(...ctx.nodes.map((n) => ctx.outgoingCount.get(n.id) ?? 0))
+      : 0;
+
+  const eventDrivenEdgesCount = ctx.edges.filter(
+    (edge) => edge.kind === 'subscribes' || edge.kind === 'emits',
+  ).length;
+
   return {
     totalNodes: ctx.nodes.length,
     totalEdges: ctx.edges.length,
@@ -35,5 +44,8 @@ export function calculateMetrics(ctx: GraphContext): AnalysisMetrics {
     estimatedRenderPressure,
     estimatedApiLoad,
     estimatedDataLoad,
+    stateStoreCount,
+    maxFanOut,
+    eventDrivenEdgesCount,
   };
 }

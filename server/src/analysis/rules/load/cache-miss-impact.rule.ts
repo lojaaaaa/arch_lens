@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class CacheMissImpactRule implements AnalysisRule {
   readonly id = 'L04';
@@ -11,7 +15,8 @@ export class CacheMissImpactRule implements AnalysisRule {
     const caches = ctx.nodesByKind.get('cache') ?? [];
 
     for (const cache of caches) {
-      const hitRate = Number(cache['hitRate']) ?? 1;
+      const raw = Number(cache['hitRate']);
+      const hitRate = Number.isFinite(raw) ? raw : 1;
       if (hitRate >= ANALYSIS_CONFIG.load.cacheLowHitRate) continue;
 
       const cacheEdges = ctx.edges.filter(

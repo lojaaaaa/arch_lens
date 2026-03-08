@@ -12,7 +12,7 @@ export const SidebarPresets = ({
     onApplyPreset,
 }: SidebarPresetsProps) => {
     return (
-        <div className="flex flex-col gap-2 rounded-md border bg-card/60 p-2">
+        <div className="flex flex-col gap-2 rounded-lg border border-sidebar-border/40 bg-sidebar-accent/30 backdrop-blur-sm p-2.5">
             <div className="text-xs font-semibold text-muted-foreground">
                 Шаблоны
             </div>

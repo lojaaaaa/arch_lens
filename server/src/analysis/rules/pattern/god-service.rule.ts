@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class GodServiceRule implements AnalysisRule {
   readonly id = 'P01';
@@ -12,7 +16,10 @@ export class GodServiceRule implements AnalysisRule {
     for (const node of services) {
       const ops = Number(node['operationsCount']) || 0;
       const ext = Number(node['externalCalls']) || 0;
-      if (ops > ANALYSIS_CONFIG.pattern.godServiceOpsThreshold && ext > ANALYSIS_CONFIG.pattern.godServiceExternalCallsThreshold) {
+      if (
+        ops > ANALYSIS_CONFIG.pattern.godServiceOpsThreshold &&
+        ext > ANALYSIS_CONFIG.pattern.godServiceExternalCallsThreshold
+      ) {
         issues.push({
           id: randomUUID(),
           severity: 'critical',

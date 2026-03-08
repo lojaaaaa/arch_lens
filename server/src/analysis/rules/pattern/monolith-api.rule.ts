@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class MonolithApiRule implements AnalysisRule {
   readonly id = 'P08';
@@ -19,7 +23,8 @@ export class MonolithApiRule implements AnalysisRule {
           title: 'Монолитный API Gateway',
           description: `API Gateway "${node.id}" содержит ${endpoints} эндпоинтов — риск монолитной структуры.`,
           affectedNodes: [node.id],
-          recommendation: 'Рассмотрите разделение Gateway на несколько специализированных.',
+          recommendation:
+            'Рассмотрите разделение Gateway на несколько специализированных.',
           metrics: { endpointsCount: endpoints },
         });
       }

@@ -27,11 +27,13 @@ export const ANALYSIS_CONFIG = {
 
   scoring: {
     penaltyInfo: 2,
-    penaltyWarning: 5,
-    penaltyCritical: 15,
+    penaltyWarning: 10,
+    penaltyCritical: 28,
     bonusCachePresent: 3,
     bonusGatewayPresent: 3,
     bonusNoCycles: 5,
     bonusAllConnected: 3,
+    /** Score = max(0, min(100, 100 - penalty + bonus)). Grade: A≥90, B≥75, C≥60, D≥40, F<40 */
+    maxScore: 100,
   },
 } as const;

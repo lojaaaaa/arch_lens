@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
-import type { AnalysisIssue, AnalysisRule, GraphContext } from '../../interfaces/index.js';
+import type {
+  AnalysisIssue,
+  AnalysisRule,
+  GraphContext,
+} from '../../interfaces/index.js';
 
 export class ExcessiveNestingRule implements AnalysisRule {
   readonly id = 'P06';
@@ -19,7 +23,8 @@ export class ExcessiveNestingRule implements AnalysisRule {
           title: 'Чрезмерная вложенность компонентов',
           description: `Компонент "${node.id}" содержит ${nested} вложенных компонентов.`,
           affectedNodes: [node.id],
-          recommendation: 'Разбейте компонент на более мелкие переиспользуемые части.',
+          recommendation:
+            'Разбейте компонент на более мелкие переиспользуемые части.',
           metrics: { nestedComponents: nested },
         });
       }

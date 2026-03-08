@@ -19,6 +19,7 @@ export const useArchitectureActions = () =>
         useShallow((state) => ({
             setNodes: state.setNodes,
             setEdges: state.setEdges,
+            restoreFlow: state.restoreFlow,
             selectNode: state.selectNode,
             selectEdge: state.selectEdge,
             addNode: state.addNode,
