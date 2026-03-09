@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 
+import type { AnalysisStatus } from '@/features/analysis';
 import type { TypeOrNull } from '@/shared/model/types';
-
-import type { AnalysisStatus } from '../model/types';
 
 type UseAnalysisRestoreParams = {
     graphToAnalyze: unknown;

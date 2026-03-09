@@ -2,17 +2,19 @@ import { useShallow } from 'zustand/shallow';
 
 import { useArchitectureStore } from './store';
 
-export const useArchitectureSelectors = () =>
-    useArchitectureStore(
-        useShallow((state) => ({
-            nodes: state.nodes,
-            edges: state.edges,
-            selectedNodeId: state.selectedNodeId,
-            selectedEdgeId: state.selectedEdgeId,
-            isDirty: state.isDirty,
-            flowInstance: state.flowInstance,
-        })),
-    );
+/** Atomic selectors — подписка только на нужные поля, меньше re-renders */
+export const useArchitectureNodes = () =>
+    useArchitectureStore((state) => state.nodes);
+export const useArchitectureEdges = () =>
+    useArchitectureStore((state) => state.edges);
+export const useArchitectureSelectedNodeId = () =>
+    useArchitectureStore((state) => state.selectedNodeId);
+export const useArchitectureSelectedEdgeId = () =>
+    useArchitectureStore((state) => state.selectedEdgeId);
+export const useArchitectureIsDirty = () =>
+    useArchitectureStore((state) => state.isDirty);
+export const useArchitectureFlowInstance = () =>
+    useArchitectureStore((state) => state.flowInstance);
 
 export const useArchitectureActions = () =>
     useArchitectureStore(

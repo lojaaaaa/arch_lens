@@ -18,7 +18,12 @@ import {
     toFlowNode,
 } from '../lib/utils';
 
-const SYSTEM_POSITION = { x: 80, y: 80 };
+const SYSTEM_POSITION = { x: 250, y: 200 };
+const HISTORY_MAX_SIZE = 50;
+
+const trimHistoryPast = <T>(past: T[]): T[] => past.slice(-HISTORY_MAX_SIZE);
+const trimHistoryFuture = <T>(future: T[]): T[] =>
+    future.slice(0, HISTORY_MAX_SIZE);
 
 const getSystemFlowNode = (nodes: ArchitectureState['nodes']) =>
     nodes.find(
@@ -62,6 +67,21 @@ const shouldRecordNodeHistory = (changes: NodeChange[]) =>
 const shouldRecordEdgeHistory = (changes: EdgeChange[]) =>
     changes.some((change) => ['add', 'remove', 'reset'].includes(change.type));
 
+/** Исключает remove-изменения для системной ноды — её нельзя удалить через Delete. */
+const filterSystemNodeRemovals = (
+    changes: NodeChange[],
+    nodes: ArchitectureState['nodes'],
+): NodeChange[] => {
+    const systemId = getSystemFlowNode(nodes)?.id;
+    if (!systemId) {
+        return changes;
+    }
+    return changes.filter(
+        (change) =>
+            change.type !== 'remove' || (change.id && change.id !== systemId),
+    );
+};
+
 export const useArchitectureStore = create<ArchitectureState>()(
     devtools((set, get) => ({
         nodes: [toFlowNode(createNode('system', SYSTEM_POSITION))],
@@ -72,7 +92,7 @@ export const useArchitectureStore = create<ArchitectureState>()(
         isDirty: false,
         history: { past: [], future: [] },
 
-        setFlowInstance: (flowInstance: unknown) => set({ flowInstance }),
+        setFlowInstance: (flowInstance) => set({ flowInstance }),
         markDirty: () => set({ isDirty: true }),
         markSaved: () => set({ isDirty: false }),
 
@@ -80,10 +100,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
             set((state) => ({
                 ...state,
                 history: {
-                    past: [
+                    past: trimHistoryPast([
                         ...state.history.past,
                         { nodes: state.nodes, edges: state.edges },
-                    ],
+                    ]),
                     future: [],
                 },
                 nodes: ensureSystemFlowNodes(nodes),
@@ -93,10 +113,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
             set((state) => ({
                 ...state,
                 history: {
-                    past: [
+                    past: trimHistoryPast([
                         ...state.history.past,
                         { nodes: state.nodes, edges: state.edges },
-                    ],
+                    ]),
                     future: [],
                 },
                 edges,
@@ -157,10 +177,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
 
                 return {
                     history: {
-                        past: [
+                        past: trimHistoryPast([
                             ...state.history.past,
                             { nodes: state.nodes, edges: state.edges },
-                        ],
+                        ]),
                         future: [],
                     },
                     nodes: nextNodes,
@@ -174,10 +194,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
 
             set((state) => ({
                 history: {
-                    past: [
+                    past: trimHistoryPast([
                         ...state.history.past,
                         { nodes: state.nodes, edges: state.edges },
-                    ],
+                    ]),
                     future: [],
                 },
                 edges: [...state.edges, flowEdge],
@@ -198,10 +218,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
                 }
                 return {
                     history: {
-                        past: [
+                        past: trimHistoryPast([
                             ...state.history.past,
                             { nodes: state.nodes, edges: state.edges },
-                        ],
+                        ]),
                         future: [],
                     },
                     nodes: state.nodes.filter((flowNode) => flowNode.id !== id),
@@ -220,10 +240,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
         removeEdge: (id) => {
             set((state) => ({
                 history: {
-                    past: [
+                    past: trimHistoryPast([
                         ...state.history.past,
                         { nodes: state.nodes, edges: state.edges },
-                    ],
+                    ]),
                     future: [],
                 },
                 edges: state.edges.filter((flowEdge) => flowEdge.id !== id),
@@ -236,10 +256,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
         updateNode: (id, patch) => {
             set((state) => ({
                 history: {
-                    past: [
+                    past: trimHistoryPast([
                         ...state.history.past,
                         { nodes: state.nodes, edges: state.edges },
-                    ],
+                    ]),
                     future: [],
                 },
                 nodes: state.nodes.map((node) => {
@@ -273,10 +293,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
         updateEdge: (id, patch) => {
             set((state) => ({
                 history: {
-                    past: [
+                    past: trimHistoryPast([
                         ...state.history.past,
                         { nodes: state.nodes, edges: state.edges },
-                    ],
+                    ]),
                     future: [],
                 },
                 edges: state.edges.map((flowEdge) => {
@@ -306,20 +326,24 @@ export const useArchitectureStore = create<ArchitectureState>()(
         },
         applyNodeChanges: (changes: NodeChange[]) => {
             set((state) => {
-                const updatedNodes = applyNodeChanges(
+                const filteredChanges = filterSystemNodeRemovals(
                     changes,
                     state.nodes,
+                );
+                const updatedNodes = applyNodeChanges(
+                    filteredChanges,
+                    state.nodes,
                 ) as ArchitectureState['nodes'];
-                if (!shouldRecordNodeHistory(changes)) {
+                if (!shouldRecordNodeHistory(filteredChanges)) {
                     return { ...state, nodes: updatedNodes };
                 }
                 return {
                     ...state,
                     history: {
-                        past: [
+                        past: trimHistoryPast([
                             ...state.history.past,
                             { nodes: state.nodes, edges: state.edges },
-                        ],
+                        ]),
                         future: [],
                     },
                     nodes: updatedNodes,
@@ -336,10 +360,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
                 return {
                     ...state,
                     history: {
-                        past: [
+                        past: trimHistoryPast([
                             ...state.history.past,
                             { nodes: state.nodes, edges: state.edges },
-                        ],
+                        ]),
                         future: [],
                     },
                     edges: updatedEdges,
@@ -360,10 +384,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
                     edges: previous.edges,
                     history: {
                         past: newPast,
-                        future: [
+                        future: trimHistoryFuture([
                             { nodes: state.nodes, edges: state.edges },
                             ...state.history.future,
-                        ],
+                        ]),
                     },
                     isDirty: true,
                 };
@@ -381,10 +405,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
                     nodes: next.nodes,
                     edges: next.edges,
                     history: {
-                        past: [
+                        past: trimHistoryPast([
                             ...state.history.past,
                             { nodes: state.nodes, edges: state.edges },
-                        ],
+                        ]),
                         future: newFuture,
                     },
                     isDirty: true,

@@ -34,6 +34,13 @@ export const NODE_LABELS: Record<NodeKind, string> = {
     external_system: 'Внешняя система',
 };
 
+/** Цвет системной ноды — фиолетовый, отличается от layer-цветов. */
+export const SYSTEM_NODE_COLORS = {
+    bg: 'bg-violet-50/60 dark:bg-violet-950/40',
+    border: 'border-violet-200/40 dark:border-violet-800/30',
+    text: 'text-violet-600 dark:text-violet-400',
+} as const;
+
 export const LAYER_COLORS: Record<
     LayerType,
     { bg: string; border: string; text: string }

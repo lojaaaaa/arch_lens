@@ -1,22 +1,18 @@
-import { lazy, Suspense } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 
+import { usePresentationStore } from '@/features/presentation';
+
 import { useEditorHotkeys } from './lib/use-editor-hotkeys';
-import { usePresentationStore } from './model/presentation-store';
 import { EditorLayout } from './ui/editor-layout';
 import { PresentationView } from './ui/presentation-view';
-
-const Sidebar = lazy(() =>
-    import('./ui/sidebar/sidebar').then((module) => ({
-        default: module.Sidebar,
-    })),
-);
+import { Sidebar } from './ui/sidebar/sidebar';
 
 const EditorPage = () => {
-    useEditorHotkeys();
     const isPresentationMode = usePresentationStore(
         (state) => state.isPresentationMode,
     );
+
+    useEditorHotkeys();
 
     if (isPresentationMode) {
         return (
@@ -28,9 +24,7 @@ const EditorPage = () => {
 
     return (
         <ReactFlowProvider>
-            <Suspense fallback={null}>
-                <Sidebar />
-            </Suspense>
+            <Sidebar />
             <EditorLayout />
         </ReactFlowProvider>
     );

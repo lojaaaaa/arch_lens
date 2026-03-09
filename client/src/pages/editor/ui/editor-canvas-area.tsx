@@ -1,6 +1,10 @@
 import { lazy, Suspense } from 'react';
 
 import { ArchitectureCanvas } from './canvas/architecture-canvas';
+import {
+    useArchitectureSelectedEdgeId,
+    useArchitectureSelectedNodeId,
+} from '../model/selectors';
 
 const NodePropertiesSheet = lazy(() =>
     import('./properties/node-properties-sheet').then((module) => ({
@@ -15,12 +19,21 @@ const EdgePropertiesSheet = lazy(() =>
 );
 
 export const EditorCanvasArea = () => {
+    const selectedNodeId = useArchitectureSelectedNodeId();
+    const selectedEdgeId = useArchitectureSelectedEdgeId();
+
     return (
         <div className="relative flex-1 min-h-0 overflow-hidden">
-            <Suspense fallback={null}>
-                <NodePropertiesSheet />
-                <EdgePropertiesSheet />
-            </Suspense>
+            {selectedNodeId && (
+                <Suspense fallback={null}>
+                    <NodePropertiesSheet />
+                </Suspense>
+            )}
+            {selectedEdgeId && (
+                <Suspense fallback={null}>
+                    <EdgePropertiesSheet />
+                </Suspense>
+            )}
             <ArchitectureCanvas />
         </div>
     );

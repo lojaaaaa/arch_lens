@@ -1,45 +1,39 @@
-import { type RefObject, useEffect } from 'react';
-import type { ReactFlowInstance } from '@xyflow/react';
+import { useEffect } from 'react';
 
-import { useAnalysisStore } from '@/pages/analysis/model/store';
-import type { TypeOrNull } from '@/shared/model/types';
+import { useGraphHighlightStore } from '@/features/graph-highlight';
 
-import type { ArchitectureFlowNode } from '../../model/types';
+import { useArchitectureStore } from '../../model/store';
 
-const FIT_VIEW_DELAY_MS = 300;
 const HIGHLIGHT_AUTO_CLEAR_MS = 10_000;
 
-export const useCanvasHighlight = (
-    flowRef: RefObject<TypeOrNull<ReactFlowInstance<ArchitectureFlowNode>>>,
-    flowReady: boolean,
-) => {
-    const highlightedNodeIds = useAnalysisStore(
+export const useCanvasHighlight = () => {
+    const flowInstance = useArchitectureStore((state) => state.flowInstance);
+    const highlightedNodeIds = useGraphHighlightStore(
         (state) => state.highlightedNodeIds,
     );
-    const highlightPreventAutoClear = useAnalysisStore(
+    const highlightPreventAutoClear = useGraphHighlightStore(
         (state) => state.highlightPreventAutoClear,
     );
-    const clearHighlight = useAnalysisStore((state) => state.clearHighlight);
+    const clearHighlight = useGraphHighlightStore(
+        (state) => state.clearHighlight,
+    );
 
     useEffect(() => {
-        if (highlightedNodeIds.length === 0 || !flowReady || !flowRef.current) {
+        if (highlightedNodeIds.length === 0 || !flowInstance?.fitView) {
             return;
         }
 
-        const fitTimer = setTimeout(() => {
-            flowRef.current?.fitView({
-                nodes: highlightedNodeIds.map((nodeId) => ({ id: nodeId })),
-                padding: 0.4,
-                duration: 500,
-            });
-        }, FIT_VIEW_DELAY_MS);
+        flowInstance.fitView({
+            nodes: highlightedNodeIds.map((nodeId) => ({ id: nodeId })),
+            padding: 0.4,
+            duration: 400,
+        });
 
         const clearTimer = highlightPreventAutoClear
             ? null
             : setTimeout(clearHighlight, HIGHLIGHT_AUTO_CLEAR_MS);
 
         return () => {
-            clearTimeout(fitTimer);
             if (clearTimer) {
                 clearTimeout(clearTimer);
             }
@@ -48,7 +42,6 @@ export const useCanvasHighlight = (
         highlightedNodeIds,
         highlightPreventAutoClear,
         clearHighlight,
-        flowReady,
-        flowRef,
+        flowInstance,
     ]);
 };

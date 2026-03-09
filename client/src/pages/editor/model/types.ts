@@ -1,4 +1,10 @@
-import type { Edge, EdgeChange, Node, NodeChange } from '@xyflow/react';
+import type {
+    Edge,
+    EdgeChange,
+    Node,
+    NodeChange,
+    ReactFlowInstance,
+} from '@xyflow/react';
 
 import type {
     ArchitectureNodeData,
@@ -17,7 +23,7 @@ export type ArchitectureState = {
     selectedNodeId: TypeOrNull<string>;
     selectedEdgeId: TypeOrNull<string>;
 
-    flowInstance: unknown;
+    flowInstance: TypeOrNull<ReactFlowInstance<ArchitectureFlowNode>>;
     isDirty: boolean;
 
     history: {
@@ -25,7 +31,9 @@ export type ArchitectureState = {
         future: { nodes: ArchitectureFlowNode[]; edges: Edge[] }[];
     };
 
-    setFlowInstance: (instance: unknown) => void;
+    setFlowInstance: (
+        instance: TypeOrNull<ReactFlowInstance<ArchitectureFlowNode>>,
+    ) => void;
     markDirty: () => void;
     markSaved: () => void;
 

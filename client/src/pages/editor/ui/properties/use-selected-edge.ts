@@ -1,7 +1,10 @@
 import type { TypeOrNull } from '@/shared/model/types';
 
 import type { FlowEdgeData } from '../../lib/utils';
-import { useArchitectureSelectors } from '../../model/selectors';
+import {
+    useArchitectureEdges,
+    useArchitectureSelectedEdgeId,
+} from '../../model/selectors';
 
 type SelectedEdgeResult = {
     selectedEdgeId: TypeOrNull<string>;
@@ -10,7 +13,8 @@ type SelectedEdgeResult = {
 };
 
 export const useSelectedEdge = (): SelectedEdgeResult => {
-    const { edges, selectedEdgeId } = useArchitectureSelectors();
+    const edges = useArchitectureEdges();
+    const selectedEdgeId = useArchitectureSelectedEdgeId();
 
     const selectedEdge = selectedEdgeId
         ? (edges.find((flowEdge) => flowEdge.id === selectedEdgeId) ?? null)

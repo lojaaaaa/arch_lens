@@ -1,13 +1,19 @@
 import { useEffect, useRef } from 'react';
 import type { Edge } from '@xyflow/react';
 
+import type { EditorClipboardApi } from '@/features/editor-clipboard';
+import { useEditorClipboard } from '@/features/editor-clipboard';
+import { usePresentationStore } from '@/features/presentation';
 import { isEditableTarget } from '@/shared/lib/utils';
 import type { TypeOrNull } from '@/shared/model/types';
 
-import { useEditorClipboard } from './use-editor-clipboard';
+import { toFlowEdge, toFlowNode } from './utils';
 import {
+    useArchitectureEdges,
     useArchitectureHotkeysActions,
-    useArchitectureSelectors,
+    useArchitectureNodes,
+    useArchitectureSelectedEdgeId,
+    useArchitectureSelectedNodeId,
 } from '../model/selectors';
 import type { ArchitectureFlowNode } from '../model/types';
 
@@ -124,7 +130,7 @@ const resolveHotkey = (event: KeyboardEvent): TypeOrNull<EditorHotkey> => {
 export const handleEditorHotkeys = (
     event: KeyboardEvent,
     context: EditorHotkeysContext,
-    clipboard: ReturnType<typeof useEditorClipboard>,
+    clipboard: EditorClipboardApi<ArchitectureFlowNode>,
 ) => {
     const hotkey = resolveHotkey(event);
 
@@ -211,8 +217,10 @@ export const handleEditorHotkeys = (
 };
 
 export const useEditorHotkeys = () => {
-    const { nodes, edges, selectedNodeId, selectedEdgeId } =
-        useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
+    const edges = useArchitectureEdges();
+    const selectedNodeId = useArchitectureSelectedNodeId();
+    const selectedEdgeId = useArchitectureSelectedEdgeId();
 
     const actions = useArchitectureHotkeysActions();
 
@@ -221,6 +229,8 @@ export const useEditorHotkeys = () => {
         edges,
         setNodes: actions.setNodes,
         setEdges: actions.setEdges,
+        toFlowNode,
+        toFlowEdge,
     });
 
     const context = buildEditorHotkeysContext(
@@ -243,12 +253,16 @@ export const useEditorHotkeys = () => {
     }, [clipboard]);
 
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) =>
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (usePresentationStore.getState().isPresentationMode) {
+                return;
+            }
             handleEditorHotkeys(
                 event,
                 contextRef.current,
                 clipboardRef.current,
             );
+        };
 
         window.addEventListener('keydown', handleKeyDown);
 

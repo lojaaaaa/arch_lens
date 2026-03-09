@@ -1,6 +1,9 @@
 import type { ArchitectureNode, TypeOrNull } from '@/shared/model/types';
 
-import { useArchitectureSelectors } from '../../model/selectors';
+import {
+    useArchitectureNodes,
+    useArchitectureSelectedNodeId,
+} from '../../model/selectors';
 
 type SelectedNodeResult = {
     selectedFlowNodeId: TypeOrNull<string>;
@@ -17,7 +20,8 @@ const getArchNodeFromFlowNodeData = (
 };
 
 export const useSelectedNode = (): SelectedNodeResult => {
-    const { nodes: flowNodes, selectedNodeId } = useArchitectureSelectors();
+    const flowNodes = useArchitectureNodes();
+    const selectedNodeId = useArchitectureSelectedNodeId();
 
     const selectedFlowNode = selectedNodeId
         ? (flowNodes.find((flowNode) => flowNode.id === selectedNodeId) ?? null)

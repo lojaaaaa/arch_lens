@@ -1,92 +1,62 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useRef } from 'react';
 import type { ReactFlowInstance } from '@xyflow/react';
-import { Background, ReactFlow, SelectionMode } from '@xyflow/react';
+import { Background, ReactFlow } from '@xyflow/react';
 
-import type { NodeKind, TypeOrNull } from '@/shared/model/types';
+import { usePresentationStore } from '@/features/presentation';
+import { useTutorial } from '@/features/tutorial';
+import { TutorialBanner } from '@/features/tutorial';
+import type { TypeOrNull } from '@/shared/model/types';
 
 import { ArchitectureNodeComponent } from './architecture-node';
 import { CanvasContextMenu } from './canvas-context-menu';
-import { CanvasEmptyState } from './canvas-empty-state';
 import { CanvasStatsPanel } from './canvas-stats-panel';
-import { TutorialBanner } from './tutorial-banner';
+import { useArchitectureCanvasProps } from './use-architecture-canvas-props';
 import { useCanvasContextMenu } from './use-canvas-context-menu';
 import { useCanvasDnd } from './use-canvas-dnd';
 import { useArchitectureCanvasHandlers } from './use-canvas-handlers';
 import { useCanvasHighlight } from './use-canvas-highlight';
-import { useTutorial } from '../../lib/use-tutorial';
+import { useEdgesWithLabels } from './use-edges-with-labels';
+import { useNodeKinds } from './use-node-kinds';
 import {
     useArchitectureActions,
-    useArchitectureSelectors,
+    useArchitectureEdges,
+    useArchitectureNodes,
 } from '../../model/selectors';
 import type { ArchitectureFlowNode } from '../../model/types';
 
-const BACKGROUND_SIZE = 1.3;
-const nodeTypes = {
+const NODE_TYPES = {
     architecture: ArchitectureNodeComponent,
 } as const;
 
+export const BACKGROUND_SIZE = 1.3;
+
 const CanvasMiniMap = lazy(() =>
-    import('./canvas-minimap').then((module) => ({
-        default: module.CanvasMiniMap,
+    import('./canvas-minimap').then((moduleExport) => ({
+        default: moduleExport.CanvasMiniMap,
     })),
 );
 
 const CanvasControls = lazy(() =>
-    import('./canvas-controls').then((module) => ({
-        default: module.CanvasControls,
+    import('./canvas-controls').then((moduleExport) => ({
+        default: moduleExport.CanvasControls,
     })),
 );
 
 export const ArchitectureCanvas = () => {
-    const { nodes, edges } = useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
+    const edges = useArchitectureEdges();
 
+    const isPresentationMode = usePresentationStore(
+        (state) => state.isPresentationMode,
+    );
     const { setFlowInstance } = useArchitectureActions();
 
     const flowRef =
         useRef<TypeOrNull<ReactFlowInstance<ArchitectureFlowNode>>>(null);
 
-    const [showExtras, setShowExtras] = useState(false);
-    const [flowReady, setFlowReady] = useState(false);
+    useCanvasHighlight();
 
-    useEffect(() => {
-        let cancelled = false;
-        const schedule = () => {
-            if (!cancelled) {
-                setShowExtras(true);
-            }
-        };
-
-        const requestIdleCallback = (
-            window as typeof window & {
-                requestIdleCallback?: (
-                    cb: () => void,
-                    opts?: { timeout: number },
-                ) => number;
-                cancelIdleCallback?: (id: number) => void;
-            }
-        ).requestIdleCallback;
-
-        if (requestIdleCallback) {
-            const idleId = requestIdleCallback(schedule, { timeout: 1000 });
-            return () => {
-                cancelled = true;
-                (
-                    window as typeof window & {
-                        cancelIdleCallback?: (id: number) => void;
-                    }
-                ).cancelIdleCallback?.(idleId);
-            };
-        }
-
-        const timeoutId = window.setTimeout(schedule, 0);
-        return () => {
-            cancelled = true;
-            window.clearTimeout(timeoutId);
-        };
-    }, []);
-
-    useCanvasHighlight(flowRef, flowReady);
-
+    const canvasProps = useArchitectureCanvasProps();
     const {
         onNodesChange,
         onEdgesChange,
@@ -110,109 +80,75 @@ export const ArchitectureCanvas = () => {
 
     const { handleDragOver, handleDrop } = useCanvasDnd(flowRef);
 
-    const nodeKinds = nodes
-        .map((n) => n.data?.node?.kind as NodeKind | undefined)
-        .filter((k): k is NodeKind => Boolean(k));
+    const nodeKinds = useNodeKinds(nodes);
     const { showBanner, hint, dismiss } = useTutorial(
         nodes.length,
         edges.length,
         nodeKinds,
     );
 
-    const pairCounts = new Map<string, number>();
-    for (const edge of edges) {
-        const key = `${edge.source}-${edge.target}`;
-        pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
-    }
+    const edgesWithLabels = useEdgesWithLabels(edges);
 
-    const pairIndices = new Map<string, number>();
-
-    const edgesWithLabels = edges.map((flowEdge) => {
-        const data = flowEdge.data as { edge?: { kind: string } };
-        const kind = data?.edge?.kind ?? 'calls';
-
-        const pairKey = `${flowEdge.source}-${flowEdge.target}`;
-        const pathTotal = pairCounts.get(pairKey) ?? 1;
-        const pathIndex = pairIndices.get(pairKey) ?? 0;
-        pairIndices.set(pairKey, pathIndex + 1);
-
-        const handleIdx =
-            pathTotal === 1
-                ? 1
-                : pathTotal === 2
-                  ? pathIndex === 0
-                      ? 0
-                      : 2
-                  : pathIndex;
-
-        return {
-            ...flowEdge,
-            label: flowEdge.label ?? kind,
-            markerEnd: flowEdge.markerEnd ?? { type: 'arrowclosed' },
-            sourceHandle: `bottom-${handleIdx}`,
-            targetHandle: `top-${handleIdx}`,
-        };
-    });
+    const isShowTutorial = !isPresentationMode && showBanner && hint;
 
     const handlePaneClick = () => {
         closeContextMenu();
         onPaneClick();
     };
 
+    const noopWhenPresentation = <T,>(handler: T) =>
+        isPresentationMode ? undefined : handler;
+
     return (
         <div className="relative h-full w-full">
             <ReactFlow<ArchitectureFlowNode>
                 nodes={nodes}
                 edges={edgesWithLabels}
-                nodeTypes={nodeTypes}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                onEdgeDoubleClick={onEdgeDoubleClick}
-                onNodeDoubleClick={onNodeDoubleClick}
-                onPaneClick={handlePaneClick}
-                onEdgeContextMenu={openEdgeContextMenu}
-                onNodeContextMenu={openNodeContextMenu}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
+                nodeTypes={NODE_TYPES}
                 onInit={(instance) => {
                     flowRef.current = instance;
                     setFlowInstance(instance);
-                    setFlowReady(true);
                 }}
-                selectionOnDrag
-                selectionMode={SelectionMode.Partial}
+                nodesDraggable={canvasProps.nodesDraggable}
+                nodesConnectable={canvasProps.nodesConnectable}
+                elementsSelectable={canvasProps.elementsSelectable}
+                selectionOnDrag={canvasProps.selectionOnDrag}
+                selectionMode={canvasProps.selectionMode}
+                onConnect={noopWhenPresentation(onConnect)}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onPaneClick={noopWhenPresentation(handlePaneClick)}
+                onNodeContextMenu={noopWhenPresentation(openNodeContextMenu)}
+                onEdgeContextMenu={noopWhenPresentation(openEdgeContextMenu)}
+                onNodeDoubleClick={noopWhenPresentation(onNodeDoubleClick)}
+                onEdgeDoubleClick={noopWhenPresentation(onEdgeDoubleClick)}
+                onDragOver={noopWhenPresentation(handleDragOver)}
+                onDrop={noopWhenPresentation(handleDrop)}
                 fitView
-                fitViewOptions={{
-                    padding: 0.2,
-                }}
+                fitViewOptions={canvasProps.fitViewOptions}
                 defaultEdgeOptions={{
                     markerEnd: { type: 'arrowclosed' },
                 }}
                 proOptions={{ hideAttribution: true }}
             >
                 <Background size={BACKGROUND_SIZE} />
-                {showExtras ? (
-                    <Suspense fallback={null}>
-                        <CanvasMiniMap />
-                        <CanvasControls />
-                    </Suspense>
-                ) : null}
+                <Suspense fallback={null}>
+                    <CanvasMiniMap />
+                    <CanvasControls />
+                </Suspense>
                 <CanvasStatsPanel
                     nodesCount={nodes.length}
                     edgesCount={edges.length}
                 />
             </ReactFlow>
 
-            {nodes.length === 0 ? <CanvasEmptyState /> : null}
-
-            {showBanner && hint ? (
-                <div className="absolute top-4 left-1/2 z-20 -translate-x-1/2 px-4 max-w-md">
+            {isShowTutorial && (
+                <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2 px-4 max-w-md">
                     <TutorialBanner hint={hint} onDismiss={dismiss} />
                 </div>
-            ) : null}
+            )}
 
-            {contextMenu && (
+            {!isPresentationMode && contextMenu && (
                 <CanvasContextMenu
                     contextMenu={contextMenu}
                     canDelete={canDeleteContext}

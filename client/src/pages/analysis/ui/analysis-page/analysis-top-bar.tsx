@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 
+import { ThemeToggle } from '@/features/theme';
 import { Button } from '@/shared/ui/button';
-import { ThemeToggle } from '@/shared/ui/theme-toggle';
 
 type AnalysisTopBarProps = {
     title: string;

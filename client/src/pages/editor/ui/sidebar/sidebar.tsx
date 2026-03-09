@@ -1,3 +1,4 @@
+import { ARCHITECTURE_PRESETS } from '@/features/architecture-presets';
 import {
     Sidebar as UISidebar,
     SidebarContent,
@@ -5,7 +6,6 @@ import {
     SidebarHeader,
 } from '@/shared/ui/sidebar';
 
-import { ARCHITECTURE_PRESETS } from './presets';
 import { SidebarClear } from './sidebar-clear';
 import { SidebarLayerGroup } from './sidebar-layer-group';
 import { SidebarPresets } from './sidebar-presets';

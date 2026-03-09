@@ -242,5 +242,5 @@ export interface AnalysisRule {
 
     appliesTo: NodeKind | 'graph';
 
-    check(graph: ArchitectureGraph): ArchitectureIssue[] | null;
+    check(graph: ArchitectureGraph): TypeOrNull<ArchitectureIssue[]>;
 }

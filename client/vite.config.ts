@@ -10,4 +10,16 @@ export default defineConfig({
             '@': '/src',
         },
     },
+    build: {
+        minify: 'esbuild',
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-react': ['react', 'react-dom', 'react-router'],
+                    'vendor-xyflow': ['@xyflow/react'],
+                },
+            },
+        },
+    },
 });

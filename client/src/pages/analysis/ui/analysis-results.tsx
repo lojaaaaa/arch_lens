@@ -1,16 +1,17 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
+import { AiRecommendations } from '@/features/ai-recommendations';
+import { useAnalysisSelectors } from '@/features/analysis';
+import { useGraphHighlightStore } from '@/features/graph-highlight';
 import { Routes } from '@/shared/model/routes';
 import type { AnalysisResult, IssueSeverity } from '@/shared/model/types';
 
-import { AnalysisAiRecommendations } from './analysis-results/analysis-ai-recommendations';
 import { AnalysisIssues } from './analysis-results/analysis-issues';
 import { AnalysisMetrics } from './analysis-results/analysis-metrics';
 import { AnalysisResultsFooter } from './analysis-results/analysis-results-footer';
 import { AnalysisResultsHeader } from './analysis-results/analysis-results-header';
 import { AnalysisSummaryCard } from './analysis-results/analysis-summary-card';
-import { useAnalysisActions, useAnalysisSelectors } from '../model/selectors';
 
 type AnalysisResultsProps = {
     result: AnalysisResult;
@@ -20,8 +21,12 @@ type AnalysisResultsProps = {
 export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
     const navigate = useNavigate();
     const { graphToAnalyze } = useAnalysisSelectors();
-    const { setHighlightedNodeIds, setHighlightPreventAutoClear } =
-        useAnalysisActions();
+    const setHighlightedNodeIds = useGraphHighlightStore(
+        (state) => state.setHighlightedNodeIds,
+    );
+    const setHighlightPreventAutoClear = useGraphHighlightStore(
+        (state) => state.setHighlightPreventAutoClear,
+    );
     const { summary, metrics, issues } = result;
     const aiRecommendations = result.aiRecommendations ?? [];
 
@@ -29,7 +34,7 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
     const validNodeIds = useMemo(() => {
         const ids = new Set<string>();
         if (graphToAnalyze?.nodes) {
-            graphToAnalyze.nodes.forEach((n) => ids.add(n.id));
+            graphToAnalyze.nodes.forEach((node) => ids.add(node.id));
         }
         issues.forEach((i) => i.affectedNodes.forEach((id) => ids.add(id)));
         return ids;
@@ -61,7 +66,7 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
             />
             <AnalysisMetrics metrics={metrics} />
             <AnalysisIssues issues={issues} onIssueClick={handleNodeClick} />
-            <AnalysisAiRecommendations
+            <AiRecommendations
                 recommendations={aiRecommendations}
                 validNodeIds={validNodeIds}
                 onRecommendationClick={handleNodeClick}

@@ -1,7 +1,8 @@
 import { memo, useState } from 'react';
 import { Handle, type NodeProps, Position } from '@xyflow/react';
 
-import { useAnalysisStore } from '@/pages/analysis/model/store';
+import { useGraphHighlightStore } from '@/features/graph-highlight';
+import { usePresentationStore } from '@/features/presentation';
 import { cn } from '@/shared/lib/utils';
 import type {
     ArchitectureNode,
@@ -9,7 +10,11 @@ import type {
     NodeKind,
 } from '@/shared/model/types';
 
-import { LAYER_COLORS, NODE_LABELS } from '../../lib/config';
+import {
+    LAYER_COLORS,
+    NODE_LABELS,
+    SYSTEM_NODE_COLORS,
+} from '../../lib/config';
 import { useArchitectureActions } from '../../model/selectors';
 
 type ArchNodeData = {
@@ -22,16 +27,20 @@ export const ArchitectureNodeComponent = memo(
         const { node } = data;
         const layer = (node?.layer ?? 'backend') as LayerType;
         const kind = (node?.kind ?? 'service') as NodeKind;
-        const colors = LAYER_COLORS[layer];
+        const colors =
+            kind === 'system' ? SYSTEM_NODE_COLORS : LAYER_COLORS[layer];
         const label = data.label || NODE_LABELS[kind] || kind;
         const displayName = node?.displayName?.trim() || '';
         const title = displayName || label;
         const typeLabel = NODE_LABELS[kind] ?? kind;
+        const isPresentationMode = usePresentationStore(
+            (state) => state.isPresentationMode,
+        );
         const { updateNode } = useArchitectureActions();
         const [isEditing, setIsEditing] = useState(false);
         const [draftName, setDraftName] = useState(displayName);
 
-        const isHighlighted = useAnalysisStore((state) =>
+        const isHighlighted = useGraphHighlightStore((state) =>
             state.highlightedNodeIds.includes(id),
         );
 
@@ -53,8 +62,12 @@ export const ArchitectureNodeComponent = memo(
             setIsEditing(false);
         };
 
-        const handleClass =
-            '!z-10 !h-4 !w-8 !opacity-0 group-hover:!opacity-100 !transform !-translate-x-1/2 !border-0 !bg-transparent group-hover:!border group-hover:!border-[var(--handle-border)] group-hover:!bg-[var(--handle)] group-hover:!rounded-full pointer-events-auto transition-opacity duration-150';
+        const handleClass = cn(
+            '!z-10 !h-4 !w-8 !transform !-translate-x-1/2 !border-0 !bg-transparent transition-opacity duration-150',
+            isPresentationMode
+                ? '!opacity-0 pointer-events-none'
+                : '!opacity-0 group-hover:!opacity-100 group-hover:!border group-hover:!border-[var(--handle-border)] group-hover:!bg-[var(--handle)] group-hover:!rounded-full pointer-events-auto',
+        );
 
         return (
             <div className="group/node size-full">
@@ -73,7 +86,7 @@ export const ArchitectureNodeComponent = memo(
                 ))}
                 <div
                     className={cn(
-                        'rounded-lg border px-3 pb-3 pt-4 min-w-[120px] max-w-[500px] transition-shadow backdrop-blur-sm relative',
+                        'rounded-lg border px-4 py-6 min-w-[150px] min-h-[56px] max-w-[500px] transition-shadow backdrop-blur-sm relative',
                         colors.bg,
                         colors.border,
                         selected && 'ring-1 ring-primary/20 ring-offset-0',
@@ -121,6 +134,9 @@ export const ArchitectureNodeComponent = memo(
                                 <button
                                     type="button"
                                     onDoubleClick={(event) => {
+                                        if (isPresentationMode) {
+                                            return;
+                                        }
                                         event.stopPropagation();
                                         handleStartEdit();
                                     }}

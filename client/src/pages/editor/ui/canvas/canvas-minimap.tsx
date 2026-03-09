@@ -1,6 +1,6 @@
 import { MiniMap } from '@xyflow/react';
 
-import { useTheme } from '@/shared/lib/use-theme';
+import { useTheme } from '@/features/theme';
 
 const MINIMAP_LIGHT = {
     nodeColor: '#e2e2e2',

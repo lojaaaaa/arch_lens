@@ -2,7 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 
-import { applyTheme, getStoredTheme } from '@/shared/lib/theme';
+import { applyTheme, getStoredTheme } from '@/features/theme';
+import { ErrorBoundary } from '@/shared/ui/error-boundary';
 
 import { router } from './router/router';
 
@@ -12,8 +13,15 @@ import './styles/index.css';
 const initialTheme = getStoredTheme() ?? 'light';
 applyTheme(initialTheme);
 
-createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root');
+if (!root) {
+    throw new Error('Root element #root not found');
+}
+
+createRoot(root).render(
     <StrictMode>
-        <RouterProvider router={router} />
+        <ErrorBoundary>
+            <RouterProvider router={router} />
+        </ErrorBoundary>
     </StrictMode>,
 );

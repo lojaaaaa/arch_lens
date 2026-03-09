@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
 
+import { usePresentationStore } from '@/features/presentation';
 import { Button } from '@/shared/ui/button';
 import {
     Tooltip,
@@ -10,7 +11,6 @@ import {
 } from '@/shared/ui/tooltip';
 
 import { ArchitectureCanvas } from './canvas/architecture-canvas';
-import { usePresentationStore } from '../model/presentation-store';
 
 export const PresentationView = () => {
     const exit = usePresentationStore((state) => state.exit);

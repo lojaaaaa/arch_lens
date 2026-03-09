@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { loadFlowFromStorage } from '@/pages/editor/lib/utils';
+import { useAnalysisActions, useAnalysisSelectors } from '@/features/analysis';
+import { loadFlowFromStorage } from '@/shared/lib/flow-storage';
 import { storedFlowToArchitectureGraph } from '@/shared/lib/stored-flow-to-graph';
-
-import { useAnalysisActions, useAnalysisSelectors } from '../model/selectors';
 
 export const useStoredGraphRestore = () => {
     const [isChecking, setIsChecking] = useState(true);

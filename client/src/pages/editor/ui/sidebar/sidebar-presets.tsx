@@ -1,6 +1,5 @@
+import type { ArchitecturePreset } from '@/features/architecture-presets';
 import { Button } from '@/shared/ui/button';
-
-import type { ArchitecturePreset } from './presets';
 
 type SidebarPresetsProps = {
     presets: ArchitecturePreset[];

@@ -1,16 +1,20 @@
 import { useNavigate } from 'react-router';
 
+import { useAnalysisStore } from '@/features/analysis';
 import { Routes } from '@/shared/model/routes';
 
-import { useAnalysisStore } from '../../../analysis/model/store';
 import { useEditorPersistence } from '../../lib/use-editor-persistence';
 import { buildExportableGraph } from '../../lib/utils';
-import { useArchitectureSelectors } from '../../model/selectors';
+import {
+    useArchitectureEdges,
+    useArchitectureNodes,
+} from '../../model/selectors';
 
 export const useHeaderAnalysisActions = () => {
     const navigate = useNavigate();
 
-    const { nodes, edges } = useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
+    const edges = useArchitectureEdges();
 
     const { save } = useEditorPersistence();
 

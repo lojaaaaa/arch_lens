@@ -46,13 +46,13 @@ export const useSchemaImport = (options: UseSchemaImportOptions) => {
                     onError?.(message);
                 }
             } catch (caughtError) {
-                const errorMessage = handleError(
+                const { message } = handleError(
                     caughtError,
                     'Ошибка при импорте',
                 );
 
-                setError(errorMessage);
-                onError?.(errorMessage);
+                setError(message);
+                onError?.(message);
             } finally {
                 setIsImporting(false);
             }

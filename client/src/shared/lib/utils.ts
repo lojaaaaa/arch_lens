@@ -5,19 +5,29 @@ import type { TypeOrNull } from './../model/types';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
+export type HandledError = {
+    message: string;
+    statusCode?: number;
+};
+
 export const handleError = (
     error: unknown,
     fallbackMessage = 'Произошла ошибка',
-): string => {
+): HandledError => {
     if (error instanceof Error && error.message) {
-        return error.message;
+        const statusCode =
+            'statusCode' in error &&
+            typeof (error as { statusCode?: number }).statusCode === 'number'
+                ? (error as { statusCode: number }).statusCode
+                : undefined;
+        return { message: error.message, statusCode };
     }
 
     if (typeof error === 'string') {
-        return error;
+        return { message: error };
     }
 
-    return fallbackMessage;
+    return { message: fallbackMessage };
 };
 
 export const isEditableTarget = (target: TypeOrNull<EventTarget>) => {

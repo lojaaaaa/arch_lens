@@ -1,14 +1,19 @@
 import type { Node } from '@xyflow/react';
 import type { Edge } from '@xyflow/react';
-import { nanoid } from 'nanoid';
 
 import type { ArchitectureGraphInput } from '@/features/architecture-graph-io';
+import {
+    createNode,
+    ensureSystemEdges,
+    ensureSystemNode,
+} from '@/shared/lib/architecture-graph-builders';
 import type {
     ArchitectureGraph,
     ArchitectureNode,
     EdgeKind,
     GraphEdge,
     NodeKind,
+    TypeOrNull,
 } from '@/shared/model/types';
 
 import { EDGE_KIND_LABELS, EDGE_STYLES, NODE_LABELS } from './config';
@@ -23,161 +28,12 @@ export interface FlowNodeData extends Record<string, unknown> {
     node: ArchitectureNode;
 }
 
-const getRandomPosition = () => {
-    return {
-        x: 80 + Math.random() * 400,
-        y: 80 + Math.random() * 300,
-    };
-};
-
-const getBaseNode = (kind: NodeKind, position?: { x: number; y: number }) => {
-    const baseNode = {
-        id: nanoid(),
-        kind,
-        position: position ?? getRandomPosition(),
-        complexity: 1,
-        criticality: 1,
-    } as ArchitectureNode;
-
-    return baseNode;
-};
-
-export const createNode = (
-    kind: NodeKind,
-    position?: { x: number; y: number },
-): ArchitectureNode => {
-    const baseNode = getBaseNode(kind, position);
-
-    switch (kind) {
-        case 'system':
-            return {
-                ...baseNode,
-                kind: 'system',
-                layer: 'frontend',
-                pagesCount: 0,
-                description: '',
-            };
-        case 'ui_page':
-            return {
-                ...baseNode,
-                kind: 'ui_page',
-                layer: 'frontend',
-                route: '/',
-                componentsCount: 0,
-                stateUsage: 'none',
-                updateFrequency: 1,
-            };
-        case 'ui_component':
-            return {
-                ...baseNode,
-                kind: 'ui_component',
-                layer: 'frontend',
-                componentType: 'custom',
-                nestedComponents: 0,
-                propsCount: 0,
-                stateType: 'none',
-                renderFrequency: 1,
-            };
-        case 'state_store':
-            return {
-                ...baseNode,
-                kind: 'state_store',
-                layer: 'frontend',
-                storeType: 'zustand',
-                subscribersCount: 0,
-                updateFrequency: 1,
-            };
-        case 'api_gateway':
-            return {
-                ...baseNode,
-                kind: 'api_gateway',
-                layer: 'backend',
-                endpointsCount: 0,
-                requestRate: 0,
-                authRequired: false,
-            };
-        case 'service':
-            return {
-                ...baseNode,
-                kind: 'service',
-                layer: 'backend',
-                operationsCount: 0,
-                externalCalls: 0,
-                stateful: false,
-            };
-        case 'database':
-            return {
-                ...baseNode,
-                kind: 'database',
-                layer: 'data',
-                dbType: 'SQL',
-                tablesCount: 0,
-                readWriteRatio: 0.5,
-            };
-        case 'cache':
-            return {
-                ...baseNode,
-                kind: 'cache',
-                layer: 'data',
-                cacheType: 'redis',
-                hitRate: 0,
-            };
-        case 'external_system':
-            return {
-                ...baseNode,
-                kind: 'external_system',
-                layer: 'data',
-                systemType: 'other',
-                protocol: 'REST',
-                reliability: 0.99,
-                latencyMs: 200,
-            };
-        default:
-            return baseNode;
-    }
-};
-
-export const ensureSystemNode = (
-    nodes: ArchitectureNode[],
-): ArchitectureNode[] => {
-    const systemIndex = nodes.findIndex((node) => node.kind === 'system');
-    if (systemIndex === -1) {
-        const systemNode = createNode('system', { x: 80, y: 80 });
-        return [systemNode, ...nodes];
-    }
-    const systemNode = nodes[systemIndex];
-    const remaining = nodes.filter((node) => node.kind !== 'system');
-    return [systemNode, ...remaining];
-};
-
-export const ensureSystemEdges = (
-    nodes: ArchitectureNode[],
-    edges: GraphEdge[],
-): GraphEdge[] => {
-    const systemNode = nodes.find((node) => node.kind === 'system');
-    if (!systemNode) {
-        return edges;
-    }
-    const existingPairs = new Set(
-        edges.map((edge) => `${edge.source}->${edge.target}:${edge.kind}`),
-    );
-    const pageIds = nodes
-        .filter((node) => node.kind === 'ui_page')
-        .map((node) => node.id);
-    const nextEdges = [...edges];
-    pageIds.forEach((pageId) => {
-        const key = `${pageId}->${systemNode.id}:depends_on`;
-        if (!existingPairs.has(key)) {
-            nextEdges.push({
-                id: nanoid(),
-                source: pageId,
-                target: systemNode.id,
-                kind: 'depends_on',
-            });
-        }
-    });
-    return nextEdges;
-};
+export {
+    createGraphEdge,
+    createNode,
+    ensureSystemEdges,
+    ensureSystemNode,
+} from '@/shared/lib/architecture-graph-builders';
 
 export const filterInvalidEdgesOnImport = (
     graph: ArchitectureGraphInput,
@@ -251,17 +107,6 @@ export const normalizeImportedNode = (
     const defaults = createNode(partial.kind, partial.position);
     return { ...defaults, ...partial, id: partial.id } as ArchitectureNode;
 };
-
-export const createGraphEdge = (
-    source: string,
-    target: string,
-    kind: EdgeKind = 'calls',
-): GraphEdge => ({
-    id: nanoid(),
-    source,
-    target,
-    kind,
-});
 
 const EDGE_LABEL_STYLE = {
     labelStyle: { fill: 'var(--foreground)', fontSize: 10 },
@@ -361,7 +206,7 @@ export const isEdgeAllowed = (
 export const getDefaultEdgeKind = (
     sourceKind: NodeKind,
     targetKind: NodeKind,
-): EdgeKind | null => {
+): TypeOrNull<EdgeKind> => {
     return allowedEdgeKinds[sourceKind]?.[targetKind]?.[0] ?? null;
 };
 
@@ -430,38 +275,4 @@ export const buildExportableGraph = (
     };
 };
 
-const STORAGE_KEY = 'architecture-editor-flow';
-
-export type StoredFlow = {
-    nodes: unknown[];
-    edges: unknown[];
-    viewport: { x: number; y: number; zoom: number };
-    savedAt: string;
-};
-
-export const saveFlowToStorage = (flow: Omit<StoredFlow, 'savedAt'>) => {
-    const stored: StoredFlow = {
-        ...flow,
-        savedAt: new Date().toISOString(),
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
-};
-
-export const loadFlowFromStorage = (): StoredFlow | null => {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-            return null;
-        }
-        return JSON.parse(raw) as StoredFlow;
-    } catch {
-        return null;
-    }
-};
-
-export const hasStoredFlow = (): boolean =>
-    localStorage.getItem(STORAGE_KEY) !== null;
-
-export const clearFlowFromStorage = () => {
-    localStorage.removeItem(STORAGE_KEY);
-};
+// Flow storage moved to @/shared/lib/flow-storage

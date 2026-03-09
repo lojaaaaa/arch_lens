@@ -1,21 +1,23 @@
 import { useState } from 'react';
 import type { EdgeMouseHandler, NodeMouseHandler } from '@xyflow/react';
 
+import type { TypeOrNull } from '@/shared/model/types';
+
 import {
     useArchitectureActions,
-    useArchitectureSelectors,
+    useArchitectureNodes,
 } from '../../model/selectors';
 import type { ArchitectureFlowNode } from '../../model/types';
 
-type ContextMenuState = {
+type ContextMenuState = TypeOrNull<{
     type: 'node' | 'edge';
     id: string;
     x: number;
     y: number;
-} | null;
+}>;
 
 export const useCanvasContextMenu = () => {
-    const { nodes } = useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
     const { removeNode, removeEdge, selectNode, selectEdge, addNode } =
         useArchitectureActions();
     const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);

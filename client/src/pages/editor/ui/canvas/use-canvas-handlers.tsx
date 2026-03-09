@@ -7,7 +7,7 @@ import {
 } from '@xyflow/react';
 import { toast } from 'sonner';
 
-import { useAnalysisStore } from '@/pages/analysis/model/store';
+import { useGraphHighlightStore } from '@/features/graph-highlight';
 
 import {
     EDGE_CONNECTION_HINTS,
@@ -17,12 +17,12 @@ import {
 import { getDefaultEdgeKind, isEdgeAllowed } from '../../lib/utils';
 import {
     useArchitectureActions,
-    useArchitectureSelectors,
+    useArchitectureNodes,
 } from '../../model/selectors';
 import type { ArchitectureFlowNode } from '../../model/types';
 
 export const useArchitectureCanvasHandlers = () => {
-    const { nodes } = useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
     const {
         applyNodeChanges,
         applyEdgeChanges,
@@ -31,7 +31,9 @@ export const useArchitectureCanvasHandlers = () => {
         addEdge,
     } = useArchitectureActions();
 
-    const clearHighlight = useAnalysisStore((state) => state.clearHighlight);
+    const clearHighlight = useGraphHighlightStore(
+        (state) => state.clearHighlight,
+    );
 
     const onNodesChange: OnNodesChange<ArchitectureFlowNode> = useCallback(
         (nodeChanges) => {

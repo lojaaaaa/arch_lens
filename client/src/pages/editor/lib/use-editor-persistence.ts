@@ -2,39 +2,36 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     clearFlowFromStorage,
-    ensureSystemFlowGraph,
     hasStoredFlow,
     loadFlowFromStorage,
     saveFlowToStorage,
-} from './utils';
+} from '@/shared/lib/flow-storage';
+
+import { ensureSystemFlowGraph } from './utils';
 import {
     useArchitectureActions,
-    useArchitectureSelectors,
+    useArchitectureEdges,
+    useArchitectureFlowInstance,
+    useArchitectureIsDirty,
+    useArchitectureNodes,
 } from '../model/selectors';
 
 export const useEditorPersistence = () => {
     const [, setStorageVersion] = useState(0);
     const hasRestoredRef = useRef(false);
 
-    const { nodes, edges, isDirty, flowInstance } = useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
+    const edges = useArchitectureEdges();
+    const isDirty = useArchitectureIsDirty();
+    const flowInstance = useArchitectureFlowInstance();
 
     const { restoreFlow, markSaved } = useArchitectureActions();
 
     const save = useCallback(() => {
-        const instance = flowInstance as
-            | {
-                  toObject: () => {
-                      nodes: unknown[];
-                      edges: unknown[];
-                      viewport: { x: number; y: number; zoom: number };
-                  };
-              }
-            | null
-            | undefined;
-        if (!instance?.toObject) {
+        if (!flowInstance?.toObject) {
             return;
         }
-        const flow = instance.toObject();
+        const flow = flowInstance.toObject();
         saveFlowToStorage({
             nodes: flow.nodes,
             edges: flow.edges,
@@ -54,15 +51,9 @@ export const useEditorPersistence = () => {
             stored.edges as Parameters<typeof restoreFlow>[1],
         );
         restoreFlow(nextNodes, nextEdges);
-        (
-            flowInstance as {
-                setViewport?: (viewport: unknown) => Promise<unknown>;
-            }
-        )
-            ?.setViewport?.(stored.viewport)
-            ?.catch(() => {
-                // viewport might be async, ignore
-            });
+        flowInstance?.setViewport?.(stored.viewport)?.catch(() => {
+            // viewport might be async, ignore
+        });
     }, [flowInstance, restoreFlow]);
 
     const reset = useCallback(() => {
@@ -88,22 +79,29 @@ export const useEditorPersistence = () => {
                         stored.edges as Parameters<typeof restoreFlow>[1],
                     );
                 restoreFlow(nextNodes, nextEdges);
-                (
-                    flowInstance as {
-                        setViewport?: (viewport: unknown) => Promise<unknown>;
-                    }
-                )
-                    ?.setViewport?.(stored.viewport)
-                    ?.catch(() => {});
+                flowInstance?.setViewport?.(stored.viewport)?.catch(() => {});
             }
         }
     }, [flowInstance, isDefaultState, restoreFlow]);
 
+    // Save on pagehide when leaving (not bfcache) — preserves data without blocking bfcache
     useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isDirty) {
-                event.preventDefault();
+        const handlePageHide = (event: PageTransitionEvent) => {
+            if (!event.persisted && isDirty) {
+                save();
             }
+        };
+        window.addEventListener('pagehide', handlePageHide);
+        return () => window.removeEventListener('pagehide', handlePageHide);
+    }, [isDirty, save]);
+
+    // beforeunload only when dirty — minimal use to allow bfcache for clean pages
+    useEffect(() => {
+        if (!isDirty) {
+            return;
+        }
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () =>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useAnalysisActions, useAnalysisSelectors } from '../model/selectors';
+import { useAnalysisActions, useAnalysisSelectors } from '@/features/analysis';
 
 export const useAnalysisRequest = () => {
     const { graphToAnalyze, analysisStatus } = useAnalysisSelectors();

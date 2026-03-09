@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useAnalysisActions, useAnalysisSelectors } from '@/features/analysis';
 import { Routes } from '@/shared/model/routes';
 
 import { useAnalysisRequest } from './lib/use-analysis-request';
 import { useAnalysisRestore } from './lib/use-analysis-restore';
 import { useSlowIndicator } from './lib/use-slow-indicator';
 import { useStoredGraphRestore } from './lib/use-stored-graph-restore';
-import { useAnalysisActions, useAnalysisSelectors } from './model/selectors';
 import { AnalysisEmpty } from './ui/analysis-page/analysis-empty';
 import { AnalysisError } from './ui/analysis-page/analysis-error';
 import { AnalysisLoading } from './ui/analysis-page/analysis-loading';
@@ -52,7 +52,7 @@ const AnalysisPage = () => {
             analysisStatus === 'error' &&
             analysisError
         ) {
-            toast.error(analysisError);
+            toast.error(analysisError?.message ?? 'Ошибка');
         }
         prevStatusRef.current = analysisStatus;
     }, [analysisStatus, analysisError]);

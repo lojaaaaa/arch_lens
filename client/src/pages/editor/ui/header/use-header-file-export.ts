@@ -2,13 +2,17 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { useSchemaExport } from '@/features/architecture-graph-io';
+import { exportCanvasToPng, exportCanvasToSvg } from '@/features/canvas-export';
 
-import { exportCanvasToPng, exportCanvasToSvg } from '../../lib/export-image';
 import { buildExportableGraph } from '../../lib/utils';
-import { useArchitectureSelectors } from '../../model/selectors';
+import {
+    useArchitectureEdges,
+    useArchitectureNodes,
+} from '../../model/selectors';
 
 export const useHeaderFileExport = () => {
-    const { nodes, edges } = useArchitectureSelectors();
+    const nodes = useArchitectureNodes();
+    const edges = useArchitectureEdges();
     const { exportToFile } = useSchemaExport();
 
     const [transparentExport, setTransparentExport] = useState(false);
