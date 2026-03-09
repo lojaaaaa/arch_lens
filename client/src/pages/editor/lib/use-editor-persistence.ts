@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useCanvasNotesStore } from '@/features/canvas-notes';
 import {
     clearFlowFromStorage,
     hasStoredFlow,
@@ -16,41 +17,71 @@ import {
     useArchitectureNodes,
 } from '../model/selectors';
 
+const isArchitectureNode = (n: {
+    type?: string;
+    data?: { node?: unknown };
+}): boolean =>
+    n.type === 'architecture' &&
+    n.data?.node !== undefined &&
+    n.data?.node !== null;
+
 export const useEditorPersistence = () => {
     const [, setStorageVersion] = useState(0);
     const hasRestoredRef = useRef(false);
 
     const nodes = useArchitectureNodes();
     const edges = useArchitectureEdges();
-    const isDirty = useArchitectureIsDirty();
+    const architectureIsDirty = useArchitectureIsDirty();
+    const notesIsDirty = useCanvasNotesStore((state) => state.isDirty);
+    const isDirty = architectureIsDirty || notesIsDirty;
     const flowInstance = useArchitectureFlowInstance();
 
     const { restoreFlow, markSaved } = useArchitectureActions();
 
-    const save = useCallback(() => {
-        if (!flowInstance?.toObject) {
-            return;
-        }
-        const flow = flowInstance.toObject();
-        saveFlowToStorage({
-            nodes: flow.nodes,
-            edges: flow.edges,
-            viewport: flow.viewport,
-        });
-        markSaved();
-        setStorageVersion((version) => version + 1);
-    }, [flowInstance, markSaved]);
+    const save = useCallback(
+        (includeNotes = true) => {
+            if (!flowInstance?.toObject) {
+                return;
+            }
+            const flow = flowInstance.toObject();
+            const architectureNodes = (flow.nodes ?? []).filter(
+                isArchitectureNode,
+            );
+            const stored = loadFlowFromStorage();
+            const canvasNotes = includeNotes
+                ? useCanvasNotesStore.getState().blocks
+                : stored?.canvasNotes;
+            saveFlowToStorage({
+                nodes: architectureNodes,
+                edges: flow.edges,
+                viewport: flow.viewport,
+                canvasNotes,
+            });
+            if (includeNotes) {
+                useCanvasNotesStore.getState().markNotesSaved();
+            }
+            markSaved();
+            setStorageVersion((version) => version + 1);
+        },
+        [flowInstance, markSaved],
+    );
 
     const restore = useCallback(() => {
         const stored = loadFlowFromStorage();
         if (!stored) {
             return;
         }
+        const storedNodes = (stored.nodes ?? []).filter((n) =>
+            isArchitectureNode(
+                n as { type?: string; data?: { node?: unknown } },
+            ),
+        );
         const { nodes: nextNodes, edges: nextEdges } = ensureSystemFlowGraph(
-            stored.nodes as Parameters<typeof restoreFlow>[0],
+            storedNodes as Parameters<typeof restoreFlow>[0],
             stored.edges as Parameters<typeof restoreFlow>[1],
         );
         restoreFlow(nextNodes, nextEdges);
+        useCanvasNotesStore.getState().restoreBlocks(stored.canvasNotes ?? []);
         flowInstance?.setViewport?.(stored.viewport)?.catch(() => {
             // viewport might be async, ignore
         });
@@ -58,6 +89,7 @@ export const useEditorPersistence = () => {
 
     const reset = useCallback(() => {
         clearFlowFromStorage();
+        useCanvasNotesStore.getState().restoreBlocks([]);
         setStorageVersion((version) => version + 1);
     }, []);
 
@@ -73,27 +105,35 @@ export const useEditorPersistence = () => {
             hasRestoredRef.current = true;
             const stored = loadFlowFromStorage();
             if (stored) {
+                const storedNodes = (stored.nodes ?? []).filter((n) =>
+                    isArchitectureNode(
+                        n as { type?: string; data?: { node?: unknown } },
+                    ),
+                );
                 const { nodes: nextNodes, edges: nextEdges } =
                     ensureSystemFlowGraph(
-                        stored.nodes as Parameters<typeof restoreFlow>[0],
+                        storedNodes as Parameters<typeof restoreFlow>[0],
                         stored.edges as Parameters<typeof restoreFlow>[1],
                     );
                 restoreFlow(nextNodes, nextEdges);
+                useCanvasNotesStore
+                    .getState()
+                    .restoreBlocks(stored.canvasNotes ?? []);
                 flowInstance?.setViewport?.(stored.viewport)?.catch(() => {});
             }
         }
     }, [flowInstance, isDefaultState, restoreFlow]);
 
-    // Save on pagehide when leaving (not bfcache) — preserves data without blocking bfcache
+    // Save on pagehide only architecture (not notes) — notes persist only on explicit Save
     useEffect(() => {
         const handlePageHide = (event: PageTransitionEvent) => {
-            if (!event.persisted && isDirty) {
-                save();
+            if (!event.persisted && architectureIsDirty) {
+                save(false);
             }
         };
         window.addEventListener('pagehide', handlePageHide);
         return () => window.removeEventListener('pagehide', handlePageHide);
-    }, [isDirty, save]);
+    }, [architectureIsDirty, save]);
 
     // beforeunload only when dirty — minimal use to allow bfcache for clean pages
     useEffect(() => {

@@ -1,8 +1,6 @@
 import { Loader2 } from 'lucide-react';
 
-import { PresentationModeToggle } from '@/features/presentation';
 import { ThemeToggle } from '@/features/theme';
-import { TutorialHintsToggle } from '@/features/tutorial';
 import { Button } from '@/shared/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
@@ -14,8 +12,6 @@ export const HeaderActions = () => {
 
     return (
         <div className="ml-auto flex items-center gap-1">
-            <TutorialHintsToggle />
-            <PresentationModeToggle />
             <ThemeToggle />
             <Tooltip>
                 <TooltipTrigger asChild>

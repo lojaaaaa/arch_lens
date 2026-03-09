@@ -1,7 +1,9 @@
-import { lazy, Suspense, useRef } from 'react';
+import { lazy, Suspense, useMemo, useRef } from 'react';
+import type { Node } from '@xyflow/react';
 import type { ReactFlowInstance } from '@xyflow/react';
 import { Background, ReactFlow } from '@xyflow/react';
 
+import { TextBlockNode, useCanvasNotesStore } from '@/features/canvas-notes';
 import { usePresentationStore } from '@/features/presentation';
 import { useTutorial } from '@/features/tutorial';
 import { TutorialBanner } from '@/features/tutorial';
@@ -9,6 +11,7 @@ import type { TypeOrNull } from '@/shared/model/types';
 
 import { ArchitectureNodeComponent } from './architecture-node';
 import { CanvasContextMenu } from './canvas-context-menu';
+import { CanvasSearchTrigger } from './canvas-search-trigger';
 import { CanvasStatsPanel } from './canvas-stats-panel';
 import { useArchitectureCanvasProps } from './use-architecture-canvas-props';
 import { useCanvasContextMenu } from './use-canvas-context-menu';
@@ -23,9 +26,13 @@ import {
     useArchitectureNodes,
 } from '../../model/selectors';
 import type { ArchitectureFlowNode } from '../../model/types';
+type FlowNode =
+    | ArchitectureFlowNode
+    | Node<{ content: string; width?: number; height?: number }>;
 
 const NODE_TYPES = {
     architecture: ArchitectureNodeComponent,
+    textBlock: TextBlockNode,
 } as const;
 
 export const BACKGROUND_SIZE = 1.3;
@@ -43,8 +50,28 @@ const CanvasControls = lazy(() =>
 );
 
 export const ArchitectureCanvas = () => {
-    const nodes = useArchitectureNodes();
+    const archNodes = useArchitectureNodes();
+    const textBlocks = useCanvasNotesStore((state) => state.blocks);
+    const textBlocksVisible = useCanvasNotesStore((state) => state.visible);
     const edges = useArchitectureEdges();
+
+    const nodes: FlowNode[] = useMemo(() => {
+        const textBlockNodes: FlowNode[] = textBlocksVisible
+            ? textBlocks.map((b) => ({
+                  id: b.id,
+                  type: 'textBlock',
+                  position: b.position,
+                  data: {
+                      content: b.content,
+                      width: b.width,
+                      height: b.height,
+                  },
+                  draggable: true,
+                  connectable: false,
+              }))
+            : [];
+        return [...archNodes, ...textBlockNodes];
+    }, [archNodes, textBlocks, textBlocksVisible]);
 
     const isPresentationMode = usePresentationStore(
         (state) => state.isPresentationMode,
@@ -73,16 +100,19 @@ export const ArchitectureCanvas = () => {
         closeContextMenu,
         openEdgeContextMenu,
         openNodeContextMenu,
+        openPaneContextMenu,
+        handleAddTextBlock,
         handleContextDelete,
         handleContextEdit,
         handleContextDuplicate,
         canDeleteContext,
         canDuplicate,
+        canEdit,
     } = useCanvasContextMenu();
 
     const { handleDragOver, handleDrop } = useCanvasDnd(flowRef);
 
-    const nodeKinds = useNodeKinds(nodes);
+    const nodeKinds = useNodeKinds(archNodes);
     const { showBanner, hint, dismiss } = useTutorial(
         nodes.length,
         edges.length,
@@ -104,7 +134,7 @@ export const ArchitectureCanvas = () => {
     return (
         <div className="relative h-full w-full">
             <ReactFlow<ArchitectureFlowNode>
-                nodes={nodes}
+                nodes={nodes as ArchitectureFlowNode[]}
                 edges={edgesWithLabels}
                 nodeTypes={NODE_TYPES}
                 onInit={(instance) => {
@@ -124,6 +154,7 @@ export const ArchitectureCanvas = () => {
                 onEdgeClick={noopWhenPresentation(onEdgeClick)}
                 onNodeContextMenu={noopWhenPresentation(openNodeContextMenu)}
                 onEdgeContextMenu={noopWhenPresentation(openEdgeContextMenu)}
+                onPaneContextMenu={noopWhenPresentation(openPaneContextMenu)}
                 onNodeDoubleClick={noopWhenPresentation(onNodeDoubleClick)}
                 onEdgeDoubleClick={noopWhenPresentation(onEdgeDoubleClick)}
                 onDragOver={noopWhenPresentation(handleDragOver)}
@@ -139,9 +170,10 @@ export const ArchitectureCanvas = () => {
                 <Suspense fallback={null}>
                     <CanvasMiniMap />
                     <CanvasControls />
+                    {!isPresentationMode && <CanvasSearchTrigger />}
                 </Suspense>
                 <CanvasStatsPanel
-                    nodesCount={nodes.length}
+                    nodesCount={archNodes.length}
                     edgesCount={edges.length}
                 />
             </ReactFlow>
@@ -157,10 +189,12 @@ export const ArchitectureCanvas = () => {
                     contextMenu={contextMenu}
                     canDelete={canDeleteContext}
                     canDuplicate={canDuplicate}
+                    canEdit={canEdit}
                     onClose={closeContextMenu}
                     onEdit={handleContextEdit}
                     onDuplicate={handleContextDuplicate}
                     onDelete={handleContextDelete}
+                    onAddTextBlock={handleAddTextBlock}
                 />
             )}
         </div>

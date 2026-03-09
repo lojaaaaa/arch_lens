@@ -1,5 +1,6 @@
-import { type MouseEvent, useCallback } from 'react';
+import { type MouseEvent, useCallback, useMemo } from 'react';
 import {
+    type NodeChange,
     type NodeMouseHandler,
     type OnConnect,
     type OnEdgesChange,
@@ -7,6 +8,7 @@ import {
 } from '@xyflow/react';
 import { toast } from 'sonner';
 
+import { useCanvasNotesStore } from '@/features/canvas-notes';
 import { useGraphHighlightStore } from '@/features/graph-highlight';
 
 import {
@@ -23,6 +25,11 @@ import type { ArchitectureFlowNode } from '../../model/types';
 
 export const useArchitectureCanvasHandlers = () => {
     const nodes = useArchitectureNodes();
+    const blocks = useCanvasNotesStore((state) => state.blocks);
+    const updateTextBlockPosition = useCanvasNotesStore(
+        (state) => state.updatePosition,
+    );
+    const removeTextBlock = useCanvasNotesStore((state) => state.removeBlock);
     const {
         applyNodeChanges,
         applyEdgeChanges,
@@ -35,11 +42,47 @@ export const useArchitectureCanvasHandlers = () => {
         (state) => state.clearHighlight,
     );
 
+    const archNodeIds = useMemo(() => new Set(nodes.map((n) => n.id)), [nodes]);
+    const textBlockIds = useMemo(
+        () => new Set(blocks.map((b) => b.id)),
+        [blocks],
+    );
+
     const onNodesChange: OnNodesChange<ArchitectureFlowNode> = useCallback(
         (nodeChanges) => {
-            applyNodeChanges(nodeChanges);
+            const archChanges: NodeChange[] = [];
+            for (const change of nodeChanges) {
+                const id =
+                    change.type === 'remove'
+                        ? change.id
+                        : (change as { id?: string }).id;
+                if (id && textBlockIds.has(id)) {
+                    if (change.type === 'position' && 'position' in change) {
+                        const pos = (
+                            change as { position?: { x: number; y: number } }
+                        ).position;
+                        if (pos) {
+                            updateTextBlockPosition(id, pos);
+                        }
+                    }
+                    if (change.type === 'remove') {
+                        removeTextBlock(id);
+                    }
+                } else if (id && archNodeIds.has(id)) {
+                    archChanges.push(change);
+                }
+            }
+            if (archChanges.length > 0) {
+                applyNodeChanges(archChanges);
+            }
         },
-        [applyNodeChanges],
+        [
+            archNodeIds,
+            textBlockIds,
+            applyNodeChanges,
+            updateTextBlockPosition,
+            removeTextBlock,
+        ],
     );
 
     const onEdgesChange: OnEdgesChange = useCallback(

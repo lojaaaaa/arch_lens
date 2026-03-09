@@ -3,9 +3,9 @@ import { useEditorPersistence } from '../../lib/use-editor-persistence';
 export const HeaderTitle = () => {
     const { isDirty } = useEditorPersistence();
 
-    return (
-        <div className="font-medium">
-            Редактор{isDirty ? ' • Не сохранено' : ''}
-        </div>
-    );
+    if (!isDirty) {
+        return null;
+    }
+
+    return <div className="text-muted-foreground text-sm">Не сохранено</div>;
 };

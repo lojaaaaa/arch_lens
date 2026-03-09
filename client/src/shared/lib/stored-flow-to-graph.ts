@@ -4,10 +4,19 @@ import type {
     GraphEdge,
 } from '@/shared/model/types';
 
+export type StoredCanvasNote = {
+    id: string;
+    position: { x: number; y: number };
+    content: string;
+    width?: number;
+    height?: number;
+};
+
 export type StoredFlow = {
     nodes: unknown[];
     edges: unknown[];
     viewport: { x: number; y: number; zoom: number };
+    canvasNotes?: StoredCanvasNote[];
     savedAt: string;
 };
 
