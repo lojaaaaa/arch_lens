@@ -106,7 +106,7 @@ export const EDGE_STYLES: Record<
 > = {
     calls: { color: EDGE_COLOR },
     reads: { color: EDGE_COLOR, strokeDasharray: '6 3' },
-    writes: { color: EDGE_COLOR, strokeWidth: 2.5 },
+    writes: { color: EDGE_COLOR },
     subscribes: { color: EDGE_COLOR, strokeDasharray: '8 4', animated: true },
     depends_on: { color: EDGE_COLOR, strokeDasharray: '4 4' },
     emits: { color: EDGE_COLOR, strokeDasharray: '8 4', animated: true },

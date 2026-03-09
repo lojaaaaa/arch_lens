@@ -84,6 +84,18 @@ export const useArchitectureCanvasHandlers = () => {
         [addEdge, nodes],
     );
 
+    const onNodeClick: NodeMouseHandler = useCallback(
+        (_, { id }) => selectNode(id),
+        [selectNode],
+    );
+
+    const onEdgeClick = useCallback(
+        (_: MouseEvent, edge: { id: string }) => {
+            selectEdge(edge.id);
+        },
+        [selectEdge],
+    );
+
     const onEdgeDoubleClick = useCallback(
         (_: MouseEvent, edge: { id: string }) => {
             selectEdge(edge.id);
@@ -105,6 +117,8 @@ export const useArchitectureCanvasHandlers = () => {
         onNodesChange,
         onEdgesChange,
         onConnect,
+        onNodeClick,
+        onEdgeClick,
         onEdgeDoubleClick,
         onNodeDoubleClick,
         onPaneClick,

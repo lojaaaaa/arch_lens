@@ -7,6 +7,7 @@ import { HeaderFileMenu } from './header-file-menu';
 import { HeaderTitle } from './header-title';
 import { NODE_LABELS } from '../../lib/config';
 import { useArchitectureNodes } from '../../model/selectors';
+import { PropertiesPanelTrigger } from '../properties/properties-panel-trigger';
 
 export const Header = () => {
     const nodes = useArchitectureNodes();
@@ -33,6 +34,7 @@ export const Header = () => {
                 onPreventAutoClear={setHighlightPreventAutoClear}
             />
             <HeaderActions />
+            <PropertiesPanelTrigger />
         </header>
     );
 };

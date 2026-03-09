@@ -185,6 +185,10 @@ export const useArchitectureStore = create<ArchitectureState>()(
                     },
                     nodes: nextNodes,
                     edges: nextEdges,
+                    selectedNodeId: selectNew
+                        ? archNode.id
+                        : state.selectedNodeId,
+                    selectedEdgeId: selectNew ? null : state.selectedEdgeId,
                     isDirty: true,
                 };
             }),

@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import type { Edge } from '@xyflow/react';
+import { toast } from 'sonner';
 
 import type { EditorClipboardApi } from '@/features/editor-clipboard';
 import { useEditorClipboard } from '@/features/editor-clipboard';
 import { usePresentationStore } from '@/features/presentation';
 import { isEditableTarget } from '@/shared/lib/utils';
+import { NODE_KIND } from '@/shared/model/config';
 import type { TypeOrNull } from '@/shared/model/types';
 
 import { toFlowEdge, toFlowNode } from './utils';
@@ -80,6 +82,32 @@ const resolveSelectedItem = <TItem extends SelectableItem>(
     }
 
     return items.find((item) => item.selected) ?? null;
+};
+
+const resolveSelectedNodes = (
+    nodes: ArchitectureFlowNode[],
+    selectedNodeId: TypeOrNull<string>,
+): ArchitectureFlowNode[] => {
+    const selected = nodes.filter(
+        (n) =>
+            (n.selected === true || n.id === selectedNodeId) &&
+            (n.data as { node?: { kind: string } })?.node?.kind !==
+                NODE_KIND.SYSTEM,
+    );
+    return [...new Map(selected.map((n) => [n.id, n])).values()];
+};
+
+const resolveSelectedEdges = (
+    edges: Edge[],
+    selectedEdgeId: TypeOrNull<string>,
+    selectedNodeIds: Set<string>,
+): Edge[] => {
+    return edges.filter(
+        (e) =>
+            (e.selected === true || e.id === selectedEdgeId) &&
+            selectedNodeIds.has(e.source) &&
+            selectedNodeIds.has(e.target),
+    );
 };
 
 const resolveHotkey = (event: KeyboardEvent): TypeOrNull<EditorHotkey> => {
@@ -168,21 +196,68 @@ export const handleEditorHotkeys = (
     };
 
     const handleDuplicate = () => {
-        if (selectedNode) {
+        const selectedNodes = resolveSelectedNodes(
+            context.nodes,
+            context.selectedNodeId,
+        );
+        const selectedNodeIds = new Set(selectedNodes.map((n) => n.id));
+        const selectedEdges = resolveSelectedEdges(
+            context.edges,
+            context.selectedEdgeId,
+            selectedNodeIds,
+        );
+
+        if (selectedNodes.length > 1) {
+            clipboard.copyMulti(selectedNodes, selectedEdges);
+            clipboard.paste();
+        } else if (selectedNode) {
             clipboard.duplicate(selectedNode);
         }
         return true;
     };
 
     const handleCopy = () => {
-        if (selectedNode) {
+        const selectedNodes = resolveSelectedNodes(
+            context.nodes,
+            context.selectedNodeId,
+        );
+        const selectedNodeIds = new Set(selectedNodes.map((n) => n.id));
+        const selectedEdges = resolveSelectedEdges(
+            context.edges,
+            context.selectedEdgeId,
+            selectedNodeIds,
+        );
+
+        if (selectedNodes.length > 1) {
+            clipboard.copyMulti(selectedNodes, selectedEdges);
+        } else if (selectedNode) {
             clipboard.copy(selectedNode);
         }
         return true;
     };
 
     const handleDelete = () => {
-        if (selectedEdge) {
+        const selectedNodes = resolveSelectedNodes(
+            context.nodes,
+            context.selectedNodeId,
+        );
+        const selectedNodeIds = new Set(selectedNodes.map((n) => n.id));
+        const selectedEdges = resolveSelectedEdges(
+            context.edges,
+            context.selectedEdgeId,
+            selectedNodeIds,
+        );
+
+        if (selectedNodes.length > 1 || selectedEdges.length > 1) {
+            for (const edge of selectedEdges) {
+                context.removeEdge(edge.id);
+            }
+            for (const node of selectedNodes) {
+                context.removeNode(node.id);
+            }
+            context.selectNode(null);
+            context.selectEdge(null);
+        } else if (selectedEdge) {
             context.removeEdge(selectedEdge.id);
             context.selectEdge(null);
         } else if (selectedNode) {
@@ -231,6 +306,7 @@ export const useEditorHotkeys = () => {
         setEdges: actions.setEdges,
         toFlowNode,
         toFlowEdge,
+        onPasteRefused: (message) => toast.warning(message),
     });
 
     const context = buildEditorHotkeysContext(

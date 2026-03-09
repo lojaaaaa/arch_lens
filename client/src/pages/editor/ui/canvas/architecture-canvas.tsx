@@ -61,6 +61,8 @@ export const ArchitectureCanvas = () => {
         onNodesChange,
         onEdgesChange,
         onConnect,
+        onNodeClick,
+        onEdgeClick,
         onEdgeDoubleClick,
         onNodeDoubleClick,
         onPaneClick,
@@ -118,6 +120,8 @@ export const ArchitectureCanvas = () => {
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onPaneClick={noopWhenPresentation(handlePaneClick)}
+                onNodeClick={noopWhenPresentation(onNodeClick)}
+                onEdgeClick={noopWhenPresentation(onEdgeClick)}
                 onNodeContextMenu={noopWhenPresentation(openNodeContextMenu)}
                 onEdgeContextMenu={noopWhenPresentation(openEdgeContextMenu)}
                 onNodeDoubleClick={noopWhenPresentation(onNodeDoubleClick)}

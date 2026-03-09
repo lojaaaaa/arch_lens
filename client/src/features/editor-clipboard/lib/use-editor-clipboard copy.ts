@@ -19,8 +19,6 @@ import type {
     UseEditorClipboardParams,
 } from '../model/types';
 
-import { MAX_GRAPH_EDGES, MAX_GRAPH_NODES } from '../model/types';
-
 const PASTE_OFFSET = 20;
 
 const findSystemNode = <T extends FlowNodeWithArchitecture>(
@@ -44,15 +42,7 @@ export const useEditorClipboard = <
 >(
     params: UseEditorClipboardParams<TFlowNode, TFlowEdge>,
 ): EditorClipboardApi<TFlowNode, TFlowEdge> => {
-    const {
-        nodes,
-        edges,
-        setNodes,
-        setEdges,
-        toFlowNode,
-        toFlowEdge,
-        onPasteRefused,
-    } = params;
+    const { nodes, edges, setNodes, setEdges, toFlowNode, toFlowEdge } = params;
     const clipboardRef = useRef<TypeOrNull<ClipboardPayload>>(null);
 
     const copy = (node: TFlowNode) => {
@@ -116,20 +106,6 @@ export const useEditorClipboard = <
             return;
         }
 
-        const newNodesCount = 1;
-        const newEdgesCount =
-            architectureNode.kind === NODE_KIND.UI_PAGE ? 1 : 0;
-
-        if (
-            nodes.length + newNodesCount > MAX_GRAPH_NODES ||
-            edges.length + newEdgesCount > MAX_GRAPH_EDGES
-        ) {
-            onPasteRefused?.(
-                `Лимит графа: ${MAX_GRAPH_NODES} узлов, ${MAX_GRAPH_EDGES} связей`,
-            );
-            return;
-        }
-
         const nextPosition = {
             x: architectureNode.position.x + PASTE_OFFSET,
             y: architectureNode.position.y + PASTE_OFFSET,
@@ -165,21 +141,6 @@ export const useEditorClipboard = <
         archNodes: ArchitectureNode[],
         graphEdges: GraphEdge[],
     ) => {
-        const pastedPageCount = archNodes.filter(
-            (n) => n.kind === NODE_KIND.UI_PAGE,
-        ).length;
-        const totalNewEdges = graphEdges.length + pastedPageCount;
-
-        if (
-            nodes.length + archNodes.length > MAX_GRAPH_NODES ||
-            edges.length + totalNewEdges > MAX_GRAPH_EDGES
-        ) {
-            onPasteRefused?.(
-                `Лимит графа: ${MAX_GRAPH_NODES} узлов, ${MAX_GRAPH_EDGES} связей`,
-            );
-            return;
-        }
-
         const idMap = new Map<string, string>();
 
         for (const n of archNodes) {

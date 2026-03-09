@@ -81,12 +81,9 @@ export const ComplexitySlider = ({
                 value={[clamped]}
                 onValueChange={([nextValue]) => onChange(nextValue)}
             />
-            <div className="flex justify-between text-[10px] text-muted-foreground">
+            <div className="grid grid-cols-5 gap-0.5 text-[10px] text-muted-foreground">
                 {COMPLEXITY_LABELS.map((label) => (
-                    <span
-                        key={label}
-                        className="w-0 text-center first:text-left last:text-right"
-                    >
+                    <span key={label} className="truncate text-center">
                         {label}
                     </span>
                 ))}
@@ -107,13 +104,13 @@ export const CriticalityControl = ({
 }) => {
     const clamped = Math.max(0, Math.min(3, value));
     return (
-        <div className="flex rounded-md border overflow-hidden">
+        <div className="grid grid-cols-2 gap-1 rounded-md border p-1">
             {CRITICALITY_LABELS.map((label, index) => (
                 <button
                     key={label}
                     type="button"
                     onClick={() => onChange(index)}
-                    className={`flex-1 px-1 py-1.5 text-xs font-medium transition-colors border-r last:border-r-0 ${
+                    className={`rounded px-2 py-1.5 text-xs font-medium transition-colors ${
                         clamped === index
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-background text-muted-foreground hover:bg-muted'
