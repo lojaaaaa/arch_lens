@@ -18,13 +18,19 @@ async function getExpressApp() {
 export async function handleNestRequest(
   req: VercelRequest,
   res: VercelResponse,
+  explicitPath?: string,
 ) {
-  const path = req.query.path;
-  if (path) {
-    const pathStr = Array.isArray(path) ? path.join('/') : path;
+  if (explicitPath) {
     const url = (req.url ?? '').split('?');
-    const otherParams = url[1] ? url[1].replace(/[?&]path=[^&]*/g, '').replace(/^&|&$/g, '') : '';
-    req.url = '/api/' + pathStr + (otherParams ? '?' + otherParams : '');
+    req.url = explicitPath + (url[1] ? '?' + url[1] : '');
+  } else {
+    const path = req.query.path;
+    if (path) {
+      const pathStr = Array.isArray(path) ? path.join('/') : path;
+      const url = (req.url ?? '').split('?');
+      const otherParams = url[1] ? url[1].replace(/[?&]path=[^&]*/g, '').replace(/^&|&$/g, '') : '';
+      req.url = '/api/' + pathStr + (otherParams ? '?' + otherParams : '');
+    }
   }
   const app = await getExpressApp();
   return new Promise<void>((resolve, reject) => {
