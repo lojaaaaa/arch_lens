@@ -8,9 +8,8 @@
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "functions": {
-    "api/[[...path]].ts": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
+    "api/analysis.ts": { "memory": 1024, "maxDuration": 60 },
+    "api/analysis/export-pdf.ts": { "memory": 1024, "maxDuration": 60 },
+    "api/health.ts": { "memory": 256, "maxDuration": 10 }
   }
 }
