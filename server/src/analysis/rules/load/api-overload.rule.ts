@@ -23,6 +23,7 @@ export class ApiOverloadRule implements AnalysisRule {
     return [
       {
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'warning',
         category: 'scalability',
         title: 'Перегрузка API Gateway',

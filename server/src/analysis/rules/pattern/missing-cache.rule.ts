@@ -16,27 +16,39 @@ export class MissingCacheRule implements AnalysisRule {
     const cacheIds = new Set(
       (ctx.nodesByKind.get('cache') ?? []).map((node) => node.id),
     );
-    for (const node of databases) {
-      const ratio = Number(node['readWriteRatio']) || 0;
-      if (ratio >= ANALYSIS_CONFIG.pattern.missingCacheReadWriteRatio) {
-        const hasCacheConnection = ctx.edges.some(
-          (edge) =>
-            (edge.source === node.id && cacheIds.has(edge.target)) ||
-            (edge.target === node.id && cacheIds.has(edge.source)),
-        );
-        if (!hasCacheConnection) {
-          issues.push({
-            id: randomUUID(),
-            severity: 'warning',
-            category: 'performance',
-            title: 'Отсутствует кэш для нагруженной базы данных',
-            description: `База данных "${node.id}" имеет высокий readWriteRatio (${ratio}), но не связана с кэшем.`,
-            affectedNodes: [node.id],
-            recommendation:
-              'Добавьте кэш между сервисом и БД — снизит нагрузку при частых чтениях.',
-            metrics: { readWriteRatio: ratio },
-          });
-        }
+
+    const serviceReadsCache = new Set<string>();
+    for (const edge of ctx.edges) {
+      if (edge.kind === 'reads' && cacheIds.has(edge.target)) {
+        serviceReadsCache.add(edge.source);
+      }
+    }
+
+    for (const db of databases) {
+      const ratio = Number(db['readWriteRatio']) || 0;
+      if (ratio < ANALYSIS_CONFIG.pattern.missingCacheReadWriteRatio) continue;
+
+      const readersOfDb = ctx.edges
+        .filter((edge) => edge.target === db.id && edge.kind === 'reads')
+        .map((edge) => edge.source);
+
+      const someReaderUsesCache = readersOfDb.some((srcId) =>
+        serviceReadsCache.has(srcId),
+      );
+
+      if (!someReaderUsesCache) {
+        issues.push({
+          id: randomUUID(),
+          ruleId: this.id,
+          severity: 'warning',
+          category: 'performance',
+          title: 'Отсутствует кэш для нагруженной базы данных',
+          description: `База данных "${db.id}" имеет высокий readWriteRatio (${ratio}), но сервисы, читающие из неё, не используют кэш.`,
+          affectedNodes: [db.id, ...readersOfDb],
+          recommendation:
+            'Добавьте кэш-узел и свяжите сервис с ним через reads — это снизит нагрузку на БД при частых чтениях.',
+          metrics: { readWriteRatio: ratio },
+        });
       }
     }
     return issues;

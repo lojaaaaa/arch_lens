@@ -97,6 +97,7 @@ const apiGatewayNodeSchema = z.object({
     authRequired: z.boolean().default(false),
     latencyMs: z.number().min(0).optional(),
     availability: z.number().min(0).max(1).optional(),
+    capacityRps: z.number().min(0).optional(),
 });
 
 const serviceNodeSchema = z.object({

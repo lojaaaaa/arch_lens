@@ -40,6 +40,7 @@ export class CacheMissImpactRule implements AnalysisRule {
         if (dbReadsCount > ANALYSIS_CONFIG.load.cacheDbReadsThreshold) {
           issues.push({
             id: randomUUID(),
+            ruleId: this.id,
             severity: 'warning',
             category: 'performance',
             title: 'Низкий hit rate кэша при высокой нагрузке на БД',

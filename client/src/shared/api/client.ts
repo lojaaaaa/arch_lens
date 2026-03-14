@@ -61,7 +61,9 @@ export const apiRequest = async <ResponseBody>(
 
     const externalSignal = apiOptions.signal;
     if (externalSignal) {
-        externalSignal.addEventListener('abort', () => controller.abort());
+        externalSignal.addEventListener('abort', () => controller.abort(), {
+            once: true,
+        });
     }
 
     try {

@@ -13,13 +13,17 @@ export type AnalysisState = {
     analysisStatus: AnalysisStatus;
     analysisError: TypeOrNull<HandledError>;
     showMetricsOnGraph: boolean;
+    showDataFlowAnimation: boolean;
+    graphChangedSinceAnalysis: boolean;
 
     setGraphToAnalyze: (graph: TypeOrNull<ArchitectureGraph>) => void;
     setShowMetricsOnGraph: (show: boolean) => void;
+    setShowDataFlowAnimation: (show: boolean) => void;
     setAnalysisResult: (result: TypeOrNull<AnalysisResult>) => void;
     setAnalysisStatus: (status: AnalysisStatus) => void;
     setAnalysisError: (error: TypeOrNull<HandledError>) => void;
     runAnalysis: (graph: ArchitectureGraph) => Promise<void>;
     restoreLastAnalysis: () => void;
     clearAnalysis: () => void;
+    markGraphChanged: () => void;
 };

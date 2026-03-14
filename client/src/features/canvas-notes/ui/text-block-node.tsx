@@ -1,5 +1,5 @@
 import type { MouseEvent as ReactMouseEvent } from 'react';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { NodeProps } from '@xyflow/react';
 import { GripVertical } from 'lucide-react';
@@ -35,6 +35,13 @@ export const TextBlockNode = memo(
             startW: number;
             startH: number;
         } | null>(null);
+        const cleanupRef = useRef<(() => void) | null>(null);
+
+        useEffect(() => {
+            return () => {
+                cleanupRef.current?.();
+            };
+        }, []);
 
         const handleStartEdit = () => {
             setDraft(content);
@@ -71,13 +78,16 @@ export const TextBlockNode = memo(
                     const newH = Math.max(60, resizeRef.current.startH + dy);
                     updateSize(id, { width: newW, height: newH });
                 };
-                const onUp = () => {
+                const cleanup = () => {
                     resizeRef.current = null;
                     document.removeEventListener('mousemove', onMove);
                     document.removeEventListener('mouseup', onUp);
+                    cleanupRef.current = null;
                 };
+                const onUp = () => cleanup();
                 document.addEventListener('mousemove', onMove);
                 document.addEventListener('mouseup', onUp);
+                cleanupRef.current = cleanup;
             },
             [id, width, height, updateSize],
         );

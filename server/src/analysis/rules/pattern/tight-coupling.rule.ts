@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { ANALYSIS_CONFIG } from '../../analysis.config.js';
 import type {
   AnalysisIssue,
   AnalysisRule,
@@ -10,6 +11,7 @@ export class TightCouplingRule implements AnalysisRule {
   readonly description = 'Сильная связанность между узлами';
 
   check(ctx: GraphContext): AnalysisIssue[] {
+    const threshold = ANALYSIS_CONFIG.pattern.tightCouplingEdgeThreshold;
     const pairCount = new Map<string, number>();
     for (const edge of ctx.edges) {
       const key = [edge.source, edge.target].sort().join('|');
@@ -17,10 +19,11 @@ export class TightCouplingRule implements AnalysisRule {
     }
     const issues: AnalysisIssue[] = [];
     for (const [key, count] of pairCount.entries()) {
-      if (count >= 3) {
+      if (count >= threshold) {
         const [nodeA, nodeB] = key.split('|');
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'warning',
           category: 'maintainability',
           title: 'Сильная связанность между узлами',

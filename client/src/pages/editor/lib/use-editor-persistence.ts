@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useCanvasNotesStore } from '@/features/canvas-notes';
 import {
@@ -25,9 +25,10 @@ const isArchitectureNode = (n: {
     n.data?.node !== undefined &&
     n.data?.node !== null;
 
+let hasRestoredOnce = false;
+
 export const useEditorPersistence = () => {
     const [, setStorageVersion] = useState(0);
-    const hasRestoredRef = useRef(false);
 
     const nodes = useArchitectureNodes();
     const edges = useArchitectureEdges();
@@ -82,9 +83,7 @@ export const useEditorPersistence = () => {
         );
         restoreFlow(nextNodes, nextEdges);
         useCanvasNotesStore.getState().restoreBlocks(stored.canvasNotes ?? []);
-        flowInstance?.setViewport?.(stored.viewport)?.catch(() => {
-            // viewport might be async, ignore
-        });
+        flowInstance?.setViewport?.(stored.viewport)?.catch(() => {});
     }, [flowInstance, restoreFlow]);
 
     const reset = useCallback(() => {
@@ -98,11 +97,11 @@ export const useEditorPersistence = () => {
     useEffect(() => {
         if (
             hasStoredFlow() &&
-            !hasRestoredRef.current &&
+            !hasRestoredOnce &&
             flowInstance &&
             isDefaultState
         ) {
-            hasRestoredRef.current = true;
+            hasRestoredOnce = true;
             const stored = loadFlowFromStorage();
             if (stored) {
                 const storedNodes = (stored.nodes ?? []).filter((n) =>
@@ -124,7 +123,6 @@ export const useEditorPersistence = () => {
         }
     }, [flowInstance, isDefaultState, restoreFlow]);
 
-    // Save on pagehide only architecture (not notes) — notes persist only on explicit Save
     useEffect(() => {
         const handlePageHide = (event: PageTransitionEvent) => {
             if (!event.persisted && architectureIsDirty) {
@@ -135,7 +133,6 @@ export const useEditorPersistence = () => {
         return () => window.removeEventListener('pagehide', handlePageHide);
     }, [architectureIsDirty, save]);
 
-    // beforeunload only when dirty — minimal use to allow bfcache for clean pages
     useEffect(() => {
         if (!isDirty) {
             return;

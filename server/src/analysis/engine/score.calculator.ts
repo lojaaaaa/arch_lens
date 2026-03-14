@@ -62,17 +62,11 @@ function computeBonus(issues: AnalysisIssue[], ctx: GraphContext): number {
   const hasGateway = (ctx.nodesByKind.get('api_gateway') ?? []).length > 0;
   if (hasGateway) bonus += bonusGatewayPresent;
 
-  const hasCycles =
-    issues.some((issue) => issue.ruleId === 'S02') ||
-    issues.some((issue) => issue.title.includes('Циклические зависимости'));
+  const hasCycles = issues.some((issue) => issue.ruleId === 'S02');
   if (!hasCycles) bonus += bonusNoCycles;
 
-  const hasOrphans =
-    issues.some((issue) => issue.ruleId === 'S01') ||
-    issues.some((issue) => issue.title.includes('изолированные узлы'));
-  const hasDisconnected =
-    issues.some((issue) => issue.ruleId === 'S08') ||
-    issues.some((issue) => issue.title.includes('Отключённый слой'));
+  const hasOrphans = issues.some((issue) => issue.ruleId === 'S01');
+  const hasDisconnected = issues.some((issue) => issue.ruleId === 'S08');
   if (!hasOrphans && !hasDisconnected) bonus += bonusAllConnected;
 
   return bonus;
@@ -92,46 +86,38 @@ function scoreToGrade(score: number): Grade {
  * Формула: за каждое превышение порога — доля от maxScore (metricsWeight).
  */
 function computeMetricsPenalty(metrics: AnalysisMetrics): number {
-  const maxScore = ANALYSIS_CONFIG.scoring.maxScore ?? 100;
-  const weight =
-    (ANALYSIS_CONFIG.scoring as { metricsWeight?: number }).metricsWeight ??
-    0.35;
-  const thresholds =
-    (
-      ANALYSIS_CONFIG.scoring as {
-        metricsThresholds?: Record<string, number>;
-      }
-    ).metricsThresholds ?? {};
+  const maxScore = ANALYSIS_CONFIG.scoring.maxScore;
+  const weight = ANALYSIS_CONFIG.scoring.metricsWeight;
+  const cfg = ANALYSIS_CONFIG.scoring.metricsThresholds;
 
-  const t = thresholds;
   let penalty = 0;
   const maxPenalty = maxScore * weight;
 
-  if ((metrics.frontendComplexity ?? 0) > (t.frontendComplexity ?? 15)) {
-    const excess = metrics.frontendComplexity - (t.frontendComplexity ?? 15);
+  if ((metrics.frontendComplexity ?? 0) > cfg.frontendComplexity) {
+    const excess = metrics.frontendComplexity - cfg.frontendComplexity;
     penalty += Math.min(excess * 2, maxPenalty * 0.2);
   }
-  if ((metrics.backendComplexity ?? 0) > (t.backendComplexity ?? 20)) {
-    const excess = metrics.backendComplexity - (t.backendComplexity ?? 20);
+  if ((metrics.backendComplexity ?? 0) > cfg.backendComplexity) {
+    const excess = metrics.backendComplexity - cfg.backendComplexity;
     penalty += Math.min(excess * 1.5, maxPenalty * 0.2);
   }
-  if ((metrics.depth ?? 0) > (t.depth ?? 5)) {
-    const excess = metrics.depth - (t.depth ?? 5);
+  if ((metrics.depth ?? 0) > cfg.depth) {
+    const excess = metrics.depth - cfg.depth;
     penalty += Math.min(excess * 3, maxPenalty * 0.15);
   }
-  if ((metrics.maxFanOut ?? 0) > (t.maxFanOut ?? 6)) {
-    const excess = metrics.maxFanOut - (t.maxFanOut ?? 6);
+  if ((metrics.maxFanOut ?? 0) > cfg.maxFanOut) {
+    const excess = metrics.maxFanOut - cfg.maxFanOut;
     penalty += Math.min(excess * 2, maxPenalty * 0.15);
   }
-  if ((metrics.cycleCount ?? 0) > (t.cycleCount ?? 0)) {
+  if ((metrics.cycleCount ?? 0) > cfg.cycleCount) {
     penalty += Math.min(metrics.cycleCount * 8, maxPenalty * 0.2);
   }
-  if ((metrics.criticalNodesCount ?? 0) > (t.criticalNodesCount ?? 2)) {
-    const excess = metrics.criticalNodesCount - (t.criticalNodesCount ?? 2);
+  if ((metrics.criticalNodesCount ?? 0) > cfg.criticalNodesCount) {
+    const excess = metrics.criticalNodesCount - cfg.criticalNodesCount;
     penalty += Math.min(excess * 4, maxPenalty * 0.1);
   }
-  if ((metrics.estimatedRenderPressure ?? 0) > (t.renderPressure ?? 15)) {
-    const excess = metrics.estimatedRenderPressure - (t.renderPressure ?? 15);
+  if ((metrics.estimatedRenderPressure ?? 0) > cfg.renderPressure) {
+    const excess = metrics.estimatedRenderPressure - cfg.renderPressure;
     penalty += Math.min(excess * 0.5, maxPenalty * 0.1);
   }
 

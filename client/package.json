@@ -22,6 +22,7 @@
         ]
     },
     "dependencies": {
+        "@dagrejs/dagre": "^2.0.4",
         "@tailwindcss/vite": "^4.1.18",
         "@xyflow/react": "^12.10.0",
         "class-variance-authority": "^0.7.1",

@@ -18,6 +18,7 @@ export class MonolithApiRule implements AnalysisRule {
       if (endpoints > ANALYSIS_CONFIG.pattern.monolithApiEndpointsThreshold) {
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'warning',
           category: 'scalability',
           title: 'Монолитный API Gateway',

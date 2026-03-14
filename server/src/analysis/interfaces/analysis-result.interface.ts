@@ -15,8 +15,8 @@ export interface AnalysisMetrics {
   backendComplexity: number;
   criticalNodesCount: number;
   estimatedRenderPressure: number;
-  estimatedApiLoad: number;
-  estimatedDataLoad: number;
+  apiEdgesCount: number;
+  dataEdgesCount: number;
   /** V2-C2: счётчики по типам связей */
   callsCount: number;
   readsCount: number;
@@ -37,6 +37,23 @@ export interface AnalysisMetrics {
   fanOutByNode: Record<string, number>;
 }
 
+export interface ScoreBreakdown {
+  maxScore: number;
+  penalty: number;
+  metricsPenalty: number;
+  bonus: number;
+  final: number;
+}
+
+export interface IssueImpact {
+  issueId: string;
+  ruleId: string;
+  title: string;
+  severity: string;
+  penaltyPoints: number;
+  potentialGain: number;
+}
+
 export interface AnalysisResultDto {
   summary: {
     score: number;
@@ -48,8 +65,12 @@ export interface AnalysisResultDto {
     /** Архитектурный стиль (информационно, не влияет на score) */
     architecturalStyle?: string;
   };
+  scoreBreakdown: ScoreBreakdown;
+  issueImpacts: IssueImpact[];
   metrics: AnalysisMetrics;
   issues: AnalysisIssue[];
+  /** Рекомендации по best practices (не влияют на score, нельзя задать в модели) */
+  bestPractices: string[];
   aiRecommendations: string[];
   generatedAt: string;
   modelVersion: string;

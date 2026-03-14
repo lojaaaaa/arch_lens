@@ -1,79 +1,104 @@
-import type { AiRecommendationProvider } from './ai-recommendation-provider.interface.js';
-import type { ArchitectureGraphDto } from '../dto/architecture-graph.dto.js';
-import type { AnalysisIssue } from '../interfaces/analysis-issue.interface.js';
+import type {
+  AiAnalysisContext,
+  AiRecommendationProvider,
+} from './ai-recommendation-provider.interface.js';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'llama-3.3-70b-versatile';
-const MAX_TOKENS = 1024;
+const MAX_TOKENS = 1500;
 
-const NODE_KIND_LABELS: Record<string, string> = {
-  ui_page: 'Страница',
-  ui_component: 'Компонент',
-  state_store: 'Хранилище',
-  api_gateway: 'API Gateway',
-  service: 'Сервис',
-  database: 'База данных',
-  cache: 'Кэш',
-  external_system: 'Внешняя система',
-  system: 'Система',
+const GRADE_LABELS: Record<string, string> = {
+  A: 'отличная',
+  B: 'хорошая',
+  C: 'удовлетворительная',
+  D: 'слабая',
+  F: 'критическая',
 };
 
-function buildPrompt(
-  graph: ArchitectureGraphDto,
-  issues: AnalysisIssue[],
-): string {
-  const nodesSummary = graph.nodes
-    .map((node) => {
-      const label = NODE_KIND_LABELS[node.kind] ?? node.kind;
-      const name = (node as { displayName?: string }).displayName;
-      return `- ${label} (id: ${node.id})${name ? ` «${name}»` : ''}`;
-    })
+const STYLE_LABELS: Record<string, string> = {
+  layered: 'слоистая',
+  microservices: 'микросервисы',
+  'event-driven': 'событийная',
+  'client-server': 'клиент-сервер',
+  monolith: 'монолит',
+};
+
+function buildPrompt(ctx: AiAnalysisContext): string {
+  const gradeLabel = GRADE_LABELS[ctx.grade] ?? ctx.grade;
+  const styleLabel =
+    STYLE_LABELS[ctx.architecturalStyle ?? ''] ??
+    ctx.architecturalStyle ??
+    'не определён';
+
+  const b = ctx.scoreBreakdown;
+  const formula = `${b.final} = ${b.maxScore} − ${b.penalty} (issues) − ${b.metricsPenalty} (метрики) + ${b.bonus} (бонус)`;
+
+  const critCount = ctx.issues.filter((i) => i.severity === 'critical').length;
+  const warnCount = ctx.issues.filter((i) => i.severity === 'warning').length;
+  const infoCount = ctx.issues.filter((i) => i.severity === 'info').length;
+
+  const topIssues = ctx.issues
+    .filter((i) => i.severity !== 'info')
+    .slice(0, 5)
+    .map((i) => `  - [${i.severity}] ${i.title}: ${i.description}`)
     .join('\n');
-  const edgesSummary = graph.edges
-    .map((edge) => `- ${edge.source} → ${edge.target}: ${edge.kind}`)
-    .join('\n');
-  const issuesSummary =
-    issues.length > 0
-      ? issues
-          .map(
-            (issue) =>
-              `[${issue.severity}] ${issue.title}: ${issue.description}` +
-              (issue.recommendation
-                ? ` Рекомендация: ${issue.recommendation}`
-                : ''),
-          )
-          .join('\n')
-      : 'Замечаний нет.';
 
-  return `Ты — эксперт по архитектуре ПО. Проанализируй схему и выдай 2-5 конкретных рекомендаций по улучшению.
+  const nodeKinds = Object.entries(ctx.nodeKindCounts)
+    .map(([kind, count]) => `${kind}: ${count}`)
+    .join(', ');
 
-Схема:
-Узлы:
-${nodesSummary}
-Связи:
-${edgesSummary}
+  const edgeKinds = Object.entries(ctx.edgeKindCounts)
+    .map(([kind, count]) => `${kind}: ${count}`)
+    .join(', ');
 
-Замечания анализа:
-${issuesSummary}
+  return `Ты — эксперт по архитектуре программного обеспечения. На основе результатов автоматического анализа архитектурной схемы, дай пользователю полезное резюме и рекомендации.
 
-Требования:
+## Результаты анализа
+
+Оценка: ${ctx.score}/100 (${gradeLabel}), грейд ${ctx.grade}
+Формула: ${formula}
+Риск: ${(ctx.riskScore * 100).toFixed(0)}%
+Уверенность в данных: ${(ctx.confidenceScore * 100).toFixed(0)}%
+Стиль: ${styleLabel}
+
+Узлы (${ctx.metrics.totalNodes}): ${nodeKinds}
+Связи (${ctx.metrics.totalEdges}): ${edgeKinds}
+
+Ключевые метрики:
+- Плотность графа: ${ctx.metrics.density.toFixed(3)}
+- Глубина: ${ctx.metrics.depth}
+- Циклы: ${ctx.metrics.cycleCount}
+- Max fan-out: ${ctx.metrics.maxFanOut}, avg fan-out: ${ctx.metrics.avgFanOut.toFixed(1)}
+- Сложность frontend: ${ctx.metrics.frontendComplexity}, backend: ${ctx.metrics.backendComplexity}
+- Критичных узлов: ${ctx.metrics.criticalNodesCount}
+
+Проблемы: ${critCount} критических, ${warnCount} предупреждений, ${infoCount} информационных
+${topIssues ? `Основные:\n${topIssues}` : ''}
+
+## Задача
+
+Напиши ответ на русском языке в таком формате:
+
+1. **Общее впечатление** (2-3 предложения): краткая оценка архитектуры — что хорошо, что вызывает опасения, общий вердикт.
+
+2. **Рекомендации** (3-5 пунктов): конкретные советы по улучшению архитектуры. Объясни ПОЧЕМУ это важно. Не привязывайся к конкретным id узлов — давай общие архитектурные советы.
+
+3. **На что обратить внимание** (1-2 пункта): потенциальные риски или узкие места, которые стоит проверить.
+
+Правила:
 - Отвечай на русском
-- Каждая рекомендация — отдельный пункт, начинающийся с "-"
-- Будь КОНКРЕТЕН: указывай id узлов в скобках, например «добавьте кэш между Service (abc) и Database (xyz)»
-- Формулируй как действие: «Сделай X вместо Y», «Добавь Z между A и B»
-- Не дублируй замечания, давай доп. советы
-- Не пиши вступление и заключение`;
+- Каждый пункт рекомендаций начинай с "- "
+- Не повторяй проблемы дословно — интерпретируй и объясняй
+- Будь полезен: давай советы, которые помогут улучшить архитектуру
+- Не пиши "На основе анализа..." и подобные вступления, начинай сразу с контента`;
 }
 
 export class AiRecommendationGroqProvider implements AiRecommendationProvider {
   constructor(private readonly apiKey: string) {}
 
-  async getRecommendations(
-    graph: ArchitectureGraphDto,
-    issues: AnalysisIssue[],
-  ): Promise<string[]> {
+  async getRecommendations(context: AiAnalysisContext): Promise<string[]> {
     try {
-      const prompt = buildPrompt(graph, issues);
+      const prompt = buildPrompt(context);
       const response = await fetch(GROQ_API_URL, {
         method: 'POST',
         headers: {
@@ -86,12 +111,12 @@ export class AiRecommendationGroqProvider implements AiRecommendationProvider {
             {
               role: 'system',
               content:
-                'Ты даёшь краткие архитектурные рекомендации. Формат: «Сделай X вместо Y», «Добавь Z между узлами (id)». Указывай id узлов в скобках. Отвечай только списком пунктов с "-".',
+                'Ты — архитектурный консультант. Даёшь понятные, полезные советы по архитектуре ПО на русском языке. Пиши кратко и по делу.',
             },
             { role: 'user', content: prompt },
           ],
           max_tokens: MAX_TOKENS,
-          temperature: 0.5,
+          temperature: 0.6,
         }),
       });
 
@@ -112,12 +137,12 @@ export class AiRecommendationGroqProvider implements AiRecommendationProvider {
         return [];
       }
 
-      const lines = text
-        .split('\n')
-        .map((line) => line.replace(/^[-•*]\s*/, '').trim())
-        .filter((line) => line.length > 10);
+      const paragraphs = text
+        .split(/\n{2,}/)
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0);
 
-      return lines.slice(0, 5);
+      return paragraphs;
     } catch (err) {
       console.warn('[AiRecommendation] Groq request failed:', err);
       return [];

@@ -103,6 +103,19 @@ export const ANALYSIS_CONFIG = {
     ],
   },
 
+  /** Fallback latency (мс) для узлов без явного latencyMs */
+  defaultLatencyMs: {
+    api_gateway: 10,
+    service: 50,
+    database: 50,
+    cache: 3,
+    external_system: 100,
+    ui_page: 0,
+    ui_component: 0,
+    state_store: 0,
+    system: 0,
+  } as Record<string, number>,
+
   /** Confidence Score < 0.6 → предупреждение о неполных данных */
   confidenceLowThreshold: 0.6,
 

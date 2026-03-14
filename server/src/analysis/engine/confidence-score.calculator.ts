@@ -1,10 +1,10 @@
 import type { ArchitectureGraphDto } from '../dto/architecture-graph.dto.js';
 
 const RELEVANT_NODE_FIELDS: Record<string, string[]> = {
-  api_gateway: ['requestRate', 'latencyMs', 'endpointsCount'],
+  api_gateway: ['requestRate', 'latencyMs', 'endpointsCount', 'capacityRps'],
   service: ['latencyMs', 'operationsCount', 'externalCalls', 'capacityRps'],
   database: ['latencyMs', 'readWriteRatio', 'tablesCount'],
-  cache: ['latencyMs', 'readWriteRatio', 'hitRate', 'capacityRps'],
+  cache: ['latencyMs', 'hitRate', 'capacityRps'],
   external_system: ['latencyMs', 'reliability', 'rateLimit'],
   system: [
     'targetAvailability',

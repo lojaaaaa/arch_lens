@@ -10,6 +10,7 @@ export const useAnalysisSelectors = () =>
             analysisStatus: state.analysisStatus,
             analysisError: state.analysisError,
             showMetricsOnGraph: state.showMetricsOnGraph,
+            graphChangedSinceAnalysis: state.graphChangedSinceAnalysis,
         })),
     );
 
@@ -21,5 +22,6 @@ export const useAnalysisActions = () =>
             clearAnalysis: state.clearAnalysis,
             setGraphToAnalyze: state.setGraphToAnalyze,
             setShowMetricsOnGraph: state.setShowMetricsOnGraph,
+            markGraphChanged: state.markGraphChanged,
         })),
     );

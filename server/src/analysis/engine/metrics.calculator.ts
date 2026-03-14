@@ -32,11 +32,11 @@ export function calculateMetrics(ctx: GraphContext): AnalysisMetrics {
   const stateStoreCount = ctx.nodesByKind.get('state_store')?.length ?? 0;
   const estimatedRenderPressure = frontendComplexity * (stateStoreCount || 1);
 
-  const estimatedApiLoad = ctx.edges.filter(
+  const apiEdgesCount = ctx.edges.filter(
     (edge) => edge.kind === 'calls' || edge.kind === 'reads',
   ).length;
 
-  const estimatedDataLoad = ctx.edges.filter(
+  const dataEdgesCount = ctx.edges.filter(
     (edge) => edge.kind === 'reads' || edge.kind === 'writes',
   ).length;
 
@@ -92,8 +92,8 @@ export function calculateMetrics(ctx: GraphContext): AnalysisMetrics {
     backendComplexity,
     criticalNodesCount,
     estimatedRenderPressure,
-    estimatedApiLoad,
-    estimatedDataLoad,
+    apiEdgesCount,
+    dataEdgesCount,
     callsCount,
     readsCount,
     writesCount,

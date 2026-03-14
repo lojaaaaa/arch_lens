@@ -24,6 +24,7 @@ export class MissingDataLayerRule implements AnalysisRule {
       if (!hasDataConnection) {
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'warning',
           category: 'architecture',
           title: 'Сервис без связей с уровнем данных',

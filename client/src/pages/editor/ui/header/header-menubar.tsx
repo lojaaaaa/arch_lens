@@ -1,7 +1,11 @@
+import { useNavigate } from 'react-router';
 import {
     BarChart3,
+    BookOpen,
+    LayoutGrid,
     Lightbulb,
     PanelRight,
+    Play,
     Presentation,
     Type,
 } from 'lucide-react';
@@ -10,6 +14,7 @@ import { useAnalysisStore } from '@/features/analysis';
 import { useCanvasNotesStore } from '@/features/canvas-notes';
 import { usePresentationStore } from '@/features/presentation';
 import { useTutorialStore } from '@/features/tutorial';
+import { Routes } from '@/shared/model/routes';
 import {
     Menubar,
     MenubarCheckboxItem,
@@ -27,9 +32,11 @@ import { useHeaderFileExport } from './use-header-file-export';
 import { useHeaderFileImport } from './use-header-file-import';
 import { useHeaderFilePersistence } from './use-header-file-persistence';
 import { useHeaderFileShortcuts } from './use-header-file-shortcuts';
+import { useArchitectureStore } from '../../model/store';
 import { usePropertiesPanelStore } from '../../model/use-properties-panel-store';
 
 export const HeaderMenubar = () => {
+    const navigate = useNavigate();
     const { fileInputRef, handleFileChange, handleImportClick } =
         useHeaderFileImport();
 
@@ -59,6 +66,12 @@ export const HeaderMenubar = () => {
     const setShowMetricsOnGraph = useAnalysisStore(
         (state) => state.setShowMetricsOnGraph,
     );
+    const showDataFlowAnimation = useAnalysisStore(
+        (state) => state.showDataFlowAnimation,
+    );
+    const setShowDataFlowAnimation = useAnalysisStore(
+        (state) => state.setShowDataFlowAnimation,
+    );
     const panelOpen = usePropertiesPanelStore((state) => state.open);
     const togglePanel = usePropertiesPanelStore((state) => state.toggle);
     const isPresentationMode = usePresentationStore(
@@ -67,6 +80,7 @@ export const HeaderMenubar = () => {
     const togglePresentation = usePresentationStore((state) => state.toggle);
     const hintsEnabled = useTutorialStore((state) => state.hintsEnabled);
     const toggleHints = useTutorialStore((state) => state.toggleHints);
+    const autoLayout = useArchitectureStore((state) => state.autoLayout);
 
     return (
         <>
@@ -267,6 +281,27 @@ export const HeaderMenubar = () => {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <MenubarCheckboxItem
+                                        checked={showDataFlowAnimation}
+                                        onCheckedChange={(v) =>
+                                            setShowDataFlowAnimation(Boolean(v))
+                                        }
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
+                                        <Play className="mr-2 size-4" />
+                                        Анимация потока
+                                    </MenubarCheckboxItem>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                    side="right"
+                                    className="max-w-60"
+                                >
+                                    Бегущие точки по связям, показывающие
+                                    направление и интенсивность трафика.
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <MenubarCheckboxItem
                                         checked={panelOpen}
                                         onCheckedChange={() => togglePanel()}
                                         onSelect={(e) => e.preventDefault()}
@@ -284,6 +319,44 @@ export const HeaderMenubar = () => {
                                 </TooltipContent>
                             </Tooltip>
                         </MenubarGroup>
+                        <MenubarSeparator />
+                        <MenubarGroup>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <MenubarItem
+                                        onClick={() => autoLayout('TB')}
+                                    >
+                                        <LayoutGrid className="mr-2 size-4" />
+                                        Авто-раскладка ↓
+                                    </MenubarItem>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                    side="right"
+                                    className="max-w-60"
+                                >
+                                    Расположить узлы по слоям сверху вниз:
+                                    Frontend → Backend → Data.
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <MenubarItem
+                                        onClick={() => autoLayout('LR')}
+                                    >
+                                        <LayoutGrid className="mr-2 size-4" />
+                                        Авто-раскладка →
+                                    </MenubarItem>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                    side="right"
+                                    className="max-w-60"
+                                >
+                                    Расположить узлы по слоям слева направо:
+                                    Frontend → Backend → Data.
+                                </TooltipContent>
+                            </Tooltip>
+                        </MenubarGroup>
+                        <MenubarSeparator />
                         <MenubarGroup>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -325,6 +398,25 @@ export const HeaderMenubar = () => {
                                 </TooltipContent>
                             </Tooltip>
                         </MenubarGroup>
+                    </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger>Справка</MenubarTrigger>
+                    <MenubarContent>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <MenubarItem
+                                    onClick={() => navigate(Routes.docs)}
+                                >
+                                    <BookOpen className="mr-2 size-4" />
+                                    Документация
+                                </MenubarItem>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-60">
+                                Описание сервиса, узлы, связи и механизм
+                                анализа.
+                            </TooltipContent>
+                        </Tooltip>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>

@@ -10,6 +10,7 @@ import { devtools } from 'zustand/middleware';
 import type { ArchitectureNode, GraphEdge } from '@/shared/model/types';
 
 import type { ArchitectureState } from './types';
+import { applyDagreLayout } from '../lib/auto-layout';
 import { EDGE_KIND_LABELS } from '../lib/config';
 import {
     createGraphEdge,
@@ -421,5 +422,27 @@ export const useArchitectureStore = create<ArchitectureState>()(
         },
         canUndo: () => get().history.past.length > 0,
         canRedo: () => get().history.future.length > 0,
+
+        autoLayout: (direction = 'TB') => {
+            set((state) => {
+                const laid = applyDagreLayout(
+                    state.nodes,
+                    state.edges,
+                    direction,
+                ) as ArchitectureState['nodes'];
+                return {
+                    ...state,
+                    history: {
+                        past: trimHistoryPast([
+                            ...state.history.past,
+                            { nodes: state.nodes, edges: state.edges },
+                        ]),
+                        future: [],
+                    },
+                    nodes: laid,
+                    isDirty: true,
+                };
+            });
+        },
     })),
 );

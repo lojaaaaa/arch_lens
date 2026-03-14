@@ -1,1 +1,2 @@
 cd client && npx lint-staged && npx tsc -b --noEmit
+cd ../server && npx eslint src/ --max-warnings=0 && npx tsc --noEmit

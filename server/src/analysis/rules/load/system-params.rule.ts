@@ -46,19 +46,39 @@ function getEntryRequestRate(
   return null;
 }
 
-/** Грубая оценка availability: произведение reliability внешних систем. */
+/**
+ * Оценка availability: произведение reliability внешних систем
+ * × availability внутренних компонентов (api_gateway, database, cache, service).
+ */
 function estimateSystemAvailability(ctx: GraphContext): number | null {
-  const externals = ctx.nodes.filter((node) => node.kind === 'external_system');
-  if (externals.length === 0) return null;
   let product = 1;
   let hasData = false;
-  for (const ext of externals) {
-    const reliability = Number(ext['reliability']);
-    if (Number.isFinite(reliability) && reliability >= 0 && reliability <= 1) {
-      product *= reliability;
-      hasData = true;
+
+  for (const node of ctx.nodes) {
+    if (node.kind === 'external_system') {
+      const reliability = Number(node['reliability']);
+      if (
+        Number.isFinite(reliability) &&
+        reliability >= 0 &&
+        reliability <= 1
+      ) {
+        product *= reliability;
+        hasData = true;
+      }
+    } else if (
+      node.kind === 'api_gateway' ||
+      node.kind === 'database' ||
+      node.kind === 'cache' ||
+      node.kind === 'service'
+    ) {
+      const avail = Number(node['availability']);
+      if (Number.isFinite(avail) && avail > 0 && avail <= 1) {
+        product *= avail;
+        hasData = true;
+      }
     }
   }
+
   return hasData ? product : null;
 }
 
@@ -149,12 +169,19 @@ export class SystemParamsRule implements AnalysisRule {
           severity: 'warning',
           category: 'reliability',
           title: 'Расчётная доступность ниже целевой',
-          description: `Оценка доступности (${(estimated * 100).toFixed(1)}%) ниже целевой (${(targetAvail * 100).toFixed(1)}%). Проверьте reliability внешних систем.`,
+          description: `Оценка доступности (${(estimated * 100).toFixed(1)}%) ниже целевой (${(targetAvail * 100).toFixed(1)}%). Учтены reliability внешних систем и availability компонентов.`,
           affectedNodes: ctx.nodes
-            .filter((node) => node.kind === 'external_system')
+            .filter(
+              (node) =>
+                node.kind === 'external_system' ||
+                node.kind === 'api_gateway' ||
+                node.kind === 'database' ||
+                node.kind === 'cache' ||
+                node.kind === 'service',
+            )
             .map((node) => node.id),
           recommendation:
-            'Увеличьте reliability внешних систем или снизьте зависимость от них.',
+            'Увеличьте reliability/availability компонентов или снизьте зависимость от ненадёжных элементов.',
           metrics: {
             estimatedAvailability: estimated,
             targetAvailability: targetAvail,

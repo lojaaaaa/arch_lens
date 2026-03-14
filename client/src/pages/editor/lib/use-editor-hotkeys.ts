@@ -118,7 +118,7 @@ const resolveHotkey = (event: KeyboardEvent): TypeOrNull<EditorHotkey> => {
         metaOrCtrl &&
         (event.code === 'KeyY' || (event.shiftKey && event.code === 'KeyZ'));
 
-    const isDuplicate = metaOrCtrl && event.code === 'KeyX';
+    const isDuplicate = metaOrCtrl && event.code === 'KeyD';
     const isCopy = metaOrCtrl && event.code === 'KeyC';
     const isPaste = metaOrCtrl && event.code === 'KeyV';
     const isDelete = event.key === 'Delete' || event.key === 'Backspace';

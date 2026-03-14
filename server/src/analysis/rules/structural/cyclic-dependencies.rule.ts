@@ -37,7 +37,7 @@ export class CyclicDependenciesRule implements AnalysisRule {
     const path: string[] = [];
     const pathIndex = new Map<string, number>();
 
-    const visit = (nodeId: string): boolean => {
+    const visit = (nodeId: string): void => {
       visited.add(nodeId);
       recursionStack.add(nodeId);
       path.push(nodeId);
@@ -46,18 +46,16 @@ export class CyclicDependenciesRule implements AnalysisRule {
       const neighbors = ctx.adjacency.get(nodeId) ?? [];
       for (const neighbor of neighbors) {
         if (!visited.has(neighbor)) {
-          if (visit(neighbor)) return true;
+          visit(neighbor);
         } else if (recursionStack.has(neighbor)) {
           const startIndex = pathIndex.get(neighbor) ?? 0;
           cycles.push(path.slice(startIndex));
-          return true;
         }
       }
 
       path.pop();
       pathIndex.delete(nodeId);
       recursionStack.delete(nodeId);
-      return false;
     };
 
     for (const node of ctx.nodes) {

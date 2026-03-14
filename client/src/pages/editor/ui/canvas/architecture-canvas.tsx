@@ -13,6 +13,7 @@ import { ArchitectureNodeComponent } from './architecture-node';
 import { CanvasContextMenu } from './canvas-context-menu';
 import { CanvasSearchTrigger } from './canvas-search-trigger';
 import { CanvasStatsPanel } from './canvas-stats-panel';
+import { EdgeTypePicker } from './edge-type-picker';
 import { useArchitectureCanvasProps } from './use-architecture-canvas-props';
 import { useCanvasContextMenu } from './use-canvas-context-menu';
 import { useCanvasDnd } from './use-canvas-dnd';
@@ -88,11 +89,16 @@ export const ArchitectureCanvas = () => {
         onNodesChange,
         onEdgesChange,
         onConnect,
+        onReconnectStart,
+        onReconnect,
+        onReconnectEnd,
         onNodeClick,
         onEdgeClick,
         onEdgeDoubleClick,
         onNodeDoubleClick,
         onPaneClick,
+        pendingConnection,
+        clearPendingConnection,
     } = useArchitectureCanvasHandlers();
 
     const {
@@ -147,6 +153,10 @@ export const ArchitectureCanvas = () => {
                 selectionOnDrag={canvasProps.selectionOnDrag}
                 selectionMode={canvasProps.selectionMode}
                 onConnect={noopWhenPresentation(onConnect)}
+                edgesReconnectable={!isPresentationMode}
+                onReconnectStart={noopWhenPresentation(onReconnectStart)}
+                onReconnect={noopWhenPresentation(onReconnect)}
+                onReconnectEnd={noopWhenPresentation(onReconnectEnd)}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onPaneClick={noopWhenPresentation(handlePaneClick)}
@@ -182,6 +192,13 @@ export const ArchitectureCanvas = () => {
                 <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2 px-4 max-w-md">
                     <TutorialBanner hint={hint} onDismiss={dismiss} />
                 </div>
+            )}
+
+            {!isPresentationMode && pendingConnection && (
+                <EdgeTypePicker
+                    pending={pendingConnection}
+                    onClose={clearPendingConnection}
+                />
             )}
 
             {!isPresentationMode && contextMenu && (

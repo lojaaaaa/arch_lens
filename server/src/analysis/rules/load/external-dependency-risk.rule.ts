@@ -26,10 +26,15 @@ export class ExternalDependencyRiskRule implements AnalysisRule {
       for (const edge of dependentEdges) {
         const otherId = edge.source === ext.id ? edge.target : edge.source;
         const other = ctx.nodeById.get(otherId);
-        if (!other || (other.criticality ?? 0) < 2) continue;
+        if (
+          !other ||
+          (other.criticality ?? 0) < ANALYSIS_CONFIG.spof.criticalityThreshold
+        )
+          continue;
 
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'warning',
           category: 'reliability',
           title: 'Ненадёжная внешняя зависимость на критическом пути',

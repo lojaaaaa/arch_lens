@@ -26,3 +26,13 @@ export const AnalysisLayout = () => (
         </main>
     </div>
 );
+
+export const DocsLayout = () => (
+    <div className="flex min-h-0 flex-1 flex-col overflow-auto">
+        <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-10 pb-10">
+            <Suspense fallback={<AnalysisPageFallback />}>
+                <Outlet />
+            </Suspense>
+        </main>
+    </div>
+);

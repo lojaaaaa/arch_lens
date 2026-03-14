@@ -11,9 +11,10 @@ export class SyncChainLatencyRule implements AnalysisRule {
   readonly description = 'Длинная цепочка синхронных вызовов';
 
   check(ctx: GraphContext): AnalysisIssue[] {
-    const syncEdges = ctx.edges.filter(
-      (edge) => edge.synchronous === true || edge.kind === 'calls',
-    );
+    const syncEdges = ctx.edges.filter((edge) => {
+      if (edge.synchronous === false) return false;
+      return edge.synchronous === true || edge.kind === 'calls';
+    });
 
     const outgoing = new Map<string, string[]>();
     for (const edge of syncEdges) {
@@ -55,6 +56,7 @@ export class SyncChainLatencyRule implements AnalysisRule {
     return [
       {
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'warning',
         category: 'performance',
         title: 'Длинная цепочка синхронных вызовов',

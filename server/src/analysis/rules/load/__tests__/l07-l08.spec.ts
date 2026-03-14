@@ -76,7 +76,7 @@ describe('L07 Critical path, L08 Bottleneck', () => {
           position: pos,
           complexity: 1,
           criticality: 1,
-          requestRate: 50,
+          capacityRps: 50,
         },
       ],
       edges: [{ id: 'e1', source: 'page', target: 'gw', kind: 'calls' }],

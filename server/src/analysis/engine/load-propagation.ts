@@ -12,8 +12,9 @@ const EDGE_KIND_WEIGHTS: Record<string, number> = {
 };
 
 /**
- * Load propagation: topological order (DAG) from entry points, no backward edges.
- * Load(node) = Σ (Load(parent) × effectiveWeight). effectiveWeight = (frequency ?? 1) × kindWeight.
+ * Load propagation: topological order (DAG condensation) from entry points.
+ * Load(target) = Σ (Load(pred) × Σ edgeWeight(pred→target)).
+ * edgeWeight = (frequency ?? 1) × kindWeight.
  * calls/reads=1.0, writes=0.5, subscribes/emits=0.3, depends_on=0 (V2-C1).
  */
 export function propagateLoad(
@@ -100,9 +101,7 @@ export function propagateLoad(
       const edges = sccEdges.get(predScc) ?? [];
       const toThis = edges.filter((edge) => edge.target === sccId);
       const sumFreqToThis = toThis.reduce((sum, edge) => sum + edge.freq, 0);
-      const sumFreqTotal = edges.reduce((sum, edge) => sum + edge.freq, 0);
-      const ratio = sumFreqTotal > 0 ? sumFreqToThis / sumFreqTotal : 1;
-      load += predLoad * ratio;
+      load += predLoad * sumFreqToThis;
     }
     if (load > 0) {
       loadByScc.set(sccId, load);

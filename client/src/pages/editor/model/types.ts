@@ -64,4 +64,6 @@ export type ArchitectureState = {
     redo: () => void;
     canUndo: () => boolean;
     canRedo: () => boolean;
+
+    autoLayout: (direction?: 'TB' | 'LR') => void;
 };

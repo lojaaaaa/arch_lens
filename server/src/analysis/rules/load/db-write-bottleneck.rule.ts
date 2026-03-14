@@ -27,6 +27,7 @@ export class DbWriteBottleneckRule implements AnalysisRule {
       ) {
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'critical',
           category: 'performance',
           title: 'Узкое место записи в базу данных',

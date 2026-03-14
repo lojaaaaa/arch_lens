@@ -9,6 +9,8 @@ export type {
   AnalysisMetrics,
   AnalysisResultDto,
   Grade,
+  ScoreBreakdown,
+  IssueImpact,
 } from './analysis-result.interface.js';
 export type {
   ValidationResult,

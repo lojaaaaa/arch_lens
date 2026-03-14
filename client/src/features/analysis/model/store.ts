@@ -44,6 +44,8 @@ export const useAnalysisStore = create<AnalysisState>()(
         analysisStatus: 'idle',
         analysisError: null,
         showMetricsOnGraph: false,
+        showDataFlowAnimation: false,
+        graphChangedSinceAnalysis: false,
 
         setGraphToAnalyze: (graphToAnalyze) =>
             set({
@@ -57,6 +59,8 @@ export const useAnalysisStore = create<AnalysisState>()(
         setAnalysisError: (analysisError) => set({ analysisError }),
         setShowMetricsOnGraph: (showMetricsOnGraph) =>
             set({ showMetricsOnGraph }),
+        setShowDataFlowAnimation: (showDataFlowAnimation) =>
+            set({ showDataFlowAnimation }),
         runAnalysis: async (graph) => {
             analysisAbortController?.abort();
             analysisAbortController = new AbortController();
@@ -72,7 +76,11 @@ export const useAnalysisStore = create<AnalysisState>()(
                     return;
                 }
                 saveAnalysis(analysisResult);
-                set({ analysisResult, analysisStatus: 'success' });
+                set({
+                    analysisResult,
+                    analysisStatus: 'success',
+                    graphChangedSinceAnalysis: false,
+                });
             } catch (error: unknown) {
                 if (
                     signal.aborted ||
@@ -109,7 +117,15 @@ export const useAnalysisStore = create<AnalysisState>()(
                 analysisStatus: 'idle',
                 analysisError: null,
                 showMetricsOnGraph: false,
+                showDataFlowAnimation: false,
+                graphChangedSinceAnalysis: false,
             });
+        },
+        markGraphChanged: () => {
+            const { analysisResult } = useAnalysisStore.getState();
+            if (analysisResult) {
+                set({ graphChangedSinceAnalysis: true });
+            }
         },
     })),
 );

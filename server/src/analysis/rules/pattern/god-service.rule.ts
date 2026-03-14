@@ -13,25 +13,38 @@ export class GodServiceRule implements AnalysisRule {
   check(ctx: GraphContext): AnalysisIssue[] {
     const issues: AnalysisIssue[] = [];
     const services = ctx.nodesByKind.get('service') ?? [];
+    const { godServiceOpsThreshold, godServiceExternalCallsThreshold } =
+      ANALYSIS_CONFIG.pattern;
+
     for (const node of services) {
       const ops = Number(node['operationsCount']) || 0;
       const ext = Number(node['externalCalls']) || 0;
-      if (
-        ops > ANALYSIS_CONFIG.pattern.godServiceOpsThreshold &&
-        ext > ANALYSIS_CONFIG.pattern.godServiceExternalCallsThreshold
-      ) {
-        issues.push({
-          id: randomUUID(),
-          severity: 'critical',
-          category: 'maintainability',
-          title: 'God Service — сервис перегружен ответственностью',
-          description: `Сервис "${node.id}" имеет слишком много операций (${ops}) и внешних вызовов (${ext}).`,
-          affectedNodes: [node.id],
-          recommendation:
-            'Разбейте сервис на более мелкие модули с чёткой ответственностью.',
-          metrics: { operationsCount: ops, externalCalls: ext },
-        });
-      }
+
+      const opsExceeded = ops > godServiceOpsThreshold;
+      const extExceeded = ext > godServiceExternalCallsThreshold;
+
+      if (!opsExceeded && !extExceeded) continue;
+
+      const severity = opsExceeded && extExceeded ? 'critical' : 'warning';
+      const reason =
+        opsExceeded && extExceeded
+          ? `слишком много операций (${ops}) и внешних вызовов (${ext})`
+          : opsExceeded
+            ? `слишком много операций (${ops})`
+            : `слишком много внешних вызовов (${ext})`;
+
+      issues.push({
+        id: randomUUID(),
+        ruleId: this.id,
+        severity,
+        category: 'maintainability',
+        title: 'God Service — сервис перегружен ответственностью',
+        description: `Сервис "${node.id}" имеет ${reason}.`,
+        affectedNodes: [node.id],
+        recommendation:
+          'Разбейте сервис на более мелкие модули с чёткой ответственностью.',
+        metrics: { operationsCount: ops, externalCalls: ext },
+      });
     }
     return issues;
   }

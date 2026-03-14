@@ -120,11 +120,13 @@ export const createGraphEdge = (
     source: string,
     target: string,
     kind: EdgeKind = 'calls',
+    options?: { synchronous?: boolean; frequency?: number },
 ): GraphEdge => ({
     id: nanoid(),
     source,
     target,
     kind,
+    ...options,
 });
 
 export const ensureSystemNode = (

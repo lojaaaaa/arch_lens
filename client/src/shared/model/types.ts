@@ -103,6 +103,8 @@ export interface APIGatewayNode extends BackendNodeBase {
     latencyMs?: number;
     /** Опционально: доступность 0–1 (99.9% = 0.999). */
     availability?: number;
+    /** Опционально: пропускная способность (rps). */
+    capacityRps?: number;
 }
 
 export interface ServiceNode extends BaseNode {
@@ -231,8 +233,8 @@ export interface ArchitectureMetrics {
     criticalNodesCount: number;
 
     estimatedRenderPressure: number;
-    estimatedApiLoad: number;
-    estimatedDataLoad: number;
+    apiEdgesCount: number;
+    dataEdgesCount: number;
 
     callsCount?: number;
     readsCount?: number;
@@ -251,6 +253,23 @@ export interface ArchitectureMetrics {
 
 export type Grade = 'A' | 'B' | 'C' | 'D' | 'F';
 
+export interface ScoreBreakdown {
+    maxScore: number;
+    penalty: number;
+    metricsPenalty: number;
+    bonus: number;
+    final: number;
+}
+
+export interface IssueImpact {
+    issueId: string;
+    ruleId: string;
+    title: string;
+    severity: string;
+    penaltyPoints: number;
+    potentialGain: number;
+}
+
 export interface AnalysisResult {
     summary: {
         score: number;
@@ -262,9 +281,13 @@ export interface AnalysisResult {
         architecturalStyle?: string;
     };
 
+    scoreBreakdown?: ScoreBreakdown;
+    issueImpacts?: IssueImpact[];
+
     metrics: ArchitectureMetrics;
 
     issues: ArchitectureIssue[];
+    bestPractices: string[];
     aiRecommendations: string[];
 
     generatedAt: string;

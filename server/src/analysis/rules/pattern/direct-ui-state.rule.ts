@@ -17,6 +17,7 @@ export class DirectUiStateRule implements AnalysisRule {
       if (source?.kind === 'ui_page' && target?.kind === 'state_store') {
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'warning',
           category: 'maintainability',
           title: 'Прямая связь UI с глобальным состоянием',

@@ -4,6 +4,8 @@ export type ArchitecturePresetId =
     | 'crud'
     | 'microservices'
     | 'event-driven'
+    | 'layered'
+    | 'message-queue'
     | 'anti-pattern';
 
 export type ArchitecturePreset = {

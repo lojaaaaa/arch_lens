@@ -46,15 +46,21 @@ export function buildGraphContext(graph: ArchitectureGraphDto): GraphContext {
 
   const nodeById = new Map(nodes.map((node) => [node.id, node]));
 
-  const incomingCount = new Map<string, number>();
-  const outgoingCount = new Map<string, number>();
   const adjacency = new Map<string, string[]>();
   const outgoingEdges = new Map<string, GraphEdgeDto[]>();
   const incomingEdges = new Map<string, GraphEdgeDto[]>();
 
+  const outgoingTargets = new Map<string, Set<string>>();
+  const incomingSources = new Map<string, Set<string>>();
+
   for (const edge of edges) {
-    outgoingCount.set(edge.source, (outgoingCount.get(edge.source) ?? 0) + 1);
-    incomingCount.set(edge.target, (incomingCount.get(edge.target) ?? 0) + 1);
+    const outTargets = outgoingTargets.get(edge.source) ?? new Set();
+    outTargets.add(edge.target);
+    outgoingTargets.set(edge.source, outTargets);
+
+    const inSources = incomingSources.get(edge.target) ?? new Set();
+    inSources.add(edge.source);
+    incomingSources.set(edge.target, inSources);
 
     const outList = outgoingEdges.get(edge.source) ?? [];
     outList.push(edge);
@@ -69,7 +75,22 @@ export function buildGraphContext(graph: ArchitectureGraphDto): GraphContext {
     adjacency.set(edge.source, neighbors);
   }
 
-  const entryPoints = getEntryPointsFromGraph(nodes, incomingEdges, nodeById);
+  const outgoingCount = new Map<string, number>();
+  const incomingCount = new Map<string, number>();
+  for (const [nodeId, targets] of outgoingTargets) {
+    outgoingCount.set(nodeId, targets.size);
+  }
+  for (const [nodeId, sources] of incomingSources) {
+    incomingCount.set(nodeId, sources.size);
+  }
+
+  let entryPoints = getEntryPointsFromGraph(nodes, incomingEdges, nodeById);
+
+  if (entryPoints.length === 0) {
+    entryPoints = nodes
+      .filter((n) => (incomingEdges.get(n.id) ?? []).length === 0)
+      .map((n) => n.id);
+  }
 
   const nodesByLayer = {
     frontend: nodes.filter((node) => node.layer === 'frontend'),

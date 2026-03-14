@@ -19,6 +19,7 @@ export class HighFanInRule implements AnalysisRule {
 
       issues.push({
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'warning',
         category: 'reliability',
         title: 'Слишком много входящих связей у узла',

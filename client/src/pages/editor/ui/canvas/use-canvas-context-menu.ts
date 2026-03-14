@@ -24,8 +24,13 @@ export const useCanvasContextMenu = () => {
     const flowInstance = useArchitectureFlowInstance();
     const addTextBlock = useCanvasNotesStore((state) => state.addBlock);
     const removeTextBlock = useCanvasNotesStore((state) => state.removeBlock);
-    const { removeNode, removeEdge, selectNode, selectEdge, addNode } =
-        useArchitectureActions();
+    const {
+        removeNode,
+        removeEdge,
+        selectNode,
+        selectEdge,
+        addNodeAtPosition,
+    } = useArchitectureActions();
 
     const textBlockIds = new Set(blocks.map((b) => b.id));
     const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
@@ -130,7 +135,16 @@ export const useCanvasContextMenu = () => {
         const archNode = (sourceNode.data as { node?: { kind?: string } })
             ?.node;
         if (archNode?.kind) {
-            addNode(archNode.kind as Parameters<typeof addNode>[0]);
+            const position = flowInstance
+                ? flowInstance.screenToFlowPosition({
+                      x: contextMenu.x + 50,
+                      y: contextMenu.y + 50,
+                  })
+                : undefined;
+            addNodeAtPosition(
+                archNode.kind as Parameters<typeof addNodeAtPosition>[0],
+                position,
+            );
         }
         setContextMenu(null);
     };

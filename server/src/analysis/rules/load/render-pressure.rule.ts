@@ -30,6 +30,7 @@ export class RenderPressureRule implements AnalysisRule {
     return [
       {
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'warning',
         category: 'performance',
         title: 'Высокая нагрузка на рендеринг',

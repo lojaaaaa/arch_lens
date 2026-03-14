@@ -5,6 +5,7 @@ import { Routes } from '@/shared/model/routes';
 import {
     AnalysisLayout,
     AppLayout,
+    DocsLayout,
     RouteLoadingLayout,
 } from '@/shared/ui/layouts';
 
@@ -37,6 +38,17 @@ export const router = createBrowserRouter([
                                 index: true,
                                 lazy: () =>
                                     import('@/pages/analysis/analysis-page'),
+                            },
+                        ],
+                    },
+                    {
+                        path: Routes.docs,
+                        element: <DocsLayout />,
+                        children: [
+                            {
+                                index: true,
+                                lazy: () =>
+                                    import('@/pages/documents/docs-page'),
                             },
                         ],
                     },

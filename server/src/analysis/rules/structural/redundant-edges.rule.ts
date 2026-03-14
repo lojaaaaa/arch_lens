@@ -11,40 +11,53 @@ export class RedundantEdgesRule implements AnalysisRule {
     'Дублирующиеся рёбра между одними и теми же узлами — избыточность';
 
   check(ctx: GraphContext): AnalysisIssue[] {
-    const pairToEdges = new Map<
+    const groupToEdges = new Map<
       string,
-      { edges: string[]; source: string; target: string }
+      { edges: string[]; source: string; target: string; kind: string }
     >();
 
     for (const edge of ctx.edges) {
-      const key = `${edge.source}|${edge.target}`;
-      const existing = pairToEdges.get(key);
+      const key = `${edge.source}|${edge.target}|${edge.kind}`;
+      const existing = groupToEdges.get(key);
       if (existing) {
         existing.edges.push(edge.id);
       } else {
-        pairToEdges.set(key, {
+        groupToEdges.set(key, {
           edges: [edge.id],
           source: edge.source,
           target: edge.target,
+          kind: edge.kind,
         });
       }
     }
 
+    const dataKinds = new Set(['database', 'cache']);
+    const dataEdgeKinds = new Set(['reads', 'writes']);
     const issues: AnalysisIssue[] = [];
 
-    for (const [, data] of pairToEdges) {
+    for (const [, data] of groupToEdges) {
       if (data.edges.length < 2) continue;
+
+      const target = ctx.nodeById.get(data.target);
+      if (
+        target &&
+        dataKinds.has(target.kind) &&
+        dataEdgeKinds.has(data.kind)
+      ) {
+        continue;
+      }
 
       issues.push({
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'info',
         category: 'maintainability',
         title: 'Избыточные рёбра',
-        description: `Между узлами "${data.source}" и "${data.target}" обнаружено ${data.edges.length} рёбер. Возможна избыточность или дублирование связей.`,
+        description: `Между узлами "${data.source}" и "${data.target}" обнаружено ${data.edges.length} рёбер типа "${data.kind}". Возможна избыточность.`,
         affectedNodes: [data.source, data.target],
         affectedEdges: data.edges,
         recommendation:
-          'Проверьте, нужны ли все эти связи. Возможно, часть из них можно объединить или удалить.',
+          'Проверьте, нужны ли все эти связи одного типа. Возможно, часть из них можно объединить или удалить.',
         metrics: { duplicateCount: data.edges.length },
       });
     }

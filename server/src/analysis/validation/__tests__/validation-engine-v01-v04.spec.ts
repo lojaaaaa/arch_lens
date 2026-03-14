@@ -44,7 +44,7 @@ describe('ValidationEngine V01–V04', () => {
     ).toContain('MISSING');
   });
 
-  it('Шаг 2: Граф с ui_page→database → errors содержит V02', () => {
+  it('Шаг 2: Граф с ui_page→database → warnings содержит V02', () => {
     const graph: ArchitectureGraphDto = {
       meta: makeMeta(),
       nodes: [
@@ -75,10 +75,10 @@ describe('ValidationEngine V01–V04', () => {
       ],
     };
     const result = engine.run(graph);
-    expect(result.errors.some((error) => error.ruleId === 'V02')).toBe(true);
-    expect(
-      result.errors.find((error) => error.ruleId === 'V02')?.message,
-    ).toContain('frontend→data');
+    expect(result.warnings.some((w) => w.ruleId === 'V02')).toBe(true);
+    expect(result.warnings.find((w) => w.ruleId === 'V02')?.message).toContain(
+      'frontend→data',
+    );
   });
 
   it('Шаг 3: Граф с двумя нодами с одним id → errors содержит V03', () => {

@@ -59,10 +59,10 @@ export const METRIC_META: Record<string, MetricMeta> = {
         meaning: 'Суммарная сложность backend и data-слоёв.',
         action: 'При >15: разбейте God Services, введите очереди, используйте кэш. Операции >10 на сервис — кандидат на split.',
     },
-    estimatedApiLoad: {
+    apiEdgesCount: {
         formula: '|edges: kind ∈ {calls, reads}|',
         meaning:
-            'Число обращений к API (calls + reads). Оценка нагрузки на gateway и сервисы.',
+            'Число рёбер к API (calls + reads). Топологическая метрика связности с сервисами и gateway.',
         action: 'При высокой нагрузке: кэшируйте read-heavy endpoints, введите rate limiting, масштабируйте горизонтально.',
     },
     estimatedRenderPressure: {
@@ -71,9 +71,10 @@ export const METRIC_META: Record<string, MetricMeta> = {
             'Эвристика нагрузки рендеринга. Высокое значение — много подписок и перерисовок.',
         action: 'При >15: селективно подписывайтесь на store, используйте memo, виртуализируйте списки. Уменьшите stateStoreCount.',
     },
-    estimatedDataLoad: {
+    dataEdgesCount: {
         formula: '|edges: kind ∈ {reads, writes}|',
-        meaning: 'Объём обращений к БД и кэшу.',
+        meaning:
+            'Число рёбер к данным (reads + writes). Топологическая метрика связности с БД и кэшем.',
         action: 'При reads ≫ writes: добавьте кэш. При writes > reads: проверьте batch-операции, очереди. Read/write ratio влияет на выбор стратегии.',
     },
     criticalNodesCount: {

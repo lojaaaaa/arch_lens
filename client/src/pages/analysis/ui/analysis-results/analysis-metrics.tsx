@@ -132,11 +132,11 @@ const CATEGORIES: {
         title: 'Performance',
         metrics: [
             {
-                key: 'estimatedApiLoad',
-                label: 'API load',
+                key: 'apiEdgesCount',
+                label: 'API edges',
                 icon: Gauge,
-                getValue: (metrics) => metrics.estimatedApiLoad.toFixed(1),
-                level: (metrics) => loadLevel(metrics.estimatedApiLoad),
+                getValue: (metrics) => metrics.apiEdgesCount.toFixed(1),
+                level: (metrics) => loadLevel(metrics.apiEdgesCount),
             },
             {
                 key: 'estimatedRenderPressure',
@@ -148,12 +148,11 @@ const CATEGORIES: {
                     loadLevel(metrics.estimatedRenderPressure, 30, 80),
             },
             {
-                key: 'estimatedDataLoad',
-                label: 'Data load',
+                key: 'dataEdgesCount',
+                label: 'Data edges',
                 icon: Database,
-                getValue: (metrics) => metrics.estimatedDataLoad.toFixed(1),
-                level: (metrics) =>
-                    loadLevel(metrics.estimatedDataLoad, 40, 90),
+                getValue: (metrics) => metrics.dataEdgesCount.toFixed(1),
+                level: (metrics) => loadLevel(metrics.dataEdgesCount, 40, 90),
             },
         ],
     },

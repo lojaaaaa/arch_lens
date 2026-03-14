@@ -34,8 +34,8 @@ const architectureMetricsSchema = z.object({
     backendComplexity: z.number(),
     criticalNodesCount: z.number(),
     estimatedRenderPressure: z.number(),
-    estimatedApiLoad: z.number(),
-    estimatedDataLoad: z.number(),
+    apiEdgesCount: z.number(),
+    dataEdgesCount: z.number(),
     callsCount: z.number().optional().default(0),
     readsCount: z.number().optional().default(0),
     writesCount: z.number().optional().default(0),
@@ -53,6 +53,23 @@ const architectureMetricsSchema = z.object({
 
 const gradeSchema = z.enum(['A', 'B', 'C', 'D', 'F']);
 
+const scoreBreakdownSchema = z.object({
+    maxScore: z.number(),
+    penalty: z.number(),
+    metricsPenalty: z.number(),
+    bonus: z.number(),
+    final: z.number(),
+});
+
+const issueImpactSchema = z.object({
+    issueId: z.string(),
+    ruleId: z.string(),
+    title: z.string(),
+    severity: z.string(),
+    penaltyPoints: z.number(),
+    potentialGain: z.number(),
+});
+
 export const analysisResultSchema = z.object({
     summary: z.object({
         score: z.number(),
@@ -63,8 +80,11 @@ export const analysisResultSchema = z.object({
         criticalIssuesCount: z.number(),
         architecturalStyle: z.string().optional(),
     }),
+    scoreBreakdown: scoreBreakdownSchema.optional(),
+    issueImpacts: z.array(issueImpactSchema).optional().default([]),
     metrics: architectureMetricsSchema,
     issues: z.array(architectureIssueSchema),
+    bestPractices: z.array(z.string()).default([]),
     aiRecommendations: z.array(z.string()).default([]),
     generatedAt: z.string(),
     modelVersion: z.string(),

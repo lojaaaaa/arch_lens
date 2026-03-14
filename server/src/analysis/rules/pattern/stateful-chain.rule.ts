@@ -29,6 +29,7 @@ export class StatefulChainRule implements AnalysisRule {
           reportedPairs.add(pair);
           issues.push({
             id: randomUUID(),
+            ruleId: this.id,
             severity: 'warning',
             category: 'scalability',
             title: 'Цепочка stateful-сервисов',

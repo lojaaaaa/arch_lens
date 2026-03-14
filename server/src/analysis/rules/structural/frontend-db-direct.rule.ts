@@ -24,6 +24,7 @@ export class FrontendDbDirectRule implements AnalysisRule {
 
       issues.push({
         id: randomUUID(),
+        ruleId: this.id,
         severity: 'critical',
         category: 'security',
         title: 'Прямое обращение фронтенда к БД',

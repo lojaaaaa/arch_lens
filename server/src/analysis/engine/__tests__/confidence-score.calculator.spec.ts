@@ -26,6 +26,7 @@ describe('calculateConfidenceScore AUTH-008', () => {
           criticality: 1,
           requestRate: 100,
           latencyMs: 10,
+          endpointsCount: 5,
         },
         {
           id: 'ext',

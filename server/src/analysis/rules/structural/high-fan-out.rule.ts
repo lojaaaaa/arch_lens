@@ -14,13 +14,19 @@ export class HighFanOutRule implements AnalysisRule {
     const { highFanOutThreshold, highFanOutCriticalThreshold } =
       ANALYSIS_CONFIG.structural;
 
+    const frontendKinds = new Set(['ui_page', 'ui_component', 'state_store']);
+
     const issues: AnalysisIssue[] = [];
 
     for (const [nodeId, count] of ctx.outgoingCount) {
       if (count < highFanOutThreshold) continue;
 
+      const node = ctx.nodeById.get(nodeId);
+      if (node && frontendKinds.has(node.kind)) continue;
+
       issues.push({
         id: randomUUID(),
+        ruleId: this.id,
         severity: count >= highFanOutCriticalThreshold ? 'critical' : 'warning',
         category: 'architecture',
         title: 'Слишком много исходящих связей у узла',

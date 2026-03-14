@@ -18,6 +18,7 @@ export class ExcessiveNestingRule implements AnalysisRule {
       if (nested > ANALYSIS_CONFIG.pattern.excessiveNestingThreshold) {
         issues.push({
           id: randomUUID(),
+          ruleId: this.id,
           severity: 'warning',
           category: 'maintainability',
           title: 'Чрезмерная вложенность компонентов',

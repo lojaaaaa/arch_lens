@@ -25,6 +25,7 @@ export class NoErrorBoundaryRule implements AnalysisRule {
           reportedFrontends.add(edge.source);
           issues.push({
             id: randomUUID(),
+            ruleId: this.id,
             severity: 'info',
             category: 'reliability',
             title: 'Нет обработки ошибок при вызове API',
