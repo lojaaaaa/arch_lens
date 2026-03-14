@@ -48,5 +48,9 @@ server/.git
 
 # Worktrees
 .worktrees/
+
+# AI, Cursor, IDE artifacts
+.cursor
+
+# Документация, отчёты, таски (всё в docs/)
 docs/
-.cursor/

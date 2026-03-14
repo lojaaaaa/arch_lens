@@ -90,7 +90,3 @@ cd client && npm run build
 # Backend
 cd server && npm run build
 ```
-
-## Лицензия
-
-UNLICENSED (дипломный проект)
