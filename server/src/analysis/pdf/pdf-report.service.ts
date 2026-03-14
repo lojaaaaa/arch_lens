@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import PDFDocument from 'pdfkit';
 import type {
@@ -41,7 +42,22 @@ function pct(v: number): string {
   return `${(v * 100).toFixed(0)}%`;
 }
 
-const FONT_DIR = path.join(process.cwd(), 'assets', 'fonts');
+function resolveFontDir(): string {
+  const candidates = [
+    path.join(process.cwd(), 'server', 'assets', 'fonts'),
+    path.join(process.cwd(), 'assets', 'fonts'),
+    path.join(__dirname, '..', '..', '..', '..', 'assets', 'fonts'),
+  ];
+  for (const dir of candidates) {
+    const regular = path.join(dir, 'Roboto-Regular.ttf');
+    if (fs.existsSync(regular)) return dir;
+  }
+  throw new Error(
+    `Fonts not found. Tried: ${candidates.join(', ')}. Add server/assets/fonts to Vercel includeFiles.`,
+  );
+}
+
+const FONT_DIR = resolveFontDir();
 const FONT_REGULAR = path.join(FONT_DIR, 'Roboto-Regular.ttf');
 const FONT_ITALIC = path.join(FONT_DIR, 'Roboto-Italic.ttf');
 
