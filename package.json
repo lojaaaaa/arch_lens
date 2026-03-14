@@ -8,9 +8,14 @@
     "lint:client": "cd client && npm run lint",
     "lint:server": "cd server && npm run lint",
     "typecheck:client": "cd client && npx tsc -b --noEmit",
-    "typecheck:server": "cd server && npx tsc --noEmit"
+    "typecheck:server": "cd server && npx tsc --noEmit",
+    "build": "cd client && npm run build && cd ../server && npm run build"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1"
   },
   "devDependencies": {
+    "@vercel/node": "^3.2.0",
     "husky": "^9.1.7"
   }
 }
