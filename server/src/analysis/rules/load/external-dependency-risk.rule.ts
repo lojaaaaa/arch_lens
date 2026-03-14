@@ -20,7 +20,7 @@ export class ExternalDependencyRiskRule implements AnalysisRule {
       if (reliability >= ANALYSIS_CONFIG.load.lowReliability) continue;
 
       const dependentEdges = ctx.edges.filter(
-        (e) => e.target === ext.id || e.source === ext.id,
+        (edge) => edge.target === ext.id || edge.source === ext.id,
       );
 
       for (const edge of dependentEdges) {

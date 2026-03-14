@@ -1,6 +1,7 @@
 import { memo, useState } from 'react';
 import { Handle, type NodeProps, Position } from '@xyflow/react';
 
+import { useAnalysisStore } from '@/features/analysis';
 import { useGraphHighlightStore } from '@/features/graph-highlight';
 import { usePresentationStore } from '@/features/presentation';
 import { cn } from '@/shared/lib/utils';
@@ -43,6 +44,28 @@ export const ArchitectureNodeComponent = memo(
         const isHighlighted = useGraphHighlightStore((state) =>
             state.highlightedNodeIds.includes(id),
         );
+
+        const showMetricsOnGraph = useAnalysisStore(
+            (state) => state.showMetricsOnGraph,
+        );
+        const analysisResult = useAnalysisStore(
+            (state) => state.analysisResult,
+        );
+        const fanOut =
+            showMetricsOnGraph && analysisResult?.metrics?.fanOutByNode
+                ? (analysisResult.metrics.fanOutByNode[id] ?? 0)
+                : undefined;
+
+        const fanOutOverlayClass =
+            fanOut !== undefined
+                ? fanOut > 6
+                    ? 'ring-2 ring-red-500/80 ring-offset-1'
+                    : fanOut >= 4
+                      ? 'ring-2 ring-amber-400/70 ring-offset-1'
+                      : fanOut <= 3
+                        ? 'ring-2 ring-emerald-500/50 ring-offset-1'
+                        : ''
+                : '';
 
         const handleStartEdit = () => {
             setDraftName(displayName);
@@ -92,6 +115,7 @@ export const ArchitectureNodeComponent = memo(
                         selected && 'ring-1 ring-primary/20 ring-offset-0',
                         isHighlighted &&
                             'ring-2 ring-red-400 ring-offset-1 shadow-lg shadow-red-200/40 animate-pulse',
+                        fanOutOverlayClass,
                     )}
                 >
                     <span

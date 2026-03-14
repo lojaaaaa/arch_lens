@@ -3,6 +3,8 @@ import type { CacheNode } from '@/shared/model/types';
 import {
     FieldWithTooltip,
     HitRateSlider,
+    OptionalCapacityRpsSelect,
+    OptionalLatencySelect,
     Select,
 } from '../node-properties-controls';
 
@@ -35,6 +37,24 @@ export const CacheFields = ({ node, onChange }: Props) => (
             <HitRateSlider
                 value={node.hitRate}
                 onChange={(hitRate) => onChange(node.id, { hitRate })}
+            />
+        </FieldWithTooltip>
+        <FieldWithTooltip
+            label="Задержка (мс)"
+            tooltip="Опционально. Critical Path учитывает."
+        >
+            <OptionalLatencySelect
+                value={node.latencyMs}
+                onChange={(latencyMs) => onChange(node.id, { latencyMs })}
+            />
+        </FieldWithTooltip>
+        <FieldWithTooltip
+            label="Пропускная способность (rps)"
+            tooltip="Опционально."
+        >
+            <OptionalCapacityRpsSelect
+                value={node.capacityRps}
+                onChange={(capacityRps) => onChange(node.id, { capacityRps })}
             />
         </FieldWithTooltip>
     </>

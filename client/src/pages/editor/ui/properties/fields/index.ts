@@ -35,6 +35,11 @@ export const CacheFields = lazy(() =>
         default: m.CacheFields,
     })),
 );
+export const SystemFields = lazy(() =>
+    import('./system-fields').then((m) => ({
+        default: m.SystemFields,
+    })),
+);
 export const ExternalSystemFields = lazy(() =>
     import('./external-system-fields').then((m) => ({
         default: m.ExternalSystemFields,

@@ -46,10 +46,6 @@ coverage/
 # Nested git repos (server had its own)
 server/.git
 
-# Playwright
-playwright-report/
-test-results/
-
 # Worktrees
 .worktrees/
 docs/

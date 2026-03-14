@@ -12,8 +12,10 @@ export type AnalysisState = {
     analysisResult: TypeOrNull<AnalysisResult>;
     analysisStatus: AnalysisStatus;
     analysisError: TypeOrNull<HandledError>;
+    showMetricsOnGraph: boolean;
 
     setGraphToAnalyze: (graph: TypeOrNull<ArchitectureGraph>) => void;
+    setShowMetricsOnGraph: (show: boolean) => void;
     setAnalysisResult: (result: TypeOrNull<AnalysisResult>) => void;
     setAnalysisStatus: (status: AnalysisStatus) => void;
     setAnalysisError: (error: TypeOrNull<HandledError>) => void;

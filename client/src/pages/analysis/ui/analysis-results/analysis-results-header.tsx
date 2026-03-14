@@ -6,12 +6,10 @@ type AnalysisResultsHeaderProps = {
 
 export const AnalysisResultsHeader = ({
     onBack,
-}: AnalysisResultsHeaderProps) => {
-    return (
-        <AnalysisTopBar
-            title="Результаты анализа"
-            onBack={onBack}
-            backLabel="Назад к редактору"
-        />
-    );
-};
+}: AnalysisResultsHeaderProps) => (
+    <AnalysisTopBar
+        title="Результаты анализа"
+        onBack={onBack}
+        backLabel="Назад к редактору"
+    />
+);

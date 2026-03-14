@@ -1,5 +1,12 @@
-import { Lightbulb, PanelRight, Presentation, Type } from 'lucide-react';
+import {
+    BarChart3,
+    Lightbulb,
+    PanelRight,
+    Presentation,
+    Type,
+} from 'lucide-react';
 
+import { useAnalysisStore } from '@/features/analysis';
 import { useCanvasNotesStore } from '@/features/canvas-notes';
 import { usePresentationStore } from '@/features/presentation';
 import { useTutorialStore } from '@/features/tutorial';
@@ -46,6 +53,12 @@ export const HeaderMenubar = () => {
 
     const notesVisible = useCanvasNotesStore((state) => state.visible);
     const toggleNotes = useCanvasNotesStore((state) => state.toggleVisible);
+    const showMetricsOnGraph = useAnalysisStore(
+        (state) => state.showMetricsOnGraph,
+    );
+    const setShowMetricsOnGraph = useAnalysisStore(
+        (state) => state.setShowMetricsOnGraph,
+    );
     const panelOpen = usePropertiesPanelStore((state) => state.open);
     const togglePanel = usePropertiesPanelStore((state) => state.toggle);
     const isPresentationMode = usePresentationStore(
@@ -62,7 +75,6 @@ export const HeaderMenubar = () => {
                 type="file"
                 accept=".json,application/json"
                 className="hidden"
-                data-testid="import-file-input"
                 onChange={handleFileChange}
             />
             <Menubar>
@@ -229,6 +241,27 @@ export const HeaderMenubar = () => {
                                 >
                                     Текстовые блоки на канвасе. Отключите для
                                     экспорта в картинку.
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <MenubarCheckboxItem
+                                        checked={showMetricsOnGraph}
+                                        onCheckedChange={(v) =>
+                                            setShowMetricsOnGraph(Boolean(v))
+                                        }
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
+                                        <BarChart3 className="mr-2 size-4" />
+                                        Метрики на графе
+                                    </MenubarCheckboxItem>
+                                </TooltipTrigger>
+                                <TooltipContent
+                                    side="right"
+                                    className="max-w-60"
+                                >
+                                    Цвет нод по fan-out (после анализа). Красный
+                                    &gt;6, жёлтый 4–6, зелёный ≤3.
                                 </TooltipContent>
                             </Tooltip>
                             <Tooltip>

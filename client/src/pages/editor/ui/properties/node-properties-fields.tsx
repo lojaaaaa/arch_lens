@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 
+import { deriveComplexity } from '@/shared/lib/derive-complexity';
 import type { ArchitectureNode } from '@/shared/model/types';
 import { Separator } from '@/shared/ui/separator';
 
@@ -10,11 +11,11 @@ import {
     ExternalSystemFields,
     ServiceFields,
     StateStoreFields,
+    SystemFields,
     UiComponentFields,
     UiPageFields,
 } from './fields';
 import {
-    ComplexitySlider,
     CriticalityControl,
     FieldWithTooltip,
     Input,
@@ -124,6 +125,15 @@ const KindFields = ({
                     />
                 </Suspense>
             );
+        case 'system':
+            return (
+                <Suspense fallback={null}>
+                    <SystemFields
+                        node={node as ArchitectureNode & { kind: 'system' }}
+                        onChange={onChange}
+                    />
+                </Suspense>
+            );
         default:
             return null;
     }
@@ -155,24 +165,33 @@ export const NodePropertiesFields = ({
             </FieldWithTooltip>
             <FieldWithTooltip
                 label="Сложность"
-                tooltip="Оценка вычислительной и архитектурной сложности узла. Влияет на расчёт нагрузки рендеринга и общий score."
+                tooltip="Вычисляется из полей ниже (operationsCount, componentsCount, endpointsCount и т.д.). Влияет на frontend/backend complexity и score."
             >
-                <ComplexitySlider
-                    value={node.complexity}
-                    onChange={(complexity) => onChange(node.id, { complexity })}
-                />
+                <div className="text-muted-foreground rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
+                    {deriveComplexity(node)} (авто)
+                </div>
             </FieldWithTooltip>
 
             <FieldWithTooltip
                 label="Критичность"
-                tooltip="Насколько отказ узла повлияет на систему. Ключевые узлы с высокой входящей связностью отмечаются как единая точка отказа."
+                tooltip="0=логи/аналитика, 1=обычный, 2=платёж/аутентификация, 3=mission-critical. Влияет на SPOF (criticality≥2 + fan-in≥3 → единая точка отказа)."
             >
-                <CriticalityControl
-                    value={node.criticality}
-                    onChange={(criticality) =>
-                        onChange(node.id, { criticality })
-                    }
-                />
+                <div className="space-y-1">
+                    <CriticalityControl
+                        value={node.criticality}
+                        onChange={(criticality) =>
+                            onChange(node.id, { criticality })
+                        }
+                    />
+                    <p className="text-muted-foreground text-[10px]">
+                        {node.criticality === 0 && '0: логи, аналитика'}
+                        {node.criticality === 1 && '1: обычный компонент'}
+                        {node.criticality === 2 && '2: платёж, auth'}
+                        {node.criticality === 3 && '3: mission-critical'}
+                        {![0, 1, 2, 3].includes(node.criticality) &&
+                            `Текущее: ${node.criticality}`}
+                    </p>
+                </div>
             </FieldWithTooltip>
 
             <Separator />

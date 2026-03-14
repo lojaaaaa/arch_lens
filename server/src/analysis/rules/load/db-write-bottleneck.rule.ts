@@ -18,7 +18,7 @@ export class DbWriteBottleneckRule implements AnalysisRule {
       const raw = Number(db['readWriteRatio']);
       const readWriteRatio = Number.isFinite(raw) ? raw : 1;
       const writesCount = ctx.edges.filter(
-        (e) => e.target === db.id && e.kind === 'writes',
+        (edge) => edge.target === db.id && edge.kind === 'writes',
       ).length;
 
       if (

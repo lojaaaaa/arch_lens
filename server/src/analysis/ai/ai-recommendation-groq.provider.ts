@@ -23,22 +23,24 @@ function buildPrompt(
   issues: AnalysisIssue[],
 ): string {
   const nodesSummary = graph.nodes
-    .map((n) => {
-      const label = NODE_KIND_LABELS[n.kind] ?? n.kind;
-      const name = (n as { displayName?: string }).displayName;
-      return `- ${label} (id: ${n.id})${name ? ` «${name}»` : ''}`;
+    .map((node) => {
+      const label = NODE_KIND_LABELS[node.kind] ?? node.kind;
+      const name = (node as { displayName?: string }).displayName;
+      return `- ${label} (id: ${node.id})${name ? ` «${name}»` : ''}`;
     })
     .join('\n');
   const edgesSummary = graph.edges
-    .map((e) => `- ${e.source} → ${e.target}: ${e.kind}`)
+    .map((edge) => `- ${edge.source} → ${edge.target}: ${edge.kind}`)
     .join('\n');
   const issuesSummary =
     issues.length > 0
       ? issues
           .map(
-            (i) =>
-              `[${i.severity}] ${i.title}: ${i.description}` +
-              (i.recommendation ? ` Рекомендация: ${i.recommendation}` : ''),
+            (issue) =>
+              `[${issue.severity}] ${issue.title}: ${issue.description}` +
+              (issue.recommendation
+                ? ` Рекомендация: ${issue.recommendation}`
+                : ''),
           )
           .join('\n')
       : 'Замечаний нет.';
@@ -112,8 +114,8 @@ export class AiRecommendationGroqProvider implements AiRecommendationProvider {
 
       const lines = text
         .split('\n')
-        .map((s) => s.replace(/^[-•*]\s*/, '').trim())
-        .filter((s) => s.length > 10);
+        .map((line) => line.replace(/^[-•*]\s*/, '').trim())
+        .filter((line) => line.length > 10);
 
       return lines.slice(0, 5);
     } catch (err) {

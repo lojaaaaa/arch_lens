@@ -52,6 +52,10 @@ const systemNodeSchema = z.object({
     layer: z.literal('frontend').default('frontend'),
     pagesCount: z.number().min(0).default(0),
     description: z.string().optional(),
+    targetAvailability: z.number().min(0).max(1).optional(),
+    targetThroughputRps: z.number().min(0).optional(),
+    latencySloMs: z.number().min(0).optional(),
+    deploymentModel: z.enum(['monolith', 'microservices', 'hybrid']).optional(),
 });
 
 const uiComponentNodeSchema = z.object({
@@ -91,6 +95,8 @@ const apiGatewayNodeSchema = z.object({
     endpointsCount: z.number().min(0).default(1),
     requestRate: z.number().min(0).default(10),
     authRequired: z.boolean().default(false),
+    latencyMs: z.number().min(0).optional(),
+    availability: z.number().min(0).max(1).optional(),
 });
 
 const serviceNodeSchema = z.object({
@@ -100,6 +106,8 @@ const serviceNodeSchema = z.object({
     operationsCount: z.number().min(0).default(1),
     externalCalls: z.number().min(0).default(0),
     stateful: z.boolean().default(false),
+    latencyMs: z.number().min(0).optional(),
+    capacityRps: z.number().min(0).optional(),
 });
 
 const databaseNodeSchema = z.object({
@@ -109,6 +117,8 @@ const databaseNodeSchema = z.object({
     dbType: z.enum(['SQL', 'NoSQL']).default('SQL'),
     tablesCount: z.number().min(0).default(1),
     readWriteRatio: z.number().min(0).max(1).default(0.7),
+    latencyMs: z.number().min(0).optional(),
+    availability: z.number().min(0).max(1).optional(),
 });
 
 const cacheNodeSchema = z.object({
@@ -117,6 +127,8 @@ const cacheNodeSchema = z.object({
     layer: z.literal('data').default('data'),
     cacheType: z.enum(['redis', 'memory']).default('redis'),
     hitRate: z.number().min(0).max(1).default(0.8),
+    latencyMs: z.number().min(0).optional(),
+    capacityRps: z.number().min(0).optional(),
 });
 
 const externalSystemNodeSchema = z.object({

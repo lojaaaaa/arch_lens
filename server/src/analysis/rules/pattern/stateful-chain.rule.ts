@@ -13,7 +13,9 @@ export class StatefulChainRule implements AnalysisRule {
     const issues: AnalysisIssue[] = [];
     const services = ctx.nodesByKind.get('service') ?? [];
     const statefulIds = new Set(
-      services.filter((n) => n['stateful'] === true).map((n) => n.id),
+      services
+        .filter((node) => node['stateful'] === true)
+        .map((node) => node.id),
     );
     const reportedPairs = new Set<string>();
     for (const edge of ctx.edges) {

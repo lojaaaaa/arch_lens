@@ -10,3 +10,9 @@ export type {
   AnalysisResultDto,
   Grade,
 } from './analysis-result.interface.js';
+export type {
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  ValidationRule,
+} from '../validation/index.js';

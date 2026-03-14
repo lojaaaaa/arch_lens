@@ -43,6 +43,7 @@ export const useAnalysisStore = create<AnalysisState>()(
         analysisResult: null,
         analysisStatus: 'idle',
         analysisError: null,
+        showMetricsOnGraph: false,
 
         setGraphToAnalyze: (graphToAnalyze) =>
             set({
@@ -54,6 +55,8 @@ export const useAnalysisStore = create<AnalysisState>()(
         setAnalysisResult: (analysisResult) => set({ analysisResult }),
         setAnalysisStatus: (analysisStatus) => set({ analysisStatus }),
         setAnalysisError: (analysisError) => set({ analysisError }),
+        setShowMetricsOnGraph: (showMetricsOnGraph) =>
+            set({ showMetricsOnGraph }),
         runAnalysis: async (graph) => {
             analysisAbortController?.abort();
             analysisAbortController = new AbortController();
@@ -105,6 +108,7 @@ export const useAnalysisStore = create<AnalysisState>()(
                 analysisResult: null,
                 analysisStatus: 'idle',
                 analysisError: null,
+                showMetricsOnGraph: false,
             });
         },
     })),

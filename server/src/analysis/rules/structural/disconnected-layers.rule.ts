@@ -37,7 +37,7 @@ export class DisconnectedLayersRule implements AnalysisRule {
         category: 'architecture',
         title: 'Отключённый слой',
         description: `Слой "${layer}" содержит узлы, но не имеет связей с другими слоями. Данный слой изолирован от остальной архитектуры.`,
-        affectedNodes: layerNodes.map((n) => n.id),
+        affectedNodes: layerNodes.map((node) => node.id),
         recommendation:
           'Убедитесь, что слой должен быть изолирован. Если нет — добавьте связи с другими слоями (frontend↔backend↔data).',
       });

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { ANALYSIS_CONFIG } from '../../analysis.config.js';
+import { deriveNodeComplexity } from '../../engine/derive-complexity.js';
 import type {
   AnalysisIssue,
   AnalysisRule,
@@ -12,7 +13,11 @@ export class RenderPressureRule implements AnalysisRule {
 
   check(ctx: GraphContext): AnalysisIssue[] {
     const frontendComplexity = ctx.nodesByLayer.frontend.reduce(
-      (sum, n) => sum + (n.complexity ?? 1),
+      (sum, node) =>
+        sum +
+        deriveNodeComplexity(
+          node as Parameters<typeof deriveNodeComplexity>[0],
+        ),
       0,
     );
     const stateStoreCount = (ctx.nodesByKind.get('state_store') ?? []).length;
@@ -20,7 +25,7 @@ export class RenderPressureRule implements AnalysisRule {
 
     if (pressure <= ANALYSIS_CONFIG.load.renderPressureThreshold) return [];
 
-    const frontendIds = ctx.nodesByLayer.frontend.map((n) => n.id);
+    const frontendIds = ctx.nodesByLayer.frontend.map((node) => node.id);
 
     return [
       {

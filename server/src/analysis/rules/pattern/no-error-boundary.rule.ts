@@ -12,7 +12,7 @@ export class NoErrorBoundaryRule implements AnalysisRule {
   check(ctx: GraphContext): AnalysisIssue[] {
     const issues: AnalysisIssue[] = [];
     const gatewayIds = new Set(
-      (ctx.nodesByKind.get('api_gateway') ?? []).map((n) => n.id),
+      (ctx.nodesByKind.get('api_gateway') ?? []).map((node) => node.id),
     );
     const reportedFrontends = new Set<string>();
     for (const edge of ctx.edges) {

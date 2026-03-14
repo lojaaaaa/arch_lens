@@ -1,6 +1,12 @@
 import type { ServiceNode } from '@/shared/model/types';
 
-import { FieldWithTooltip, Input, Toggle } from '../node-properties-controls';
+import {
+    FieldWithTooltip,
+    Input,
+    OptionalCapacityRpsSelect,
+    OptionalLatencySelect,
+    Toggle,
+} from '../node-properties-controls';
 
 type Props = {
     node: ServiceNode;
@@ -44,6 +50,24 @@ export const ServiceFields = ({ node, onChange }: Props) => (
             <Toggle
                 value={node.stateful}
                 onChange={(stateful) => onChange(node.id, { stateful })}
+            />
+        </FieldWithTooltip>
+        <FieldWithTooltip
+            label="Задержка (мс)"
+            tooltip="Опционально. Critical Path учитывает. По умолчанию 50 ms."
+        >
+            <OptionalLatencySelect
+                value={node.latencyMs}
+                onChange={(latencyMs) => onChange(node.id, { latencyMs })}
+            />
+        </FieldWithTooltip>
+        <FieldWithTooltip
+            label="Пропускная способность (rps)"
+            tooltip="Опционально. Сравнение с load при bottleneck."
+        >
+            <OptionalCapacityRpsSelect
+                value={node.capacityRps}
+                onChange={(capacityRps) => onChange(node.id, { capacityRps })}
             />
         </FieldWithTooltip>
     </>

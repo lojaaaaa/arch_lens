@@ -28,6 +28,30 @@ const REQUEST_RATE_OPTIONS = [
     { label: 'Экстремальная (>1000 rps)', value: 2000 },
 ] as const;
 
+const LATENCY_OPTIONS = [
+    { label: 'Не задано', value: -1 },
+    { label: '10 ms', value: 10 },
+    { label: '50 ms', value: 50 },
+    { label: '100 ms', value: 100 },
+    { label: '200 ms', value: 200 },
+    { label: '500 ms', value: 500 },
+] as const;
+
+const AVAILABILITY_OPTIONS = [
+    { label: 'Не задано', value: -1 },
+    { label: '99%', value: 0.99 },
+    { label: '99.9%', value: 0.999 },
+    { label: '99.99%', value: 0.9999 },
+] as const;
+
+const CAPACITY_RPS_OPTIONS = [
+    { label: 'Не задано', value: -1 },
+    { label: '100 rps', value: 100 },
+    { label: '500 rps', value: 500 },
+    { label: '1000 rps', value: 1000 },
+    { label: '5000 rps', value: 5000 },
+] as const;
+
 const RELIABILITY_OPTIONS = [
     { label: 'Низкая (<95%)', value: 0.9 },
     { label: 'Стандартная (95–99%)', value: 0.97 },
@@ -216,6 +240,75 @@ export const HitRateSlider = ({
         </div>
     );
 };
+
+export const OptionalLatencySelect = ({
+    value,
+    onChange,
+}: {
+    value?: number;
+    onChange: (v: number | undefined) => void;
+}) => (
+    <select
+        value={value ?? -1}
+        onChange={(e) => {
+            const v = Number(e.target.value);
+            onChange(v < 0 ? undefined : v);
+        }}
+        className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+    >
+        {LATENCY_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+                {opt.label}
+            </option>
+        ))}
+    </select>
+);
+
+export const OptionalAvailabilitySelect = ({
+    value,
+    onChange,
+}: {
+    value?: number;
+    onChange: (v: number | undefined) => void;
+}) => (
+    <select
+        value={value ?? -1}
+        onChange={(e) => {
+            const v = Number(e.target.value);
+            onChange(v < 0 ? undefined : v);
+        }}
+        className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+    >
+        {AVAILABILITY_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+                {opt.label}
+            </option>
+        ))}
+    </select>
+);
+
+export const OptionalCapacityRpsSelect = ({
+    value,
+    onChange,
+}: {
+    value?: number;
+    onChange: (v: number | undefined) => void;
+}) => (
+    <select
+        value={value ?? -1}
+        onChange={(e) => {
+            const v = Number(e.target.value);
+            onChange(v < 0 ? undefined : v);
+        }}
+        className="border-input dark:bg-input/30 h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+    >
+        {CAPACITY_RPS_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+                {opt.label}
+            </option>
+        ))}
+    </select>
+);
 
 export const ReliabilitySelect = ({
     value,

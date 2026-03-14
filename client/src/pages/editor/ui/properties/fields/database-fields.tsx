@@ -3,6 +3,8 @@ import type { DatabaseNode } from '@/shared/model/types';
 import {
     FieldWithTooltip,
     Input,
+    OptionalAvailabilitySelect,
+    OptionalLatencySelect,
     ReadWriteRatioSlider,
     Select,
 } from '../node-properties-controls';
@@ -52,6 +54,24 @@ export const DatabaseFields = ({ node, onChange }: Props) => (
                 onChange={(readWriteRatio) =>
                     onChange(node.id, { readWriteRatio })
                 }
+            />
+        </FieldWithTooltip>
+        <FieldWithTooltip
+            label="Задержка (мс)"
+            tooltip="Опционально. Critical Path учитывает."
+        >
+            <OptionalLatencySelect
+                value={node.latencyMs}
+                onChange={(latencyMs) => onChange(node.id, { latencyMs })}
+            />
+        </FieldWithTooltip>
+        <FieldWithTooltip
+            label="Доступность"
+            tooltip="Опционально. 99.9% = 0.999."
+        >
+            <OptionalAvailabilitySelect
+                value={node.availability}
+                onChange={(availability) => onChange(node.id, { availability })}
             />
         </FieldWithTooltip>
     </>

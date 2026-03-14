@@ -54,11 +54,18 @@ export interface UIPageNode extends FrontendNodeBase {
     updateFrequency: number;
 }
 
+export type DeploymentModel = 'monolith' | 'microservices' | 'hybrid';
+
 export interface SystemNode extends FrontendNodeBase {
     kind: 'system';
 
     pagesCount: number;
     description?: string;
+
+    targetAvailability?: number;
+    targetThroughputRps?: number;
+    latencySloMs?: number;
+    deploymentModel?: DeploymentModel;
 }
 
 export interface UIComponentNode extends FrontendNodeBase {
@@ -91,6 +98,11 @@ export interface APIGatewayNode extends BackendNodeBase {
     endpointsCount: number;
     requestRate: number;
     authRequired: boolean;
+
+    /** Опционально: задержка (мс). Critical Path. */
+    latencyMs?: number;
+    /** Опционально: доступность 0–1 (99.9% = 0.999). */
+    availability?: number;
 }
 
 export interface ServiceNode extends BaseNode {
@@ -99,6 +111,9 @@ export interface ServiceNode extends BaseNode {
     operationsCount: number;
     externalCalls: number;
     stateful: boolean;
+
+    latencyMs?: number;
+    capacityRps?: number;
 }
 
 export interface DatabaseNode extends BaseNode {
@@ -107,6 +122,9 @@ export interface DatabaseNode extends BaseNode {
     dbType: 'SQL' | 'NoSQL';
     tablesCount: number;
     readWriteRatio: number;
+
+    latencyMs?: number;
+    availability?: number;
 }
 
 export interface CacheNode extends DataNodeBase {
@@ -114,6 +132,9 @@ export interface CacheNode extends DataNodeBase {
 
     cacheType: 'redis' | 'memory';
     hitRate: number;
+
+    latencyMs?: number;
+    capacityRps?: number;
 }
 
 export interface ExternalSystemNode extends DataNodeBase {
@@ -201,7 +222,9 @@ export interface ArchitectureIssue {
 export interface ArchitectureMetrics {
     totalNodes: number;
     totalEdges: number;
-
+    density?: number;
+    depth?: number;
+    cycleCount?: number;
     frontendComplexity: number;
     backendComplexity: number;
 
@@ -211,19 +234,32 @@ export interface ArchitectureMetrics {
     estimatedApiLoad: number;
     estimatedDataLoad: number;
 
+    callsCount?: number;
+    readsCount?: number;
+    writesCount?: number;
+    subscribesCount?: number;
+    emitsCount?: number;
+    dependsOnCount?: number;
     stateStoreCount: number;
     maxFanOut: number;
     eventDrivenEdgesCount: number;
+    avgFanOut?: number;
+    godIndexByNode?: Record<string, number>;
+    instabilityByNode?: Record<string, number>;
+    fanOutByNode?: Record<string, number>;
 }
 
 export type Grade = 'A' | 'B' | 'C' | 'D' | 'F';
 
 export interface AnalysisResult {
     summary: {
-        score: number; // 0..100
+        score: number;
         grade: Grade;
+        riskScore?: number;
+        confidenceScore?: number;
         issuesCount: number;
         criticalIssuesCount: number;
+        architecturalStyle?: string;
     };
 
     metrics: ArchitectureMetrics;

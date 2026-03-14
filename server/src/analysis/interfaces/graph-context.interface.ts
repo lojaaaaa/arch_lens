@@ -12,6 +12,15 @@ export interface GraphContext {
   edges: GraphEdgeDto[];
 
   nodeById: Map<string, ArchitectureNodeDto>;
+
+  /** Исходящие рёбра по nodeId — O(1) поиск соседей */
+  outgoingEdges: Map<string, GraphEdgeDto[]>;
+  /** Входящие рёбра по nodeId */
+  incomingEdges: Map<string, GraphEdgeDto[]>;
+
+  /** Entry points: api_gateway без входящих от frontend, ui_page без входящих */
+  entryPoints: string[];
+
   incomingCount: Map<string, number>;
   outgoingCount: Map<string, number>;
 

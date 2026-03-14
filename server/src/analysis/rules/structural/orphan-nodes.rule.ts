@@ -27,7 +27,7 @@ export class OrphanNodesRule implements AnalysisRule {
         category: 'architecture',
         title: 'Обнаружены изолированные узлы',
         description: `${orphans.length} узел(ов) не связаны с остальной системой.`,
-        affectedNodes: orphans.map((n) => n.id),
+        affectedNodes: orphans.map((node) => node.id),
         recommendation:
           'Проверьте, должны ли эти узлы быть частью архитектуры.',
       },

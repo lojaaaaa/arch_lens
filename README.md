@@ -68,9 +68,6 @@ diplom/
 │   ├── src/
 │   │   └── analysis/       # анализ схем, правила, DTO
 │   └── package.json
-├── e2e/                    # E2E-тесты (Playwright)
-│   ├── fixtures/           # JSON-фикстуры для импорта
-│   └── e2e-flow.spec.ts    # Сценарий полного цикла
 ├── tasks.json              # Задачи разработки
 ├── report.txt              # Отчёт о разработке
 └── code_style.md           # Стиль кода и принципы
@@ -83,18 +80,6 @@ diplom/
 Анализ архитектурного графа. Тело запроса — JSON в формате `ArchitectureGraph` (meta, nodes, edges).
 
 Ответ: `AnalysisResult` (summary, metrics, issues).
-
-## E2E-тесты
-
-```bash
-# Убедитесь, что backend запущен (порт 3000)
-cd server && npm run start:dev
-
-# В другом терминале — E2E
-npm run test:e2e
-```
-
-Playwright запускает frontend на 5173 (или использует существующий dev-сервер).
 
 ## Сборка
 

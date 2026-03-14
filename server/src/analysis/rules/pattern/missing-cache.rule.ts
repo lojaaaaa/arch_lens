@@ -14,15 +14,15 @@ export class MissingCacheRule implements AnalysisRule {
     const issues: AnalysisIssue[] = [];
     const databases = ctx.nodesByKind.get('database') ?? [];
     const cacheIds = new Set(
-      (ctx.nodesByKind.get('cache') ?? []).map((n) => n.id),
+      (ctx.nodesByKind.get('cache') ?? []).map((node) => node.id),
     );
     for (const node of databases) {
       const ratio = Number(node['readWriteRatio']) || 0;
       if (ratio >= ANALYSIS_CONFIG.pattern.missingCacheReadWriteRatio) {
         const hasCacheConnection = ctx.edges.some(
-          (e) =>
-            (e.source === node.id && cacheIds.has(e.target)) ||
-            (e.target === node.id && cacheIds.has(e.source)),
+          (edge) =>
+            (edge.source === node.id && cacheIds.has(edge.target)) ||
+            (edge.target === node.id && cacheIds.has(edge.source)),
         );
         if (!hasCacheConnection) {
           issues.push({

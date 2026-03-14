@@ -26,7 +26,10 @@ function createEdge(id: string, source: string, target: string, kind: string) {
   return { id, source, target, kind };
 }
 
-function createGraph(nodes: ArchitectureGraphDto['nodes'], edges: ArchitectureGraphDto['edges']): ArchitectureGraphDto {
+function createGraph(
+  nodes: ArchitectureGraphDto['nodes'],
+  edges: ArchitectureGraphDto['edges'],
+): ArchitectureGraphDto {
   return {
     meta: { name: 'test', version: 1, createdAt: new Date().toISOString() },
     nodes,
@@ -59,10 +62,7 @@ describe('OrphanNodesRule (S01)', () => {
       [createEdge('e1', 'a', 'b', 'reads')],
     );
     const graphWithOrphan = createGraph(
-      [
-        ...graph.nodes,
-        createNode('orphan', 'service', 'backend'),
-      ],
+      [...graph.nodes, createNode('orphan', 'service', 'backend')],
       graph.edges,
     );
     const ctx = buildGraphContext(graphWithOrphan);
@@ -190,7 +190,7 @@ describe('CyclicDependenciesRule (S02)', () => {
     const ctx = buildGraphContext(graph);
     const issues = rule.check(ctx);
     expect(issues.length).toBeGreaterThanOrEqual(1);
-    expect(issues.some((i) => i.severity === 'critical')).toBe(true);
+    expect(issues.some((issue) => issue.severity === 'critical')).toBe(true);
   });
 });
 
@@ -278,7 +278,11 @@ describe('RuleEngine', () => {
     const issues = engine.run(ctx);
 
     expect(issues.length).toBeGreaterThanOrEqual(2);
-    expect(issues.some((i) => i.title.includes('Прямое обращение'))).toBe(true);
-    expect(issues.some((i) => i.title.includes('изолированн'))).toBe(true);
+    expect(
+      issues.some((issue) => issue.title.includes('Прямое обращение')),
+    ).toBe(true);
+    expect(issues.some((issue) => issue.title.includes('изолированн'))).toBe(
+      true,
+    );
   });
 });

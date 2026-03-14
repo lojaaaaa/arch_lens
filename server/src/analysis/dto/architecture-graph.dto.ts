@@ -60,6 +60,136 @@ export class ArchitectureNodeDto {
   @IsNumber()
   criticality: number;
 
+  // Shared optional — используются в анализе
+  @IsOptional()
+  @IsString()
+  displayName?: string;
+
+  // ui_page
+  @IsOptional()
+  @IsString()
+  route?: string;
+  @IsOptional()
+  @IsNumber()
+  componentsCount?: number;
+  @IsOptional()
+  @IsString()
+  stateUsage?: string;
+  @IsOptional()
+  @IsNumber()
+  updateFrequency?: number;
+
+  // system
+  @IsOptional()
+  @IsNumber()
+  pagesCount?: number;
+  @IsOptional()
+  @IsString()
+  description?: string;
+  @IsOptional()
+  @IsNumber()
+  targetAvailability?: number;
+  @IsOptional()
+  @IsNumber()
+  targetThroughputRps?: number;
+  @IsOptional()
+  @IsNumber()
+  latencySloMs?: number;
+  @IsOptional()
+  @IsIn(['monolith', 'microservices', 'hybrid'])
+  deploymentModel?: string;
+
+  // ui_component
+  @IsOptional()
+  @IsString()
+  componentType?: string;
+  @IsOptional()
+  @IsNumber()
+  nestedComponents?: number;
+  @IsOptional()
+  @IsNumber()
+  propsCount?: number;
+  @IsOptional()
+  @IsString()
+  stateType?: string;
+  @IsOptional()
+  @IsNumber()
+  renderFrequency?: number;
+
+  // state_store
+  @IsOptional()
+  @IsString()
+  storeType?: string;
+  @IsOptional()
+  @IsNumber()
+  subscribersCount?: number;
+
+  // api_gateway
+  @IsOptional()
+  @IsNumber()
+  endpointsCount?: number;
+  @IsOptional()
+  @IsNumber()
+  requestRate?: number;
+  @IsOptional()
+  @IsBoolean()
+  authRequired?: boolean;
+
+  // service
+  @IsOptional()
+  @IsNumber()
+  operationsCount?: number;
+  @IsOptional()
+  @IsNumber()
+  externalCalls?: number;
+  @IsOptional()
+  @IsBoolean()
+  stateful?: boolean;
+
+  // database
+  @IsOptional()
+  @IsString()
+  dbType?: string;
+  @IsOptional()
+  @IsNumber()
+  tablesCount?: number;
+  @IsOptional()
+  @IsNumber()
+  readWriteRatio?: number;
+
+  // cache
+  @IsOptional()
+  @IsString()
+  cacheType?: string;
+  @IsOptional()
+  @IsNumber()
+  hitRate?: number;
+
+  // external_system
+  @IsOptional()
+  @IsString()
+  systemType?: string;
+  @IsOptional()
+  @IsString()
+  protocol?: string;
+  @IsOptional()
+  @IsNumber()
+  reliability?: number;
+  @IsOptional()
+  @IsNumber()
+  latencyMs?: number;
+  @IsOptional()
+  @IsNumber()
+  rateLimit?: number;
+
+  // override latency/availability для service, database, cache, api_gateway (future)
+  @IsOptional()
+  @IsNumber()
+  availability?: number;
+  @IsOptional()
+  @IsNumber()
+  capacityRps?: number;
+
   [key: string]: unknown;
 }
 

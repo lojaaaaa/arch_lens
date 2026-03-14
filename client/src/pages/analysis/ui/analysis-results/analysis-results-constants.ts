@@ -122,6 +122,22 @@ export const LEVEL_DOT: Record<MetricLevel, string> = {
     neutral: 'bg-muted-foreground dark:bg-foreground/80',
 };
 
+export const riskScoreLevel = (risk: number): 'low' | 'moderate' | 'high' => {
+    if (risk < 0.3) {
+        return 'low';
+    }
+    if (risk < 0.6) {
+        return 'moderate';
+    }
+    return 'high';
+};
+
+export const RISK_LABELS: Record<'low' | 'moderate' | 'high', string> = {
+    low: 'низкий',
+    moderate: 'умеренный',
+    high: 'высокий',
+};
+
 export const loadLevel = (
     value: number,
     moderate = 50,

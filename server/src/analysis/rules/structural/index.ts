@@ -9,6 +9,7 @@ import { NoApiGatewayRule } from './no-api-gateway.rule.js';
 import { DisconnectedLayersRule } from './disconnected-layers.rule.js';
 import { SinglePointOfFailureRule } from './single-point-of-failure.rule.js';
 import { RedundantEdgesRule } from './redundant-edges.rule.js';
+import { S11ExcessiveDepthRule } from './s11-excessive-depth.rule.js';
 
 export const structuralRules: AnalysisRule[] = [
   new OrphanNodesRule(),
@@ -21,4 +22,5 @@ export const structuralRules: AnalysisRule[] = [
   new DisconnectedLayersRule(),
   new SinglePointOfFailureRule(),
   new RedundantEdgesRule(),
+  new S11ExcessiveDepthRule(),
 ];

@@ -12,14 +12,14 @@ export class SyncChainLatencyRule implements AnalysisRule {
 
   check(ctx: GraphContext): AnalysisIssue[] {
     const syncEdges = ctx.edges.filter(
-      (e) => e.synchronous === true || e.kind === 'calls',
+      (edge) => edge.synchronous === true || edge.kind === 'calls',
     );
 
     const outgoing = new Map<string, string[]>();
-    for (const e of syncEdges) {
-      const list = outgoing.get(e.source) ?? [];
-      list.push(e.target);
-      outgoing.set(e.source, list);
+    for (const edge of syncEdges) {
+      const list = outgoing.get(edge.source) ?? [];
+      list.push(edge.target);
+      outgoing.set(edge.source, list);
     }
 
     let maxChain: string[] = [];
@@ -38,8 +38,8 @@ export class SyncChainLatencyRule implements AnalysisRule {
       }
 
       const next = outgoing.get(nodeId) ?? [];
-      for (const n of next) {
-        dfs(n, new Set(visited), [...path]);
+      for (const nextNode of next) {
+        dfs(nextNode, new Set(visited), [...path]);
       }
     };
 

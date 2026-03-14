@@ -5,13 +5,21 @@ import { AiRecommendations } from '@/features/ai-recommendations';
 import { useAnalysisSelectors } from '@/features/analysis';
 import { useGraphHighlightStore } from '@/features/graph-highlight';
 import { Routes } from '@/shared/model/routes';
-import type { AnalysisResult, IssueSeverity } from '@/shared/model/types';
+import type {
+    AnalysisResult,
+    IssueSeverity,
+    SystemNode,
+} from '@/shared/model/types';
 
 import { AnalysisIssues } from './analysis-results/analysis-issues';
 import { AnalysisMetrics } from './analysis-results/analysis-metrics';
 import { AnalysisResultsFooter } from './analysis-results/analysis-results-footer';
 import { AnalysisResultsHeader } from './analysis-results/analysis-results-header';
+import { AnalysisRisks } from './analysis-results/analysis-risks';
+import { AnalysisStrengths } from './analysis-results/analysis-strengths';
 import { AnalysisSummaryCard } from './analysis-results/analysis-summary-card';
+import { AnalysisTopImprovements } from './analysis-results/analysis-top-improvements';
+import { AnalysisWeaknesses } from './analysis-results/analysis-weaknesses';
 
 type AnalysisResultsProps = {
     result: AnalysisResult;
@@ -21,6 +29,7 @@ type AnalysisResultsProps = {
 export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
     const navigate = useNavigate();
     const { graphToAnalyze } = useAnalysisSelectors();
+
     const setHighlightedNodeIds = useGraphHighlightStore(
         (state) => state.setHighlightedNodeIds,
     );
@@ -36,7 +45,9 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
         if (graphToAnalyze?.nodes) {
             graphToAnalyze.nodes.forEach((node) => ids.add(node.id));
         }
-        issues.forEach((i) => i.affectedNodes.forEach((id) => ids.add(id)));
+        issues.forEach((issue) =>
+            issue.affectedNodes.forEach((nodeId) => ids.add(nodeId)),
+        );
         return ids;
     }, [graphToAnalyze?.nodes, issues]);
 
@@ -48,6 +59,14 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
         setHighlightPreventAutoClear(true);
         navigate(Routes.editor);
     };
+
+    const systemNode = useMemo(
+        () =>
+            graphToAnalyze?.nodes?.find(
+                (n): n is SystemNode => n.kind === 'system',
+            ) ?? null,
+        [graphToAnalyze?.nodes],
+    );
 
     const severityCounts = issues.reduce(
         (acc, issue) => {
@@ -63,8 +82,16 @@ export const AnalysisResults = ({ result, onBack }: AnalysisResultsProps) => {
             <AnalysisSummaryCard
                 summary={summary}
                 severityCounts={severityCounts}
+                systemNode={systemNode}
             />
+            <AnalysisStrengths result={result} />
+            <AnalysisWeaknesses result={result} />
             <AnalysisMetrics metrics={metrics} />
+            <AnalysisRisks issues={issues} />
+            <AnalysisTopImprovements
+                result={result}
+                onIssueClick={handleNodeClick}
+            />
             <AnalysisIssues issues={issues} onIssueClick={handleNodeClick} />
             <AiRecommendations
                 recommendations={aiRecommendations}

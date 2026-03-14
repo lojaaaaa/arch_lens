@@ -255,6 +255,124 @@ const buildEventDrivenPreset = (): {
     };
 };
 
+const buildAntiPatternPreset = (): {
+    nodes: ArchitectureNode[];
+    edges: GraphEdge[];
+} => {
+    const system = createPresetNode(
+        'system',
+        { x: 80, y: 60 },
+        {
+            displayName: 'Система',
+        },
+    );
+    const page = createPresetNode(
+        'ui_page',
+        { x: 80, y: 180 },
+        {
+            displayName: 'Страница',
+        },
+    );
+    const database = createPresetNode(
+        'database',
+        { x: 320, y: 180 },
+        {
+            displayName: 'Orders DB',
+        },
+    );
+    const godService = createPresetNode(
+        'service',
+        { x: 560, y: 100 },
+        {
+            displayName: 'God Service',
+            operationsCount: 15,
+            externalCalls: 8,
+        },
+    );
+    const db1 = createPresetNode(
+        'database',
+        { x: 800, y: 60 },
+        {
+            displayName: 'DB1',
+        },
+    );
+    const db2 = createPresetNode(
+        'database',
+        { x: 800, y: 140 },
+        {
+            displayName: 'DB2',
+        },
+    );
+    const cache = createPresetNode(
+        'cache',
+        { x: 800, y: 220 },
+        {
+            displayName: 'Cache',
+        },
+    );
+    const orphan = createPresetNode(
+        'service',
+        { x: 320, y: 320 },
+        {
+            displayName: 'Orphan',
+        },
+    );
+    const cycleA = createPresetNode(
+        'service',
+        { x: 560, y: 260 },
+        {
+            displayName: 'Service A',
+        },
+    );
+    const cycleB = createPresetNode(
+        'service',
+        { x: 720, y: 260 },
+        {
+            displayName: 'Service B',
+        },
+    );
+    const cycleC = createPresetNode(
+        'service',
+        { x: 640, y: 340 },
+        {
+            displayName: 'Service C',
+        },
+    );
+
+    const nodes = [
+        system,
+        page,
+        database,
+        godService,
+        db1,
+        db2,
+        cache,
+        orphan,
+        cycleA,
+        cycleB,
+        cycleC,
+    ];
+    const edges = [
+        createGraphEdge(page.id, godService.id, 'calls'),
+        createGraphEdge(godService.id, db1.id, 'reads'),
+        createGraphEdge(godService.id, db1.id, 'writes'),
+        createGraphEdge(godService.id, db2.id, 'reads'),
+        createGraphEdge(godService.id, db2.id, 'writes'),
+        createGraphEdge(godService.id, cache.id, 'reads'),
+        createGraphEdge(godService.id, cache.id, 'writes'),
+        createGraphEdge(godService.id, database.id, 'reads'),
+        createGraphEdge(cycleA.id, cycleB.id, 'calls'),
+        createGraphEdge(cycleB.id, cycleC.id, 'calls'),
+        createGraphEdge(cycleC.id, cycleA.id, 'calls'),
+    ];
+
+    const ensuredNodes = ensureSystemNode(nodes);
+    return {
+        nodes: ensuredNodes,
+        edges: ensureSystemEdges(ensuredNodes, edges),
+    };
+};
+
 export const ARCHITECTURE_PRESETS: ArchitecturePreset[] = [
     {
         id: 'crud',
@@ -273,5 +391,12 @@ export const ARCHITECTURE_PRESETS: ArchitecturePreset[] = [
         label: 'Событийная',
         description: 'Producer/Consumer с event-store.',
         build: buildEventDrivenPreset,
+    },
+    {
+        id: 'anti-pattern',
+        label: 'Антипаттерны',
+        description:
+            'Эталонная «плохая» архитектура: циклы, frontend→DB, god service, orphan.',
+        build: buildAntiPatternPreset,
     },
 ];

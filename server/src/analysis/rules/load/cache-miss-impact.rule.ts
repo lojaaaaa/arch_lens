@@ -20,12 +20,12 @@ export class CacheMissImpactRule implements AnalysisRule {
       if (hitRate >= ANALYSIS_CONFIG.load.cacheLowHitRate) continue;
 
       const cacheEdges = ctx.edges.filter(
-        (e) => e.source === cache.id || e.target === cache.id,
+        (edge) => edge.source === cache.id || edge.target === cache.id,
       );
       const connectedIds = new Set<string>();
-      for (const e of cacheEdges) {
-        connectedIds.add(e.source);
-        connectedIds.add(e.target);
+      for (const edge of cacheEdges) {
+        connectedIds.add(edge.source);
+        connectedIds.add(edge.target);
       }
       connectedIds.delete(cache.id);
 
@@ -34,7 +34,7 @@ export class CacheMissImpactRule implements AnalysisRule {
         if (node?.kind !== 'database') continue;
 
         const dbReadsCount = ctx.edges.filter(
-          (e) => e.target === nodeId && e.kind === 'reads',
+          (edge) => edge.target === nodeId && edge.kind === 'reads',
         ).length;
 
         if (dbReadsCount > ANALYSIS_CONFIG.load.cacheDbReadsThreshold) {

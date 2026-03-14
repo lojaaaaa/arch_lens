@@ -210,6 +210,19 @@ export const getDefaultEdgeKind = (
     return allowedEdgeKinds[sourceKind]?.[targetKind]?.[0] ?? null;
 };
 
+const serializeNodeForAnalysis = (node: ArchitectureNode): ArchitectureNode => {
+    const base = {
+        id: node.id,
+        kind: node.kind,
+        layer: node.layer,
+        position: { ...node.position },
+        complexity: node.complexity,
+        criticality: node.criticality,
+        displayName: node.displayName,
+    };
+    return { ...base, ...node } as ArchitectureNode;
+};
+
 export const buildArchitectureGraph = (
     nodes: ArchitectureFlowNode[],
     edges: Edge[],
@@ -219,8 +232,7 @@ export const buildArchitectureGraph = (
             if (!node) {
                 throw new Error(`Node ${id} has no architecture data`);
             }
-
-            return node;
+            return serializeNodeForAnalysis(node);
         }),
 
         edges: edges.map((edge) => {
@@ -231,6 +243,12 @@ export const buildArchitectureGraph = (
                 source: edge.source,
                 target: edge.target,
                 kind: graphEdge?.kind ?? 'calls',
+                ...(graphEdge?.frequency !== undefined && {
+                    frequency: graphEdge.frequency,
+                }),
+                ...(graphEdge?.synchronous !== undefined && {
+                    synchronous: graphEdge.synchronous,
+                }),
             };
         }),
     };
@@ -274,5 +292,3 @@ export const buildExportableGraph = (
         edges: graphEdges,
     };
 };
-
-// Flow storage moved to @/shared/lib/flow-storage
