@@ -2,7 +2,8 @@ import 'dotenv/config';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createApp } from '../../server/src/app.factory';
 
-let appPromise: Promise<import('express').Application> | null = null;
+type HttpHandler = (req: VercelRequest, res: VercelResponse) => void;
+let appPromise: Promise<HttpHandler> | null = null;
 
 async function getExpressApp() {
   if (!appPromise) {
